@@ -1,0 +1,741 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\FW}{\mathsf{FW}}
+\newcommand{\Sep}{\mathsf{Sep}}
+\newcommand{\polylog}{\operatorname{polylog}}
+\newcommand{\eps}{\varepsilon}
+
+\title{Frank--Wolfe Complexity Separation Between\\
+Frobenius and Operator-Norm Geometries}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We compare the standard smoothness--radius factors governing the
+Frank--Wolfe convergence bounds under the Frobenius and operator-norm
+geometries. For the Gaussian associative-memory softmax loss with
+Zipf probabilities
+\[
+p_i=\frac{i^{-\alpha}}{H_{N,\alpha}},
+\qquad
+H_{N,\alpha}:=\sum_{j=1}^N j^{-\alpha},
+\]
+we study
+\[
+\FW_F(\eps):=\beta_F R_F^2(\eps),
+\qquad
+\FW_{\op}(\eps):=\beta_{\op}R_{\op}^2(\eps).
+\]
+We assume
+\[
+N=d^\kappa,
+\qquad
+0<\kappa<2,
+\qquad
+\alpha\ge0
+\]
+with $\kappa$ and $\alpha$ fixed. In the accuracy range where the
+available Frobenius-radius lower bound is nontrivial, we prove a
+polynomial separation between the two Frank--Wolfe complexity factors.
+The dependence on the target loss $\eps$ cancels up to logarithmic
+factors, uniformly over the entire admissible accuracy range.
+\end{abstract}
+
+\section{Setting and interpretation}
+
+Let
+\[
+L(W) = \sum_{i=1}^N p_i \log\left( 1+\sum_{j\ne i} \exp\bigl((u_j-u_i)^\top Wv_i\bigr) \right),
+\]
+where the input and output embeddings are independent normalized
+Gaussian vectors in $\R^d$.
+
+For $X\in\{F,\op\}$, define
+\[
+R_X(\eps) := \inf\bigl\{||W||_X:L(W)\le\eps\bigr\}.
+\]
+Let $\beta_X$ denote the global smoothness constant of $L$ with
+respect to $||\cdot||_X$.
+
+For a $\beta_X$-smooth objective over an $X$-norm ball of radius $R$,
+the Frank--Wolfe curvature constant is bounded, up to a universal
+constant, by
+\[
+C_L\lesssim \beta_XR^2.
+\]
+Consequently, the geometry-dependent factor in the standard
+Frank--Wolfe convergence estimate is
+\[
+\FW_X(\eps):=\beta_XR_X^2(\eps).
+\]
+This note compares these standard smoothness--radius factors. It does
+not claim a minimax lower bound on the actual number of iterations of
+every possible algorithm.
+
+Throughout, $\widetilde O$, $\widetilde\Omega$, and
+$\widetilde\Theta$ suppress powers of
+\[
+\log d,\qquad \log N,\qquad \log(1/\delta),
+\]
+but do not suppress polynomial powers of $d$ or $N$. Constants may
+depend on the fixed Zipf exponent $\alpha$.
+
+We assume
+\[
+\delta^{-1}=d^{O(1)}.
+\]
+The operator-radius construction requires
+\[
+N\le c_0\frac{d^2}{\log d}.
+\]
+Since $N=d^\kappa$ with fixed $\kappa<2$,
+\[
+\frac{N\log d}{d^2} = \frac{\log d}{d^{2-\kappa}} \longrightarrow0,
+\]
+so this condition holds for all sufficiently large $d$.
+
+\begin{theorem}[Main Complexity Separation]
+\label{thm:main}
+Consider the Gaussian associative-memory softmax loss with Zipf probabilities $p_i \propto i^{-\alpha}$ for a fixed exponent $\alpha \ge 0$. Assume the number of facts is $N=d^\kappa$ for a fixed $0<\kappa<2$, and let the failure probability be $\delta^{-1}=d^{O(1)}$.
+
+There exist constants $c_\alpha > 0$ such that for any target accuracy $\eps$ in the range
+\[
+0 < \eps \le c_\alpha
+\begin{cases}
+1, & 0 \le \alpha < 1, \\[1mm]
+(\log N)^{-1}, & \alpha = 1, \\[1mm]
+N^{1-\alpha}, & \alpha > 1,
+\end{cases}
+\]
+the ratio of the Frank--Wolfe smoothness--radius factors satisfies, with probability at least $1-\delta$,
+\[
+\boxed{
+\frac{\FW_F(\eps)}{\FW_{\op}(\eps)} 
+:= \frac{\beta_F R_F^2(\eps)} {\beta_{\op}R_{\op}^2(\eps)} =
+\begin{cases}
+\widetilde\Omega_\alpha(d^{\kappa\alpha}), & 0<\kappa\le1,\quad 0\le\alpha<1, \\[2mm]
+\widetilde\Omega_\alpha(d^\kappa), & 0<\kappa\le1,\quad \alpha\ge1, \\[2mm]
+\widetilde\Omega_\alpha\left( d^{(\kappa-1)(1-\alpha)}+d^\alpha \right), & 1<\kappa<2,\quad 0\le\alpha<1, \\[2mm]
+\widetilde\Omega_\alpha(d), & 1<\kappa<2,\quad \alpha\ge1.
+\end{cases}
+}
+\]
+\end{theorem}
+
+\section{Input estimates}
+
+Set
+\[
+m:=\min\{d,N\},
+\qquad
+P_m:=\sum_{i=1}^m p_i =\frac{H_{m,\alpha}}{H_{N,\alpha}}.
+\]
+
+The smoothness estimates give, with high probability,
+\begin{equation}
+\beta_F \asymp \frac1d+p_1 = \frac1d+\frac1{H_{N,\alpha}},
+\label{eq:beta-F-general}
+\end{equation}
+and
+\begin{equation}
+\beta_{\op} \lesssim_\alpha (\log d)^2 \left( \frac1d+P_m \right).
+\label{eq:beta-op-general}
+\end{equation}
+The power $(\log d)^2$ in \eqref{eq:beta-op-general} is a convenient
+uniform upper bound. For fixed $\alpha>0$, the available estimate can
+be sharpened by one logarithmic factor, but this does not affect any
+polynomial separation derived below.
+
+The operator-radius construction gives, for every $0<\eps\le1$,
+\begin{equation}
+R_{\op}^2(\eps) \lesssim \left(1+\frac Nd\right) \log^2\left(\frac{2N}{\eps}\right).
+\label{eq:Rop}
+\end{equation}
+
+For the Frobenius radius, introduce the natural probability scale
+\begin{equation}
+q_\alpha(N) :=
+\begin{cases}
+1, & 0\le\alpha<1,\\[1mm]
+(\log N)^{-1}, & \alpha=1,\\[1mm]
+N^{1-\alpha}, & \alpha>1.
+\end{cases}
+\label{eq:q-alpha}
+\end{equation}
+After changing constants depending only on $\alpha$, the Frobenius
+lower bounds can be written uniformly as
+\begin{equation}
+R_F^2(\eps) \gtrsim_\alpha \frac{N}{\log d} \log^2\left( \frac{c_\alpha q_\alpha(N)}{\eps} \right),
+\qquad
+0<\eps\le c_\alpha q_\alpha(N).
+\label{eq:RF-unified}
+\end{equation}
+
+More explicitly,
+\begin{equation}
+R_F^2(\eps) \gtrsim_\alpha
+\begin{cases}
+\displaystyle
+\frac{N}{\log d} \log^2\left(\frac{c_\alpha}{\eps}\right),
+& 0\le\alpha<1, \quad 0<\eps\le c_\alpha, \\[4mm]
+\displaystyle
+\frac{N}{\log d} \log^2\left(\frac{c}{\eps\log N}\right),
+& \alpha=1, \quad 0<\eps\le \frac{c}{\log N}, \\[4mm]
+\displaystyle
+\frac{N}{\log d} \log^2\left( \frac{c_\alpha}{\eps N^{\alpha-1}} \right),
+& \alpha>1, \quad 0<\eps\le c_\alpha N^{1-\alpha}.
+\end{cases}
+\label{eq:RF-cases}
+\end{equation}
+
+\section{Why the accuracy dependence disappears in the ratio}
+
+The logarithms in \eqref{eq:Rop} and \eqref{eq:RF-unified} do not
+literally coincide. Nevertheless, their ratio is bounded below by an
+inverse polylogarithmic factor uniformly over the entire relevant
+accuracy range.
+
+\begin{lemma}[Uniform comparison of the accuracy logarithms]
+\label{lem:epsilon-cancel}
+After decreasing $c_\alpha$ if necessary, suppose
+\[
+0<\eps\le c_\alpha q_\alpha(N)
+\]
+and define
+\[
+\ell_F(\eps) := \log\left( \frac{c_\alpha q_\alpha(N)}{\eps} \right),
+\qquad
+\ell_{\op}(\eps) := \log\left(\frac{2N}{\eps}\right).
+\]
+Then
+\[
+\frac{\ell_F^2(\eps)}{\ell_{\op}^2(\eps)} \gtrsim_\alpha \frac1{(\log d)^2}.
+\]
+In particular, no polynomial dependence on $\eps$ remains in the
+complexity ratio.
+\end{lemma}
+
+\begin{proof}
+By shrinking $c_\alpha$, we may assume
+\[
+\ell_F(\eps)\ge1.
+\]
+Moreover,
+\begin{align}
+\ell_{\op}(\eps)
+&= \log\left(\frac{2N}{\eps}\right) \nonumber \\
+&= \log\left( \frac{c_\alpha q_\alpha(N)}{\eps} \right) + \log\left( \frac{2N}{c_\alpha q_\alpha(N)} \right) \nonumber \\
+&= \ell_F(\eps) + \log\left( \frac{2N}{c_\alpha q_\alpha(N)} \right).
+\label{eq:log-decomposition}
+\end{align}
+For fixed $\alpha$,
+\[
+\frac{N}{q_\alpha(N)} =
+\begin{cases}
+N, & 0\le\alpha<1,\\
+N\log N, & \alpha=1,\\
+N^\alpha, & \alpha>1.
+\end{cases}
+\]
+Since $N=d^\kappa$ and $\kappa$ is fixed,
+\[
+\log\left( \frac{2N}{c_\alpha q_\alpha(N)} \right) \lesssim_{\alpha,\kappa} \log d.
+\]
+Using $\ell_F(\eps)\ge1$ in \eqref{eq:log-decomposition},
+\[
+\ell_{\op}(\eps) \le \ell_F(\eps)+C_{\alpha,\kappa}\log d \le \bigl(1+C_{\alpha,\kappa}\log d\bigr) \ell_F(\eps).
+\]
+Therefore,
+\[
+\frac{\ell_F^2(\eps)}{\ell_{\op}^2(\eps)} \ge \frac1{ \bigl(1+C_{\alpha,\kappa}\log d\bigr)^2 } \gtrsim_{\alpha,\kappa} \frac1{(\log d)^2}.
+\]
+\end{proof}
+
+\begin{remark}
+The restriction
+\[
+\eps\lesssim_\alpha q_\alpha(N)
+\]
+is essential for the present Frobenius-radius lower bound. In
+particular, when $\alpha>1$, the relevant accuracy range is
+\[
+\eps\lesssim_\alpha N^{1-\alpha}.
+\]
+At larger accuracies, the population loss may ignore a block
+containing $\Theta(N)$ low-probability facts, so the current
+$K\asymp N$ Frobenius lower bound need not remain nontrivial.
+\end{remark}
+
+\section{A unified Frank--Wolfe separation formula}
+
+Define
+\[
+\Sep(\eps) := \frac{\FW_F(\eps)}{\FW_{\op}(\eps)} = \frac{\beta_FR_F^2(\eps)} {\beta_{\op}R_{\op}^2(\eps)}.
+\]
+
+\begin{theorem}[Unified complexity separation]
+\label{thm:unified}
+Let $\alpha\ge0$ and $N=d^\kappa$ with fixed $0<\kappa<2$.
+For
+\[
+0<\eps\le c_\alpha q_\alpha(N),
+\]
+with high probability,
+\begin{equation}
+\Sep(\eps) \gtrsim_\alpha \frac1{(\log d)^5} \min\{N,d\} \frac{d^{-1}+p_1} {d^{-1}+P_{\min\{N,d\}}}.
+\label{eq:explicit-polylog-separation}
+\end{equation}
+Equivalently,
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega_\alpha\left( \min\{N,d\} \frac{d^{-1}+p_1} {d^{-1}+P_{\min\{N,d\}}} \right).
+}
+\label{eq:master-separation}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Combining \eqref{eq:beta-F-general} and
+\eqref{eq:RF-unified},
+\[
+\FW_F(\eps) \gtrsim_\alpha \left(\frac1d+p_1\right) \frac{N}{\log d} \ell_F^2(\eps).
+\]
+Combining \eqref{eq:beta-op-general} and \eqref{eq:Rop},
+\[
+\FW_{\op}(\eps) \lesssim_\alpha (\log d)^2 \left(\frac1d+P_m\right) \left(1+\frac Nd\right) \ell_{\op}^2(\eps).
+\]
+Thus
+\begin{align}
+\Sep(\eps) &\gtrsim_\alpha \frac{N}{1+N/d} \frac{d^{-1}+p_1}{d^{-1}+P_m} \frac1{(\log d)^3} \frac{\ell_F^2(\eps)}{\ell_{\op}^2(\eps)}.
+\label{eq:ratio-before-log}
+\end{align}
+Lemma~\ref{lem:epsilon-cancel} gives
+\[
+\frac{\ell_F^2(\eps)}{\ell_{\op}^2(\eps)} \gtrsim_\alpha \frac1{(\log d)^2}.
+\]
+Finally,
+\[
+\frac{N}{1+N/d} = \frac{Nd}{N+d} \asymp \min\{N,d\}.
+\]
+Substitution into \eqref{eq:ratio-before-log} proves
+\eqref{eq:explicit-polylog-separation} and
+\eqref{eq:master-separation}.
+\end{proof}
+
+\section{Evaluation of the Zipf quantities}
+
+The standard generalized-harmonic-number estimates are
+\[
+H_{n,\alpha} \asymp_\alpha
+\begin{cases}
+n^{1-\alpha}, & 0\le\alpha<1,\\
+\log n, & \alpha=1,\\
+1, & \alpha>1.
+\end{cases}
+\]
+Consequently,
+\begin{equation}
+p_1 = \frac1{H_{N,\alpha}} \asymp_\alpha
+\begin{cases}
+N^{\alpha-1}, & 0\le\alpha<1,\\
+(\log N)^{-1}, & \alpha=1,\\
+1, & \alpha>1,
+\end{cases}
+\label{eq:p1}
+\end{equation}
+and
+\begin{equation}
+P_m = \frac{H_{m,\alpha}}{H_{N,\alpha}} \asymp_\alpha
+\begin{cases}
+\left(\dfrac mN\right)^{1-\alpha}, &0\le\alpha<1,\\[3mm]
+\dfrac{\log m}{\log N}, &\alpha=1,\\[3mm]
+1, &\alpha>1.
+\end{cases}
+\label{eq:Pm}
+\end{equation}
+
+We now evaluate \eqref{eq:master-separation} in all regimes.
+
+\section{Regime I: \texorpdfstring{$N\le d$}{N less than d}}
+
+Suppose
+\[
+0<\kappa\le1, \qquad N=d^\kappa\le d.
+\]
+Then
+\[
+m=N, \qquad P_m=P_N=1.
+\]
+Therefore,
+\[
+\Sep(\eps) = \widetilde\Omega_\alpha\left( N\left(\frac1d+p_1\right) \right).
+\]
+
+\subsection{\texorpdfstring{$0\le\alpha<1$}{alpha less than one}}
+
+In this regime,
+\[
+p_1\asymp_\alpha N^{\alpha-1}.
+\]
+Since $N\le d$ and $0<1-\alpha\le1$,
+\[
+N^{\alpha-1} = \frac1{N^{1-\alpha}} \ge \frac1d.
+\]
+Hence
+\[
+\frac1d+p_1 \asymp_\alpha N^{\alpha-1},
+\]
+and thus
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega_\alpha(d^{\kappa\alpha}),
+\qquad
+0\le\alpha<1,\quad 0<\kappa\le1.
+}
+\label{eq:sep-smallN-alpha-less1}
+\end{equation}
+
+At $\alpha=0$, this gives only
+\[
+\Sep(\eps)=\widetilde\Omega(1),
+\]
+so the present estimates do not yield a polynomial separation in the
+uniform-frequency regime when $N\le d$.
+
+For every fixed $\alpha>0$, however,
+\[
+d^{\kappa\alpha}\to\infty,
+\]
+and hence there is a polynomial advantage for the operator geometry.
+
+\subsection{\texorpdfstring{$\alpha=1$}{alpha equals one}}
+
+Here
+\[
+p_1\asymp\frac1{\log N},
+\]
+which dominates $1/d$. Therefore,
+\[
+\Sep(\eps) = \widetilde\Omega\left( \frac{N}{\log N} \right) = \widetilde\Omega(N).
+\]
+Since $N=d^\kappa$,
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega(d^\kappa),
+\qquad
+\alpha=1,\quad 0<\kappa\le1.
+}
+\label{eq:sep-smallN-alpha1}
+\end{equation}
+
+\subsection{\texorpdfstring{$\alpha>1$}{alpha greater than one}}
+
+In this case,
+\[
+p_1\asymp_\alpha1,
+\]
+so
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega_\alpha(d^\kappa),
+\qquad
+\alpha>1,\quad 0<\kappa\le1.
+}
+\label{eq:sep-smallN-alpha-greater1}
+\end{equation}
+
+Combining all three cases,
+\begin{equation}
+\boxed{
+\Sep(\eps) =
+\begin{cases}
+\widetilde\Omega_\alpha(d^{\kappa\alpha}), &0\le\alpha<1,\\[1mm]
+\widetilde\Omega_\alpha(d^\kappa), &\alpha\ge1,
+\end{cases}
+\qquad
+0<\kappa\le1.
+}
+\label{eq:sep-kappa-small-final}
+\end{equation}
+Equivalently,
+\[
+\Sep(\eps) = \widetilde\Omega_\alpha\left( d^{\kappa\min\{\alpha,1\}} \right), \qquad 0<\kappa\le1.
+\]
+
+\section{Regime II: \texorpdfstring{$d<N<d^2$}{d less than N less than d squared}}
+
+Suppose
+\[
+1<\kappa<2, \qquad N=d^\kappa.
+\]
+Then
+\[
+m=d.
+\]
+
+\subsection{\texorpdfstring{$0\le\alpha<1$}{alpha less than one}}
+
+We have
+\[
+p_1\asymp_\alpha N^{\alpha-1}, \qquad P_d \asymp_\alpha \left(\frac dN\right)^{1-\alpha}.
+\]
+Moreover, because $d<N<d^2$,
+\[
+\left(\frac dN\right)^{1-\alpha} \ge \frac dN > \frac1d.
+\]
+Therefore,
+\[
+\frac1d+P_d \asymp_\alpha \left(\frac dN\right)^{1-\alpha}.
+\]
+The master formula gives
+\begin{align}
+\Sep(\eps)
+&= \widetilde\Omega_\alpha\left[ d \frac{d^{-1}+N^{\alpha-1}} {(d/N)^{1-\alpha}} \right] \nonumber \\
+&= \widetilde\Omega_\alpha\left[ \frac{1}{(d/N)^{1-\alpha}} + \frac{dN^{\alpha-1}} {(d/N)^{1-\alpha}} \right] \nonumber \\
+&= \widetilde\Omega_\alpha\left[ \left(\frac Nd\right)^{1-\alpha} +d^\alpha \right].
+\label{eq:largeN-alpha-less1-Nd}
+\end{align}
+Thus
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega_\alpha\left[ \left(\frac Nd\right)^{1-\alpha} +d^\alpha \right], \qquad d<N<d^2,\quad 0\le\alpha<1.
+}
+\label{eq:largeN-alpha-less1}
+\end{equation}
+
+Using $N=d^\kappa$,
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega_\alpha\left[ d^{(\kappa-1)(1-\alpha)} +d^\alpha \right] = \widetilde\Omega_\alpha\left( d^{\max\{(\kappa-1)(1-\alpha), \alpha\}} \right).
+}
+\label{eq:largeN-kappa-alpha-less1}
+\end{equation}
+
+The two powers are equal when
+\[
+(\kappa-1)(1-\alpha)=\alpha.
+\]
+Solving gives the phase boundary
+\begin{equation}
+\alpha_\star = 1-\frac1\kappa.
+\label{eq:alpha-star}
+\end{equation}
+Therefore,
+\begin{equation}
+\boxed{
+\Sep(\eps) =
+\begin{cases}
+\widetilde\Omega_\alpha\left( d^{(\kappa-1)(1-\alpha)} \right), & 0\le\alpha\le 1-\dfrac1\kappa, \\[3mm]
+\widetilde\Omega_\alpha(d^\alpha), & 1-\dfrac1\kappa\le\alpha<1.
+\end{cases}
+}
+\label{eq:largeN-alpha-less1-piecewise}
+\end{equation}
+
+The two expressions agree at
+$\alpha=1-1/\kappa$.
+
+The origin of the two terms in
+\eqref{eq:largeN-alpha-less1-Nd} is worth emphasizing:
+\[
+\left(\frac Nd\right)^{1-\alpha}
+\]
+comes from the diffuse $d^{-1}$ component of $\beta_F$, whereas
+\[
+d^\alpha
+\]
+comes from the largest-atom component
+$p_1\asymp N^{\alpha-1}$.
+
+In particular, at $\alpha=0$,
+\[
+\boxed{
+\Sep(\eps) = \widetilde\Omega\left(d^{\kappa-1}\right).
+}
+\]
+Thus, even for uniform frequencies, a polynomial separation emerges
+as soon as $N>d$.
+
+\subsection{\texorpdfstring{$\alpha=1$}{alpha equals one}}
+
+For $N=d^\kappa$ with $\kappa>1$,
+\[
+p_1\asymp\frac1{\log N}, \qquad P_d \asymp \frac{\log d}{\log N} = \frac1\kappa \asymp1.
+\]
+Hence
+\[
+\Sep(\eps) = \widetilde\Omega\left( d\frac{1/\log N}{1} \right) = \widetilde\Omega\left( \frac d{\log N} \right).
+\]
+Since $\log N=\kappa\log d$,
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega(d), \qquad \alpha=1,\quad 1<\kappa<2.
+}
+\label{eq:largeN-alpha1}
+\end{equation}
+
+\subsection{\texorpdfstring{$\alpha>1$}{alpha greater than one}}
+
+For fixed $\alpha>1$,
+\[
+p_1\asymp_\alpha1, \qquad P_d\asymp_\alpha1.
+\]
+Therefore,
+\begin{equation}
+\boxed{
+\Sep(\eps) = \widetilde\Omega_\alpha(d), \qquad \alpha>1,\quad 1<\kappa<2.
+}
+\label{eq:largeN-alpha-greater1}
+\end{equation}
+
+Combining the three cases,
+\begin{equation}
+\boxed{
+\Sep(\eps) =
+\begin{cases}
+\widetilde\Omega_\alpha\left[ d^{(\kappa-1)(1-\alpha)}+d^\alpha \right], & 0\le\alpha<1, \\[2mm]
+\widetilde\Omega_\alpha(d), & \alpha\ge1,
+\end{cases}
+\qquad
+1<\kappa<2.
+}
+\label{eq:sep-kappa-large-final}
+\end{equation}
+
+Equivalently, the polynomial exponent can be written compactly as
+\[
+\Sep(\eps) = \widetilde\Omega_\alpha\left(d^{s(\kappa,\alpha)}\right),
+\]
+where
+\begin{equation}
+s(\kappa,\alpha) =
+\begin{cases}
+\kappa\min\{\alpha,1\}, &0<\kappa\le1, \\[2mm]
+\min\left\{ 1, \max\left\{ \alpha, (\kappa-1)(1-\alpha) \right\} \right\}, &1<\kappa<2.
+\end{cases}
+\label{eq:separation-exponent}
+\end{equation}
+
+\section{Equivalent comparison of the two complexity factors}
+
+The preceding results can also be understood by comparing the
+polynomial parts of the numerator and denominator separately.
+
+\subsection*{Case \(N\le d\)}
+
+Since
+\[
+\beta_{\op}=\Theta(1), \qquad R_{\op}^2(\eps) \lesssim \log^2\left(\frac{2N}{\eps}\right),
+\]
+the operator complexity factor has no polynomial dependence on $d$ or
+$N$:
+\[
+\FW_{\op}(\eps) \le \polylog(d,N,1/\eps).
+\]
+On the other hand,
+\[
+\FW_F(\eps) \gtrsim_\alpha \frac{N}{\log d} \left(\frac1d+p_1\right) \ell_F^2(\eps).
+\]
+Its polynomial part is therefore
+\[
+\begin{cases}
+N^\alpha, & 0\le\alpha<1,\\
+N, & \alpha\ge1,
+\end{cases}
+\]
+up to logarithmic factors.
+
+\subsection*{Case \(d<N<d^2\)}
+
+For $0\le\alpha<1$,
+\[
+\beta_{\op} = \widetilde O_\alpha\left( \left(\frac dN\right)^{1-\alpha} \right), \qquad R_{\op}^2(\eps) \lesssim \frac Nd \log^2\left(\frac{2N}{\eps}\right).
+\]
+Thus the polynomial part of the operator complexity factor is
+\[
+\FW_{\op}(\eps) = \widetilde O_\alpha\left( \left(\frac Nd\right)^\alpha \right),
+\]
+whereas
+\[
+\FW_F(\eps) = \widetilde\Omega_\alpha\left( \frac Nd+N^\alpha \right)
+\]
+after matching the accuracy logarithms. Consequently,
+\begin{align*}
+\frac{\FW_F(\eps)}{\FW_{\op}(\eps)}
+&= \widetilde\Omega_\alpha\left( \frac{N/d+N^\alpha}{(N/d)^\alpha} \right)\\
+&= \widetilde\Omega_\alpha\left[ \left(\frac Nd\right)^{1-\alpha} +d^\alpha \right].
+\end{align*}
+
+For $\alpha\ge1$,
+\[
+\beta_{\op}=\Theta_\alpha(1), \qquad R_{\op}^2(\eps) \lesssim \frac Nd \log^2\left(\frac{2N}{\eps}\right),
+\]
+while the Frobenius polynomial factor is of order $N$.
+The resulting separation is therefore of order $d$, up to
+polylogarithmic factors.
+
+\section{Final conclusion}
+
+For all fixed $\alpha\ge0$ and fixed $0<\kappa<2$, in the accuracy
+range
+\[
+0<\eps\lesssim_\alpha
+\begin{cases}
+1, & 0\le\alpha<1,\\
+(\log N)^{-1}, & \alpha=1,\\
+N^{1-\alpha}, & \alpha>1,
+\end{cases}
+\]
+the Frank--Wolfe smoothness--radius factors satisfy
+\begin{equation}
+\boxed{
+\frac{\beta_FR_F^2(\eps)} {\beta_{\op}R_{\op}^2(\eps)} =
+\begin{cases}
+\widetilde\Omega_\alpha(d^{\kappa\alpha}), & 0<\kappa\le1,\quad 0\le\alpha<1, \\[2mm]
+\widetilde\Omega_\alpha(d^\kappa), & 0<\kappa\le1,\quad \alpha\ge1, \\[2mm]
+\widetilde\Omega_\alpha\left( d^{(\kappa-1)(1-\alpha)}+d^\alpha \right), & 1<\kappa<2,\quad 0\le\alpha<1, \\[2mm]
+\widetilde\Omega_\alpha(d), & 1<\kappa<2,\quad \alpha\ge1.
+\end{cases}
+}
+\end{equation}
+
+For $1<\kappa<2$ and $0\le\alpha<1$, the more explicit phase diagram is
+\[
+\boxed{
+\frac{\beta_FR_F^2(\eps)} {\beta_{\op}R_{\op}^2(\eps)} =
+\begin{cases}
+\widetilde\Omega_\alpha\left( d^{(\kappa-1)(1-\alpha)} \right), & 0\le\alpha\le1-\dfrac1\kappa, \\[3mm]
+\widetilde\Omega_\alpha(d^\alpha), & 1-\dfrac1\kappa\le\alpha<1.
+\end{cases}
+}
+\]
+
+Thus, except for the corner
+\[
+\alpha=0,\qquad N\le d,
+\]
+the available bounds yield a polynomial separation in favor of the
+operator-norm geometry. The maximal separation is linear in the
+ambient dimension:
+\[
+\Sep(\eps)=\widetilde\Omega_\alpha(d)
+\]
+throughout the heavy-head regime $\alpha\ge1$ when $N>d$.
+
+\end{document}

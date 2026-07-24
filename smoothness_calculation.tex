@@ -1,0 +1,1961 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\Diag}{\operatorname{Diag}}
+\newcommand{\softmax}{\operatorname{softmax}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle_F}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\brak}[1]{\left[#1\right]}
+\newcommand{\paren}[1]{\left(#1\right)}
+\newcommand{\sphere}{\mathbb{S}}
+
+\title{A Finite-Dimensional Technical Note on Global Smoothness of\\
+Gaussian Associative-Memory Cross-Entropy\\
+under Frobenius and Operator-Norm Geometries}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give a self-contained finite-dimensional proof of global smoothness bounds for a
+Gaussian associative-memory softmax loss.  The proof is organized around one explicit
+good event, and every failure probability is stated in its original exponential-tail
+form; no confidence parameter is introduced.  For Zipf weights
+\[
+ p_i=\frac{i^{-\alpha}}{H_{N,\alpha}},
+ \qquad
+ H_{n,\alpha}=\sum_{k=1}^n k^{-\alpha},
+ \qquad \alpha\ge 0,
+\]
+we prove, simultaneously with an explicit probability, that
+\[
+ \beta_F\asymp \frac1d+p_1,
+ \qquad
+ \beta_{\op}\gtrsim \frac1d+P_{\min\{d,N\}},
+\]
+and we establish an explicit finite-dimensional upper bound for
+\(\beta_{\op}\).  In the regime \(N=d^{\Theta(1)}\), the operator-norm
+bound matches the lower bound up to polylogarithmic factors.
+\end{abstract}
+
+\tableofcontents
+
+\section{Setup, definitions, and main theorem}
+\label{sec:setup}
+
+\subsection{Random model and loss}
+
+For an integer \(n\ge 1\), write \([n]:=\{1,\ldots,n\}\).  Fix integers
+\(d,N\ge 2\).  Let
+\[
+ u_1,\ldots,u_N,\ v_1,\ldots,v_N
+\]
+be mutually independent random vectors with
+\[
+ u_j\sim \mathcal N\!\left(0,\frac1d I_d\right),
+ \qquad
+ v_i\sim \mathcal N\!\left(0,\frac1d I_d\right).
+\]
+The vectors \(u_j\) are the output embeddings and the vectors \(v_i\) are the
+input embeddings.  Put
+\[
+ U:=[u_1,\ldots,u_N]\in\R^{d\times N}.
+\]
+
+Fix a Zipf exponent \(\alpha\ge 0\), and define
+\[
+ H_{n,\alpha}:=\sum_{k=1}^n k^{-\alpha},
+ \qquad
+ p_i:=\frac{i^{-\alpha}}{H_{N,\alpha}},
+ \qquad i\in[N].
+\]
+Thus \(p_1\ge\cdots\ge p_N>0\) and \(\sum_{i=1}^N p_i=1\).  For
+\(s\in[N]\), define the head mass
+\[
+ P_s:=\sum_{i=1}^s p_i=\frac{H_{s,\alpha}}{H_{N,\alpha}}.
+\]
+
+For \(W\in\R^{d\times d}\), define the logits and softmax probabilities
+\[
+ z_{ij}(W):=u_j^\top Wv_i,
+ \qquad
+ q_{ij}(W):=\frac{e^{z_{ij}(W)}}{\sum_{k=1}^N e^{z_{ik}(W)}}.
+\]
+The loss associated with input \(i\) and the population loss are
+\[
+ \ell_i(W)
+ :=
+ \log\!\left(\sum_{j=1}^N e^{u_j^\top Wv_i}\right)-u_i^\top Wv_i,
+ \qquad
+ L(W):=\sum_{i=1}^N p_i\ell_i(W).
+\]
+The target term \(-u_i^\top Wv_i\) is linear in \(W\), and therefore it does
+not appear in the Hessian.
+
+We use the Frobenius inner product
+\[
+ \ip{A}{B}:=\Tr(A^\top B).
+\]
+The Frobenius and operator norms are denoted by \(\norm{\cdot}_F\) and
+\(\norm{\cdot}_{\op}\), respectively.  Define the global quadratic
+smoothness constants
+\[
+ \beta_F
+ :=
+ \sup_{W\in\R^{d\times d}}
+ \sup_{H\ne 0}
+ \frac{\nabla^2L(W)[H,H]}{\norm{H}_F^2},
+\]
+\[
+ \beta_{\op}
+ :=
+ \sup_{W\in\R^{d\times d}}
+ \sup_{H\ne 0}
+ \frac{\nabla^2L(W)[H,H]}{\norm{H}_{\op}^2}.
+\]
+Section~\ref{sec:hessian} proves that these are exactly the global Lipschitz
+constants of the gradient from the corresponding primal norm to its dual norm.
+
+\subsection{Parameters and explicit failure probability}
+
+Set
+\[
+ m:=\min\{d,N\},
+ \qquad
+ K:=\left\lfloor\frac{m}{256}\right\rfloor.
+\]
+When \(N>d\), define
+\[
+ J:=\left\lceil\log_2\frac Nd\right\rceil,
+ \qquad
+ \Xi_{\alpha,J}:=\sum_{r=0}^{J-1}2^{-\alpha r}.
+\]
+When \(N\le d\), set \(J:=0\) and \(\Xi_{\alpha,J}:=0\).  In all cases, set
+\[
+ L_N:=\log(2N^2),
+ \qquad
+ T_d:=d^2\log(3d)+d.
+\]
+
+The selector construction below has failure probability
+\[
+ \varepsilon_{\mathrm{sel}}(d,N,K)
+ :=
+ 4K e^{-d/32}
+ +2K e^{-d/48}
+ +K(N-2)e^{-d/64}.
+\]
+Define the total explicit failure bound
+\begin{align}
+ \varepsilon_{\mathrm{tot}}(d,N)
+ :=\;&
+ 2N e^{-d/2}
+ +e^{-d}
+ +e^{-d/16}
+ +\varepsilon_{\mathrm{sel}}(d,N,K)
+ \notag\\
+ &\quad
+ +4\cdot 17^K e^{-d/32}
+ +J e^{-d}.
+ \label{eq:total-failure}
+\end{align}
+No independence between the events contributing to
+\eqref{eq:total-failure} is asserted or needed; the final estimate follows from
+a union bound and one conditional union bound for the dyadic blocks.
+
+\begin{theorem}[Finite-dimensional global smoothness]
+\label{thm:main}
+Assume
+\[
+ \alpha\ge 0,
+ \qquad
+ m=\min\{d,N\}\ge 512.
+\]
+Then, with probability at least
+\[
+ \boxed{1-\varepsilon_{\mathrm{tot}}(d,N)},
+\]
+all of the following conclusions hold simultaneously.
+
+\paragraph{Frobenius geometry.}
+\[
+ \boxed{
+ \frac1{64}\left(\frac1d+p_1\right)
+ \le \beta_F
+ \le 80\left(\frac1d+p_1\right).
+ }
+\]
+Equivalently, because \(p_1=H_{N,\alpha}^{-1}\),
+\[
+ \frac1{64}\left(\frac1d+\frac1{H_{N,\alpha}}\right)
+ \le \beta_F
+ \le 80\left(\frac1d+\frac1{H_{N,\alpha}}\right).
+\]
+
+\paragraph{Operator geometry: lower bound.}
+\[
+ \boxed{
+ \beta_{\op}
+ \ge
+ \frac1{294912}
+ \left(\frac1d+P_m\right).
+ }
+\]
+
+\paragraph{Operator geometry: upper bound.}
+In every case,
+\[
+ \boxed{\beta_{\op}\le 16.}
+\]
+If \(N>d\), then the sharper estimate
+\[
+ \boxed{
+ \beta_{\op}
+ \le
+ \min\left\{
+ 16,
+ 16P_d
+ +\frac{2^{\alpha+4}(L_N+10)}{d}
+ +\frac{32T_d}{d^2}\,\Xi_{\alpha,J}P_d
+ \right\}
+ }
+\]
+also holds.  Here \(N>d\) implies \(m=d\), so \(P_d=P_m\).
+\end{theorem}
+
+\begin{remark}[When the probability bound is informative]
+The theorem is a finite-dimensional statement and does not require a separate
+relation between \(d\) and \(N\).  If the displayed lower bound on probability
+is negative, it is simply vacuous.  In the common regime \(N=d^{O(1)}\), every
+term in \eqref{eq:total-failure} is \(e^{-\Omega(d)}\), because
+\(K\le d/256\) and \(J=O(\log d)\).
+\end{remark}
+
+\section{Exact Hessian formula and norm geometry}
+\label{sec:hessian}
+
+For \(i\in[N]\), write
+\[
+ q_i(W):=(q_{i1}(W),\ldots,q_{iN}(W))^\top\in\R^N
+\]
+and define
+\[
+ C_i(W)
+ :=
+ U\bigl(\Diag(q_i(W))-q_i(W)q_i(W)^\top\bigr)U^\top.
+\]
+
+\begin{proposition}[Gradient and Hessian]
+\label{prop:hessian}
+For every \(W,A,B\in\R^{d\times d}\),
+\[
+ \nabla \ell_i(W)
+ =
+ \left(\sum_{j=1}^N q_{ij}(W)u_j-u_i\right)v_i^\top,
+\]
+\[
+ \ip{B}{\nabla^2L(W)[A]}
+ =
+ \sum_{i=1}^N p_i(Bv_i)^\top C_i(W)(Av_i).
+\]
+Moreover, \(C_i(W)\succeq 0\), and hence
+\[
+ \boxed{
+ \nabla^2L(W)[H,H]
+ =
+ \sum_{i=1}^N p_i(Hv_i)^\top C_i(W)(Hv_i)
+ \ge 0.
+ }
+\]
+\end{proposition}
+
+\begin{proof}
+For a direction \(A\),
+\[
+ Dz_{ij}(W)[A]=u_j^\top Av_i.
+\]
+Therefore
+\begin{align*}
+ D\ell_i(W)[A]
+ &=
+ \sum_{j=1}^N q_{ij}(W)u_j^\top Av_i-u_i^\top Av_i\\
+ &=
+ \left(\sum_{j=1}^N q_{ij}(W)u_j-u_i\right)^\top Av_i.
+\end{align*}
+Using the Frobenius inner product gives the displayed gradient formula.
+
+Let
+\[
+ \mu_i(W):=\sum_{j=1}^N q_{ij}(W)u_j=Uq_i(W).
+\]
+The Jacobian of the softmax map is
+\[
+ D\softmax(z)=\Diag(q)-qq^\top.
+\]
+Consequently,
+\[
+ Dq_i(W)[A]
+ =
+ \bigl(\Diag(q_i(W))-q_i(W)q_i(W)^\top\bigr)U^\top Av_i,
+\]
+and hence
+\[
+ D\mu_i(W)[A]=C_i(W)Av_i.
+\]
+Because the target term is linear,
+\[
+ \nabla^2\ell_i(W)[A]=C_i(W)Av_iv_i^\top.
+\]
+Summing over \(i\) and taking the Frobenius inner product with \(B\) yields
+\[
+ \ip{B}{\nabla^2L(W)[A]}
+ =
+ \sum_{i=1}^N p_i(Bv_i)^\top C_i(W)(Av_i).
+\]
+Finally,
+\[
+ C_i(W)
+ =
+ \sum_{j=1}^N q_{ij}(W)u_ju_j^\top
+ -\left(\sum_{j=1}^N q_{ij}(W)u_j\right)
+  \left(\sum_{j=1}^N q_{ij}(W)u_j\right)^\top
+\]
+is a covariance matrix, so it is positive semidefinite.
+\end{proof}
+
+\begin{proposition}[Quadratic characterization of smoothness]
+\label{prop:quadratic-characterization}
+Let \(\norm{\cdot}_X\) be any norm on \(\R^{d\times d}\), and let
+\(\norm{\cdot}_{X,*}\) be its dual norm.  For every fixed \(W\),
+\[
+ \sup_{\norm{H}_X\le 1}
+ \norm{\nabla^2L(W)[H]}_{X,*}
+ =
+ \sup_{\norm{H}_X\le 1}
+ \nabla^2L(W)[H,H].
+\]
+Consequently,
+\[
+ \sup_W\sup_{\norm{H}_X\le 1}
+ \nabla^2L(W)[H,H]
+\]
+is the smallest number \(\beta\) such that
+\[
+ \norm{\nabla L(W_1)-\nabla L(W_0)}_{X,*}
+ \le
+ \beta\norm{W_1-W_0}_X
+\]
+for all \(W_0,W_1\in\R^{d\times d}\).
+\end{proposition}
+
+\begin{proof}
+For fixed \(W\), define the symmetric positive-semidefinite bilinear form
+\[
+ B_W(A,H):=\ip{A}{\nabla^2L(W)[H]}.
+\]
+Positive semidefiniteness follows from Proposition~\ref{prop:hessian}.  Applying
+nonnegativity to \(B_W(A+tH,A+tH)\) as a quadratic polynomial in \(t\) gives
+\[
+ \abs{B_W(A,H)}^2\le B_W(A,A)B_W(H,H).
+\]
+Therefore
+\begin{align*}
+ \sup_{\norm{H}_X\le1}
+ \norm{\nabla^2L(W)[H]}_{X,*}
+ &=
+ \sup_{\norm{A}_X\le1,\ \norm{H}_X\le1}
+ \abs{B_W(A,H)}\\
+ &\le
+ \sup_{\norm{G}_X\le1}B_W(G,G).
+\end{align*}
+The reverse inequality follows by choosing \(A=H=G\).
+
+For the Lipschitz statement, use the fundamental theorem of calculus:
+\[
+ \nabla L(W_1)-\nabla L(W_0)
+ =
+ \int_0^1
+ \nabla^2L\bigl(W_0+t(W_1-W_0)\bigr)[W_1-W_0] \,dt.
+\]
+The preceding operator-norm identity gives the upper bound.  Conversely, a
+global gradient Lipschitz bound implies the same Hessian bound by taking a
+directional derivative at any \(W\).
+\end{proof}
+
+\section{Deterministic reductions}
+\label{sec:deterministic}
+
+Define
+\[
+ R_u:=\max_{j\in[N]}\norm{u_j}^2,
+ \qquad
+ M_v:=\sum_{i=1}^N p_i v_iv_i^\top.
+\]
+For \(y\in\R^d\), define the output width
+\[
+ w_U(y)
+ :=
+ \max_{j,k\in[N]}(u_j-u_k)^\top y
+ =
+ \max_j u_j^\top y-\min_k u_k^\top y.
+\]
+
+\begin{lemma}[Uniform covariance bound]
+\label{lem:covariance-upper}
+For every probability vector \(q\in\R^N\), define
+\[
+ C(q)
+ :=
+ \sum_{j=1}^N q_j u_ju_j^\top
+ -\left(\sum_{j=1}^N q_j u_j\right)
+  \left(\sum_{j=1}^N q_j u_j\right)^\top.
+\]
+Then
+\[
+ 0\preceq C(q)\preceq R_u I_d.
+\]
+\end{lemma}
+
+\begin{proof}
+For every \(x\in\R^d\),
+\begin{align*}
+ x^\top C(q)x
+ &=
+ \sum_j q_j(x^\top u_j)^2
+ -\left(\sum_j q_jx^\top u_j\right)^2\\
+ &\le
+ \sum_j q_j(x^\top u_j)^2
+ \le
+ R_u\norm{x}^2.
+\end{align*}
+The lower bound follows because \(C(q)\) is a covariance matrix.
+\end{proof}
+
+\begin{lemma}[Frobenius reduction]
+\label{lem:frobenius-reduction}
+For every realization of the embeddings,
+\[
+ \boxed{\beta_F\le R_u\norm{M_v}_{\op}.}
+\]
+\end{lemma}
+
+\begin{proof}
+By Proposition~\ref{prop:hessian} and
+Lemma~\ref{lem:covariance-upper},
+\begin{align*}
+ \nabla^2L(W)[H,H]
+ &\le
+ R_u\sum_{i=1}^N p_i\norm{Hv_i}^2\\
+ &=
+ R_u\Tr(H^\top HM_v)\\
+ &\le
+ R_u\norm{M_v}_{\op}\norm{H}_F^2.
+\end{align*}
+Take the supremum over \(W\) and nonzero \(H\).
+\end{proof}
+
+\begin{lemma}[Operator-width reduction]
+\label{lem:operator-reduction}
+For every realization,
+\[
+ \boxed{
+ \beta_{\op}
+ \le
+ \frac14
+ \sup_{\norm{H}_{\op}\le1}
+ \sum_{i=1}^N p_i w_U(Hv_i)^2.
+ }
+\]
+Also,
+\[
+ \boxed{\beta_{\op}\le R_u\Tr(M_v).}
+\]
+\end{lemma}
+
+\begin{proof}
+Let a scalar random variable \(X\) be supported in \([a,b]\).  Then
+\[
+ \Var(X)
+ =\min_c\E(X-c)^2
+ \le
+ \E\left(X-\frac{a+b}{2}\right)^2
+ \le
+ \frac{(b-a)^2}{4}.
+\]
+For fixed \(y\), apply this to the random variable \(u_j^\top y\) under
+\(j\sim q_i(W)\).  Its range length is \(w_U(y)\), so
+\[
+ y^\top C_i(W)y\le\frac14w_U(y)^2.
+\]
+Substitute \(y=Hv_i\) into Proposition~\ref{prop:hessian} and then take the
+supremum over \(W\) and \(\norm{H}_{\op}\le1\).
+
+The second estimate follows from
+\begin{align*}
+ \nabla^2L(W)[H,H]
+ &\le
+ R_u\sum_i p_i\norm{Hv_i}^2\\
+ &\le
+ R_u\norm{H}_{\op}^2\sum_i p_i\norm{v_i}^2
+ =
+ R_u\norm{H}_{\op}^2\Tr(M_v).
+\end{align*}
+\end{proof}
+
+\section{Probability tools}
+\label{sec:probability-tools}
+
+\begin{lemma}[Weighted chi-square inequality]
+\label{lem:weighted-chi-square}
+Let \(\xi_1,\ldots,\xi_M\) be independent standard normal variables, and let
+\(a_1,\ldots,a_M\ge0\).  Define
+\[
+ S:=\sum_{r=1}^M a_r(\xi_r^2-1).
+\]
+Then, for every \(t>0\),
+\[
+ \Pp\left(
+ S\ge2\norm{a}_2\sqrt t+2\norm{a}_\infty t
+ \right)\le e^{-t},
+\]
+\[
+ \Pp\left(
+ S\le-2\norm{a}_2\sqrt t
+ \right)\le e^{-t}.
+\]
+\end{lemma}
+
+\begin{proof}
+If \(\norm{a}_2=0\), then every \(a_r=0\), so \(S=0\) and both claims are
+immediate.  Assume \(\norm{a}_2>0\).
+
+For \(0<\lambda<(2\norm{a}_\infty)^{-1}\),
+\[
+ \E e^{\lambda a_r(\xi_r^2-1)}
+ =e^{-\lambda a_r}(1-2\lambda a_r)^{-1/2}.
+\]
+For \(0\le x<1/2\),
+\[
+ -\frac12\log(1-2x)-x\le\frac{x^2}{1-2x}.
+\]
+By independence,
+\[
+ \log\E e^{\lambda S}
+ \le
+ \frac{\lambda^2\norm{a}_2^2}
+ {1-2\lambda\norm{a}_\infty}.
+\]
+Chernoff's inequality with
+\[
+ \lambda
+ =
+ \frac{\sqrt t}{\norm{a}_2+2\norm{a}_\infty\sqrt t}
+\]
+gives the upper tail.
+
+For the lower tail,
+\[
+ \E e^{-\lambda a_r(\xi_r^2-1)}
+ =e^{\lambda a_r}(1+2\lambda a_r)^{-1/2}.
+\]
+Since
+\[
+ x-\frac12\log(1+2x)\le x^2
+ \qquad (x\ge0),
+\]
+we have
+\[
+ \log\E e^{-\lambda S}\le\lambda^2\norm{a}_2^2.
+\]
+Chernoff's inequality with \(\lambda=\sqrt t/\norm{a}_2\) gives the lower
+tail.
+\end{proof}
+
+\begin{lemma}[Covering nets]
+\label{lem:nets}
+The Euclidean unit sphere in \(\R^q\) has an \(r\)-net in Euclidean norm of
+cardinality at most
+\[
+ \left(1+\frac2r\right)^q.
+\]
+The operator-norm unit ball in \(\R^{d\times d}\) has a
+\(d^{-1/2}\)-net in operator norm of cardinality at most
+\[
+ (3d)^{d^2}.
+\]
+\end{lemma}
+
+\begin{proof}
+A maximal \(r\)-separated subset of a normed set is an \(r\)-net.  For the
+Euclidean sphere, the Euclidean balls of radius \(r/2\) centered at the net
+points are disjoint and contained in the Euclidean ball of radius \(1+r/2\).
+Volume comparison gives the first claim.
+
+For the second claim, take a maximal \(d^{-1/2}\)-separated subset in operator
+norm of the operator unit ball.  Since
+\[
+ \norm{A}_F\le\sqrt d\norm{A}_{\op},
+\]
+the operator unit ball lies in the Frobenius ball of radius \(\sqrt d\) in
+ambient dimension \(d^2\).  Moreover, operator-norm separation implies
+Frobenius-norm separation.  Euclidean volume comparison therefore gives
+\[
+ \left(1+\frac{2\sqrt d}{d^{-1/2}}\right)^{d^2}
+ =(1+2d)^{d^2}
+ \le(3d)^{d^2}.
+\]
+\end{proof}
+
+\begin{lemma}[Gaussian vector estimates]
+\label{lem:gaussian-vector}
+Let \(g,h\) be independent \(\mathcal N(0,I_d/d)\) vectors.  Then
+\[
+ \Pp\left(\norm{g}^2\notin[1/2,3/2]\right)
+ \le2e^{-d/32},
+\]
+\[
+ \Pp(\norm{g}>2)\le e^{-d/2},
+\]
+and
+\[
+ \Pp\left(
+ \abs{g^\top h}>\frac14,
+ \ \norm{g}^2\le\frac32
+ \right)
+ \le2e^{-d/48}.
+\]
+\end{lemma}
+
+\begin{proof}
+Because \(d\norm{g}^2\sim\chi_d^2\), Chernoff optimization gives
+\[
+ \Pp(\chi_d^2\ge ad)
+ \le
+ \exp\left[-\frac d2(a-1-\log a)\right]
+ \qquad (a>1),
+\]
+and
+\[
+ \Pp(\chi_d^2\le ad)
+ \le
+ \exp\left[-\frac d2(a-1-\log a)\right]
+ \qquad (0<a<1).
+\]
+For \(a=3/2\) and \(a=1/2\), the exponent is at least \(d/32\).  For
+\(a=4\), the exponent is at least \(d/2\).  This proves the first two claims.
+
+Conditional on \(g\),
+\[
+ g^\top h\sim\mathcal N\left(0,\frac{\norm{g}^2}{d}\right).
+\]
+On the event \(\norm{g}^2\le3/2\), the two-sided Gaussian tail bound gives
+\[
+ \Pp\left(\abs{g^\top h}>\frac14\mid g\right)
+ \le
+ 2\exp\left(-\frac{(1/4)^2}{2(3/2)/d}\right)
+ =2e^{-d/48}.
+\]
+\end{proof}
+
+\begin{lemma}[Rectangular Gaussian conditioning]
+\label{lem:rectangular-gaussian}
+Let \(G\in\R^{d\times K}\) have independent \(\mathcal N(0,1/d)\) entries,
+and assume \(1\le K\le d/256\).  Then
+\[
+ \Pp\left(
+ \sigma_{\min}(G)<\frac12
+ \ \text{or}\ 
+ \norm{G}_{\op}>\frac32
+ \right)
+ \le
+ 2\cdot17^K e^{-d/32}.
+\]
+\end{lemma}
+
+\begin{proof}
+Take a \(1/8\)-net \(\mathcal N\) of \(\sphere^{K-1}\) with
+\(\abs{\mathcal N}\le17^K\).  For every fixed \(x\in\sphere^{K-1}\),
+\[
+ Gx\sim\mathcal N(0,I_d/d).
+\]
+Lemma~\ref{lem:gaussian-vector} and a union bound imply that, except on an
+event of probability at most \(2\cdot17^K e^{-d/32}\),
+\[
+ \frac1{\sqrt2}\le\norm{Gx_0}\le\sqrt{\frac32}
+ \qquad\text{for every }x_0\in\mathcal N.
+\]
+Assume this event.  For arbitrary \(x\in\sphere^{K-1}\), choose
+\(x_0\in\mathcal N\) with \(\norm{x-x_0}\le1/8\).  First,
+\[
+ \norm{G}_{\op}
+ \le
+ \sqrt{\frac32}+\frac18\norm{G}_{\op},
+\]
+so
+\[
+ \norm{G}_{\op}
+ \le
+ \frac87\sqrt{\frac32}<\frac32.
+\]
+Second,
+\[
+ \norm{Gx}
+ \ge
+ \frac1{\sqrt2}
+ -\frac18\norm{G}_{\op}
+ \ge
+ \frac1{\sqrt2}
+ -\frac17\sqrt{\frac32}
+ >\frac12.
+\]
+Taking the infimum over \(x\in\sphere^{K-1}\) proves the lower singular-value
+bound.
+\end{proof}
+
+\section{Frobenius upper bound}
+\label{sec:frobenius-upper}
+
+\begin{lemma}[Uniform upper bound for the weighted input covariance]
+\label{lem:Mv-upper}
+Define the event
+\[
+ \mathcal E_M
+ :=
+ \left\{
+ \norm{M_v}_{\op}\le\frac6d+20p_1
+ \right\}.
+\]
+Then
+\[
+ \Pp(\mathcal E_M)\ge1-e^{-d}.
+\]
+\end{lemma}
+
+\begin{proof}
+Fix \(x\in\sphere^{d-1}\).  Since
+\(\sqrt d\,x^\top v_i\) are independent standard normal variables, there are
+independent \(\xi_i\sim\mathcal N(0,1)\) such that
+\[
+ x^\top M_vx
+ =
+ \frac1d\sum_{i=1}^N p_i\xi_i^2.
+\]
+Lemma~\ref{lem:weighted-chi-square} gives, for every \(t>0\),
+\[
+ x^\top M_vx
+ \le
+ \frac1d\left(1+2\norm{p}_2\sqrt t+2p_1t\right)
+\]
+with failure probability at most \(e^{-t}\).
+
+Take a \(1/4\)-net \(\mathcal N\) of \(\sphere^{d-1}\) with
+\(\abs{\mathcal N}\le9^d\), and choose
+\[
+ t=d(\log9+1).
+\]
+A union bound shows that the preceding estimate holds for every
+\(x\in\mathcal N\) with failure probability at most
+\[
+ 9^d e^{-d(\log9+1)}=e^{-d}.
+\]
+Assume this net event.  Let \(y\) be a unit top eigenvector of \(M_v\), and
+choose \(x\in\mathcal N\) with \(\norm{x-y}\le1/4\).  Since \(M_v\succeq0\),
+\begin{align*}
+ \norm{M_v}_{\op}
+ &=y^\top M_vy\\
+ &\le
+ x^\top M_vx
+ +\abs{(y-x)^\top M_vy}
+ +\abs{x^\top M_v(y-x)}\\
+ &\le
+ x^\top M_vx+\frac12\norm{M_v}_{\op}.
+\end{align*}
+Thus
+\[
+ \norm{M_v}_{\op}
+ \le
+ \frac2d\left(1+2\norm{p}_2\sqrt t+2p_1t\right).
+\]
+Because
+\[
+ \norm{p}_2^2=\sum_i p_i^2\le p_1\sum_i p_i=p_1
+\]
+and \(t<4d\),
+\[
+ \norm{M_v}_{\op}
+ \le
+ \frac2d+8\sqrt{\frac{p_1}{d}}+16p_1.
+\]
+Using \(8\sqrt{ab}\le4a+4b\) gives
+\[
+ \norm{M_v}_{\op}\le\frac6d+20p_1.
+\]
+\end{proof}
+
+\begin{proposition}[Frobenius upper estimate on explicit events]
+\label{prop:frobenius-upper}
+On the event
+\[
+ \left\{\max_{j\in[N]}\norm{u_j}\le2\right\}\cap\mathcal E_M,
+\]
+one has
+\[
+ \beta_F\le80\left(\frac1d+p_1\right).
+\]
+\end{proposition}
+
+\begin{proof}
+On the displayed event, \(R_u\le4\).  Lemmas
+\ref{lem:frobenius-reduction} and \ref{lem:Mv-upper} give
+\[
+ \beta_F
+ \le
+ 4\left(\frac6d+20p_1\right)
+ =
+ \frac{24}{d}+80p_1
+ \le
+ 80\left(\frac1d+p_1\right).
+\]
+\end{proof}
+
+\section{Two-output selectors}
+\label{sec:selectors}
+
+\begin{lemma}[Deterministic two-output selector]
+\label{lem:deterministic-selector}
+Suppose two output vectors \(u_a,u_b\) satisfy
+\[
+ \frac12\le\norm{u_a}^2,\norm{u_b}^2\le\frac32,
+ \qquad
+ \abs{u_a^\top u_b}\le\frac14.
+\]
+Then there exists \(y\in\R^d\) such that
+\[
+ u_a^\top y=u_b^\top y=1,
+ \qquad
+ \norm{y}^2\le8.
+\]
+If, in addition,
+\[
+ u_j^\top y\le\frac12
+ \qquad\text{for every }j\notin\{a,b\},
+\]
+then, as \(t\to\infty\),
+\[
+ \softmax(tU^\top y)
+ \longrightarrow
+ \frac12e_a+\frac12e_b,
+\]
+and the associated output covariance converges to
+\[
+ C_\infty
+ =
+ \frac14(u_a-u_b)(u_a-u_b)^\top.
+\]
+For the unit vector
+\[
+ x:=\frac{u_a-u_b}{\norm{u_a-u_b}},
+\]
+one has
+\[
+ x^\top C_\infty x\ge\frac18.
+\]
+\end{lemma}
+
+\begin{proof}
+Let
+\[
+ A:=[u_a,u_b],
+ \qquad
+ G:=A^\top A.
+\]
+By the Gershgorin bound for the symmetric \(2\times2\) matrix \(G\),
+\[
+ \lambda_{\min}(G)
+ \ge
+ \min\{\norm{u_a}^2,\norm{u_b}^2\}
+ -\abs{u_a^\top u_b}
+ \ge\frac14.
+\]
+Thus \(G\) is invertible.  Define
+\[
+ y:=AG^{-1}\binom11.
+\]
+Then
+\[
+ A^\top y=GG^{-1}\binom11=\binom11,
+\]
+and
+\[
+ \norm{y}^2
+ =(1,1)G^{-1}(1,1)^\top
+ \le
+ \frac{\norm{(1,1)}^2}{\lambda_{\min}(G)}
+ \le8.
+\]
+The selected logits are both equal to \(t\), while every other logit is at
+most \(t/2\).  Dividing numerator and denominator of the softmax by \(e^t\)
+proves the softmax limit.  The covariance of the limiting two-point uniform
+distribution is
+\begin{align*}
+ C_\infty
+ &=
+ \frac12u_au_a^\top+\frac12u_bu_b^\top
+ -\frac14(u_a+u_b)(u_a+u_b)^\top\\
+ &=
+ \frac14(u_a-u_b)(u_a-u_b)^\top.
+\end{align*}
+Finally,
+\[
+ \norm{u_a-u_b}^2
+ =
+ \norm{u_a}^2+\norm{u_b}^2-2u_a^\top u_b
+ \ge
+ \frac12+\frac12-2\cdot\frac14
+ =\frac12,
+\]
+so
+\[
+ x^\top C_\infty x
+ =\frac14\norm{u_a-u_b}^2
+ \ge\frac18.
+\]
+\end{proof}
+
+\begin{lemma}[Simultaneous selector event]
+\label{lem:simultaneous-selector}
+Fix \(K\ge1\) disjoint output pairs
+\[
+ (u_1,u_2),\ldots,(u_{2K-1},u_{2K}),
+ \qquad 2K\le N.
+\]
+There is an event \(\mathcal E_{\mathrm{sel}}\) such that
+\[
+ \Pp(\mathcal E_{\mathrm{sel}})
+ \ge
+ 1-
+ \left(
+ 4K e^{-d/32}
+ +2K e^{-d/48}
+ +K(N-2)e^{-d/64}
+ \right),
+\]
+and, on \(\mathcal E_{\mathrm{sel}}\), every pair admits vectors
+\(y_r,x_r\) and a covariance limit \(C_{\infty,r}\) satisfying all
+conclusions of Lemma~\ref{lem:deterministic-selector}.
+\end{lemma}
+
+\begin{proof}
+For each of the \(2K\) paired vectors, the norm condition
+\(\norm{u_j}^2\in[1/2,3/2]\) fails with probability at most
+\(2e^{-d/32}\).  Hence all paired norm conditions hold except on an event of
+probability at most
+\[
+ 4K e^{-d/32}.
+\]
+
+For each pair \((u_{2r-1},u_{2r})\), Lemma~\ref{lem:gaussian-vector} gives
+\[
+ \Pp\left(
+ \abs{u_{2r-1}^\top u_{2r}}>\frac14,
+ \ \norm{u_{2r-1}}^2\le\frac32
+ \right)
+ \le2e^{-d/48}.
+\]
+Thus the probability of a pairwise inner-product failure while the relevant
+norm upper bound holds is at most \(2K e^{-d/48}\).
+
+On the complement of these two failure events,
+Lemma~\ref{lem:deterministic-selector} constructs \(y_r\), depending only on
+\((u_{2r-1},u_{2r})\), with \(\norm{y_r}^2\le8\).  For
+\(j\notin\{2r-1,2r\}\), the vector \(u_j\) is independent of this pair, and
+therefore, conditionally on the pair,
+\[
+ u_j^\top y_r
+ \sim
+ \mathcal N\left(0,\frac{\norm{y_r}^2}{d}\right).
+\]
+The one-sided Gaussian tail bound implies
+\[
+ \Pp\left(u_j^\top y_r>\frac12\mid u_{2r-1},u_{2r}\right)
+ \le
+ \exp\left(-\frac{(1/2)^2}{2(8/d)}\right)
+ =e^{-d/64}.
+\]
+Taking conditional expectations and union bounding over the \(K(N-2)\)
+pair--outside-index choices gives the third failure term.  On the resulting
+event, every pair satisfies the hypotheses of
+Lemma~\ref{lem:deterministic-selector}.
+\end{proof}
+
+\section{Frobenius lower bound}
+\label{sec:frobenius-lower}
+
+Let
+\[
+ V_K:=[v_1,\ldots,v_K]\in\R^{d\times K},
+\]
+and define the rectangular input event
+\[
+ \mathcal E_V
+ :=
+ \left\{
+ \sigma_{\min}(V_K)\ge\frac12,
+ \ \norm{V_K}_{\op}\le\frac32
+ \right\}.
+\]
+By Lemma~\ref{lem:rectangular-gaussian},
+\begin{equation}
+ \Pp(\mathcal E_V)
+ \ge1-2\cdot17^K e^{-d/32}.
+ \label{eq:EV-probability}
+\end{equation}
+
+\begin{lemma}[Single-atom Frobenius lower bound]
+\label{lem:single-atom-lower}
+On \(\mathcal E_{\mathrm{sel}}\cap\mathcal E_V\),
+\[
+ \beta_F\ge\frac{p_1}{32}.
+\]
+\end{lemma}
+
+\begin{proof}
+Use the selector \(y_1,x_1,C_{\infty,1}\) for the first output pair
+\((u_1,u_2)\).  On \(\mathcal E_V\),
+\[
+ \norm{v_1}=\norm{V_Ke_1}\ge\sigma_{\min}(V_K)\ge\frac12,
+\]
+so \(\norm{v_1}^2\ge1/4\).  Define
+\[
+ W_t:=t\,y_1\frac{v_1^\top}{\norm{v_1}^2},
+ \qquad
+ H:=x_1\frac{v_1^\top}{\norm{v_1}}.
+\]
+Then
+\[
+ W_tv_1=ty_1,
+ \qquad
+ \norm{H}_F=1,
+ \qquad
+ Hv_1=x_1\norm{v_1}.
+\]
+All Hessian summands are nonnegative.  Therefore
+\[
+ \nabla^2L(W_t)[H,H]
+ \ge
+ p_1\norm{v_1}^2x_1^\top C_1(W_t)x_1.
+\]
+As \(t\to\infty\), the selector property gives
+\(C_1(W_t)\to C_{\infty,1}\).  Hence
+\[
+ \beta_F
+ \ge
+ p_1\norm{v_1}^2x_1^\top C_{\infty,1}x_1
+ \ge
+ p_1\cdot\frac14\cdot\frac18
+ =\frac{p_1}{32}.
+\]
+\end{proof}
+
+\begin{lemma}[Weighted trace lower bound]
+\label{lem:trace-lower}
+Define
+\[
+ \mathcal E_{\mathrm{tr}}
+ :=
+ \left\{\Tr(M_v)\ge\frac12\right\}.
+\]
+Then
+\[
+ \Pp(\mathcal E_{\mathrm{tr}})\ge1-e^{-d/16}.
+\]
+\end{lemma}
+
+\begin{proof}
+Write
+\[
+ \Tr(M_v)
+ =
+ \frac1d\sum_{i=1}^N\sum_{k=1}^d p_i g_{ik}^2,
+\]
+where all \(g_{ik}\) are independent standard normal variables.  Apply the
+lower-tail part of Lemma~\ref{lem:weighted-chi-square} to the weights
+\[
+ a_{ik}:=\frac{p_i}{d}.
+\]
+Their Euclidean norm is
+\[
+ \norm{a}_2
+ =
+ \frac{\norm{p}_2}{\sqrt d}.
+\]
+Take
+\[
+ t:=\frac{d}{16\norm{p}_2^2}.
+\]
+Then \(2\norm{a}_2\sqrt t=1/2\), and therefore
+\[
+ \Pp\left(\Tr(M_v)<\frac12\right)
+ \le
+ \exp\left(-\frac{d}{16\norm{p}_2^2}\right)
+ \le e^{-d/16},
+\]
+because \(\norm{p}_2^2\le(\sum_i p_i)^2=1\).
+\end{proof}
+
+\begin{lemma}[Diffuse Frobenius lower bound]
+\label{lem:diffuse-lower}
+On \(\mathcal E_{\mathrm{sel}}\cap\mathcal E_{\mathrm{tr}}\),
+\[
+ \beta_F\ge\frac1{32d}.
+\]
+\end{lemma}
+
+\begin{proof}
+Use the selector \(y_1,x_1,C_{\infty,1}\) for the first output pair.  Gaussian
+input vectors are nonzero almost surely; we work on this full-probability
+event.  For \(b\in\sphere^{d-1}\), define
+\[
+ M_+(b)
+ :=
+ \sum_{i:\,b^\top v_i>0}p_i v_iv_i^\top.
+\]
+Let \(b\) be uniform on \(\sphere^{d-1}\), independently of the embeddings.
+For every fixed nonzero \(v_i\), symmetry gives
+\[
+ \Pp_b(b^\top v_i>0)=\frac12.
+\]
+Thus
+\[
+ \E_b\Tr(M_+(b))
+ =
+ \frac12\Tr(M_v).
+\]
+The finite union of hyperplanes \(\{b:b^\top v_i=0\}\) has spherical measure
+zero.  Hence there exists a \(b\) outside all these hyperplanes such that
+\[
+ \Tr(M_+(b))\ge\frac12\Tr(M_v).
+\]
+On \(\mathcal E_{\mathrm{tr}}\), this gives
+\[
+ \Tr(M_+(b))\ge\frac14.
+\]
+Let \(a\in\sphere^{d-1}\) be a top eigenvector of \(M_+(b)\).  Since a
+positive-semidefinite \(d\times d\) matrix has largest eigenvalue at least its
+trace divided by \(d\),
+\[
+ a^\top M_+(b)a\ge\frac1{4d}.
+\]
+Define
+\[
+ W_t:=t y_1b^\top,
+ \qquad
+ H:=x_1a^\top.
+\]
+Then \(\norm{H}_F=1\).  If \(b^\top v_i>0\), then
+\[
+ W_tv_i=t(b^\top v_i)y_1,
+\]
+and the scalar \(t(b^\top v_i)\) tends to \(+\infty\).  Hence
+\[
+ C_i(W_t)\longrightarrow C_{\infty,1}.
+\]
+Using nonnegativity of all Hessian terms and the finiteness of the selected
+index set,
+\begin{align*}
+ \beta_F
+ &\ge
+ \liminf_{t\to\infty}\nabla^2L(W_t)[H,H]\\
+ &\ge
+ \sum_{i:\,b^\top v_i>0}
+ p_i(a^\top v_i)^2x_1^\top C_{\infty,1}x_1\\
+ &=
+ x_1^\top C_{\infty,1}x_1\,a^\top M_+(b)a\\
+ &\ge
+ \frac18\cdot\frac1{4d}
+ =\frac1{32d}.
+\end{align*}
+\end{proof}
+
+\begin{proposition}[Frobenius lower estimate on explicit events]
+\label{prop:frobenius-lower}
+On
+\[
+ \mathcal E_{\mathrm{sel}}
+ \cap\mathcal E_V
+ \cap\mathcal E_{\mathrm{tr}},
+\]
+one has
+\[
+ \beta_F
+ \ge
+ \frac1{64}\left(p_1+\frac1d\right).
+\]
+\end{proposition}
+
+\begin{proof}
+Lemmas~\ref{lem:single-atom-lower} and \ref{lem:diffuse-lower} give
+\[
+ \beta_F
+ \ge
+ \max\left\{\frac{p_1}{32},\frac1{32d}\right\}.
+\]
+Since \(\max\{a,b\}\ge(a+b)/2\),
+\[
+ \beta_F
+ \ge
+ \frac1{64}\left(p_1+\frac1d\right).
+\]
+\end{proof}
+
+\section{Operator-norm lower bound}
+\label{sec:operator-lower}
+
+Define, for \(i\in[K]\),
+\[
+ g_i:=\frac{u_{2i-1}-u_{2i}}{\sqrt2},
+ \qquad
+ G_K:=[g_1,\ldots,g_K].
+\]
+The columns \(g_i\) are independent \(\mathcal N(0,I_d/d)\) vectors.  Define
+\[
+ \mathcal E_G
+ :=
+ \left\{
+ \sigma_{\min}(G_K)\ge\frac12,
+ \ \norm{G_K}_{\op}\le\frac32
+ \right\}.
+\]
+Lemma~\ref{lem:rectangular-gaussian} gives
+\begin{equation}
+ \Pp(\mathcal E_G)
+ \ge1-2\cdot17^K e^{-d/32}.
+ \label{eq:EG-probability}
+\end{equation}
+
+\begin{proposition}[Simultaneous activation]
+\label{prop:simultaneous-activation}
+On
+\[
+ \mathcal E_{\mathrm{sel}}\cap\mathcal E_V\cap\mathcal E_G,
+\]
+one has
+\[
+ \beta_{\op}\ge\frac1{288}\sum_{i=1}^K p_i.
+\]
+\end{proposition}
+
+\begin{proof}
+For each \(i\in[K]\), let \(y_i,x_i,C_{\infty,i}\) be the selector objects
+for the output pair \((u_{2i-1},u_{2i})\).  By construction,
+\[
+ x_i=\frac{u_{2i-1}-u_{2i}}{\norm{u_{2i-1}-u_{2i}}}
+ =\frac{g_i}{\norm{g_i}},
+\]
+and
+\[
+ x_i^\top C_{\infty,i}x_i\ge\frac18.
+\]
+Let
+\[
+ X_K:=[x_1,\ldots,x_K],
+ \qquad
+ Y_K:=[y_1,\ldots,y_K].
+\]
+On \(\mathcal E_G\), every \(\norm{g_i}\ge\sigma_{\min}(G_K)\ge1/2\).
+Writing
+\[
+ D:=\Diag(\norm{g_1},\ldots,\norm{g_K}),
+ \qquad
+ X_K=G_KD^{-1},
+\]
+we obtain
+\[
+ \norm{X_K}_{\op}
+ \le
+ \norm{G_K}_{\op}\norm{D^{-1}}_{\op}
+ \le
+ \frac32\cdot2=3.
+\]
+
+On \(\mathcal E_V\), \(V_K\) has full column rank and
+\[
+ \norm{V_K^\dagger}_{\op}
+ =\frac1{\sigma_{\min}(V_K)}
+ \le2,
+\]
+where \(V_K^\dagger=(V_K^\top V_K)^{-1}V_K^\top\).  Define
+\[
+ W_t:=tY_KV_K^\dagger.
+\]
+Since \(V_K^\dagger V_K=I_K\),
+\[
+ W_tv_i=ty_i
+ \qquad (i\in[K]).
+\]
+Therefore
+\[
+ C_i(W_t)\longrightarrow C_{\infty,i}
+ \qquad (i\in[K]).
+\]
+Now define
+\[
+ H:=\frac16X_KV_K^\dagger.
+\]
+Then
+\[
+ \norm{H}_{\op}
+ \le
+ \frac16\norm{X_K}_{\op}\norm{V_K^\dagger}_{\op}
+ \le1,
+\]
+and
+\[
+ Hv_i=\frac16x_i
+ \qquad (i\in[K]).
+\]
+Using nonnegativity of the Hessian summands,
+\begin{align*}
+ \beta_{\op}
+ &\ge
+ \liminf_{t\to\infty}\nabla^2L(W_t)[H,H]\\
+ &\ge
+ \sum_{i=1}^K p_i
+ \left(\frac16x_i\right)^\top
+ C_{\infty,i}
+ \left(\frac16x_i\right)\\
+ &\ge
+ \frac1{36}\cdot\frac18\sum_{i=1}^Kp_i
+ =
+ \frac1{288}\sum_{i=1}^Kp_i.
+\end{align*}
+\end{proof}
+
+\begin{lemma}[Head-mass comparison]
+\label{lem:head-mass}
+Let \(a_1\ge\cdots\ge a_m\ge0\), and let \(1\le K\le m\).  Then
+\[
+ \sum_{i=1}^K a_i
+ \ge
+ \frac Km\sum_{i=1}^m a_i.
+\]
+\end{lemma}
+
+\begin{proof}
+If \(K=m\), the claim is equality.  Assume \(K<m\).  Since
+\[
+ a_{K+1}\le a_K\le\frac1K\sum_{i=1}^K a_i,
+\]
+we have
+\[
+ \sum_{i=K+1}^m a_i
+ \le
+ (m-K)a_{K+1}
+ \le
+ \frac{m-K}{K}\sum_{i=1}^K a_i.
+\]
+Adding the head mass to both sides and rearranging proves the result.
+\end{proof}
+
+\begin{proposition}[Operator lower estimate on explicit events]
+\label{prop:operator-lower}
+Assume \(m\ge512\).  On
+\[
+ \mathcal E_{\mathrm{sel}}
+ \cap\mathcal E_V
+ \cap\mathcal E_G
+ \cap\mathcal E_{\mathrm{tr}},
+\]
+one has
+\[
+ \beta_{\op}
+ \ge
+ \frac1{294912}\left(P_m+\frac1d\right).
+\]
+\end{proposition}
+
+\begin{proof}
+Because \(m/256\ge2\),
+\[
+ K=\left\lfloor\frac{m}{256}\right\rfloor
+ \ge\frac{m}{512}.
+\]
+Apply Lemma~\ref{lem:head-mass} to the nonincreasing sequence
+\(p_1,\ldots,p_m\).  Proposition~\ref{prop:simultaneous-activation} gives
+\[
+ \beta_{\op}
+ \ge
+ \frac1{288}\sum_{i=1}^Kp_i
+ \ge
+ \frac1{288}\frac KmP_m
+ \ge
+ \frac{P_m}{147456}.
+\]
+Moreover, the Frobenius unit ball is contained in the operator-norm unit ball,
+because \(\norm{H}_{\op}\le\norm{H}_F\).  Hence
+\[
+ \beta_{\op}\ge\beta_F.
+\]
+On the displayed event, Lemma~\ref{lem:diffuse-lower} therefore gives
+\[
+ \beta_{\op}\ge\frac1{32d}.
+\]
+Combining the two estimates,
+\begin{align*}
+ \beta_{\op}
+ &\ge
+ \max\left\{\frac{P_m}{147456},\frac1{32d}\right\}\\
+ &\ge
+ \frac{P_m}{294912}+\frac1{64d}\\
+ &\ge
+ \frac1{294912}\left(P_m+\frac1d\right).
+\end{align*}
+\end{proof}
+
+\section{Uniform spectral-width estimate}
+\label{sec:block-width}
+
+\begin{lemma}[Uniform block spectral-width bound]
+\label{lem:block-width}
+Let \(I\subseteq[N]\) be deterministic, with \(s:=\abs{I}\ge1\).  Fix an
+output realization satisfying
+\[
+ \max_{j\in[N]}\norm{u_j}\le2.
+\]
+For \(\tau>0\), define
+\[
+ T(\tau):=d^2\log(3d)+\tau,
+ \qquad
+ b_s(\tau):=\max\left\{8,\frac{2T(\tau)}s\right\}.
+\]
+Conditionally on this output realization, there is an event
+\(\mathcal E_I(\tau)\), depending only on \(\{v_i:i\in I\}\), such that
+\[
+ \Pp\bigl(\mathcal E_I(\tau)\mid U\bigr)\ge1-e^{-\tau},
+\]
+and, on
+\[
+ \mathcal E_I(\tau)
+ \cap
+ \left\{\max_{i\in I}\norm{v_i}\le2\right\},
+\]
+one has
+\[
+ \boxed{
+ \sup_{\norm{H}_{\op}\le1}
+ \frac1s\sum_{i\in I}w_U(Hv_i)^2
+ \le
+ \frac{64}{d}\left(L_N+b_s(\tau)+2\right).
+ }
+\]
+\end{lemma}
+
+\begin{proof}
+Fix \(H\) with \(\norm{H}_{\op}\le1\), and let
+\(v\sim\mathcal N(0,I_d/d)\), independently of \(U\).  For fixed \(j,k\),
+conditionally on \(U\),
+\[
+ (u_j-u_k)^\top Hv
+ \sim
+ \mathcal N\left(
+ 0,\frac{\norm{H^\top(u_j-u_k)}^2}{d}
+ \right).
+\]
+Because \(\norm{u_j-u_k}\le4\), the conditional variance is at most
+\(16/d\).  Therefore
+\[
+ \Pp\left(
+ \abs{(u_j-u_k)^\top Hv}\ge z\mid U
+ \right)
+ \le2e^{-dz^2/32}.
+\]
+A union bound over at most \(N^2\) ordered pairs gives
+\[
+ \Pp\left(w_U(Hv)\ge z\mid U\right)
+ \le2N^2e^{-dz^2/32}.
+\]
+With
+\[
+ z^2=\frac{32}{d}(L_N+r),
+ \qquad
+ L_N=\log(2N^2),
+\]
+we obtain
+\[
+ \Pp\left(
+ w_U(Hv)^2\ge\frac{32}{d}(L_N+r)
+ \ \middle|\ U
+ \right)
+ \le e^{-r}.
+\]
+
+For \(i\in I\), define
+\[
+ Y_i
+ :=
+ \left(
+ \frac d{32}w_U(Hv_i)^2-L_N
+ \right)_+.
+\]
+Then, conditionally on \(U\), the variables \(Y_i\) are independent and
+\[
+ \Pp(Y_i\ge r\mid U)\le e^{-r}
+ \qquad (r\ge0).
+\]
+For \(0<\lambda<1\), the tail-integration identity gives
+\begin{align*}
+ \E[e^{\lambda Y_i}\mid U]
+ &=
+ 1+\int_0^\infty \lambda e^{\lambda r}
+ \Pp(Y_i\ge r\mid U)\,dr\\
+ &\le
+ 1+\lambda\int_0^\infty e^{-(1-\lambda)r}\,dr
+ =\frac1{1-\lambda}.
+\end{align*}
+Thus, for \(b>1\), Chernoff's inequality with \(\lambda=1-1/b\) yields
+\[
+ \Pp\left(
+ \frac1s\sum_{i\in I}Y_i\ge b
+ \ \middle|\ U
+ \right)
+ \le
+ e^{-s(b-1-\log b)}.
+\]
+For \(b\ge8\),
+\[
+ b-1-\log b\ge\frac b2.
+\]
+We claim that
+\[
+ s\bigl(b_s(\tau)-1-\log b_s(\tau)\bigr)\ge T(\tau).
+\]
+Indeed, if \(b_s(\tau)=2T(\tau)/s\), the claim follows from the preceding
+half-linear bound.  If \(b_s(\tau)=8\), then \(T(\tau)\le4s\), while
+\(8-1-\log8>4\).  This proves the claim.
+
+Take a \(d^{-1/2}\)-net \(\mathcal H\) of the operator unit ball.  By
+Lemma~\ref{lem:nets},
+\[
+ \abs{\mathcal H}\le(3d)^{d^2}.
+\]
+A union bound over \(H_0\in\mathcal H\) shows that, with conditional failure
+probability at most
+\[
+ (3d)^{d^2}e^{-T(\tau)}=e^{-\tau},
+\]
+one has simultaneously
+\[
+ \frac1s\sum_{i\in I}w_U(H_0v_i)^2
+ \le
+ \frac{32}{d}\left(L_N+b_s(\tau)\right)
+ \qquad (H_0\in\mathcal H).
+\]
+This defines \(\mathcal E_I(\tau)\).
+
+Now let \(\norm{H}_{\op}\le1\), and choose \(H_0\in\mathcal H\) satisfying
+\(\norm{H-H_0}_{\op}\le d^{-1/2}\).  On the input-norm event in the
+statement,
+\begin{align*}
+ w_U(Hv_i)
+ &\le
+ w_U(H_0v_i)
+ +\max_{j,k}\abs{(u_j-u_k)^\top(H-H_0)v_i}\\
+ &\le
+ w_U(H_0v_i)
+ +4d^{-1/2}\norm{v_i}\\
+ &\le
+ w_U(H_0v_i)+\frac8{\sqrt d}.
+\end{align*}
+Therefore
+\[
+ w_U(Hv_i)^2
+ \le
+ 2w_U(H_0v_i)^2+\frac{128}{d}.
+\]
+Average over \(i\in I\) and use the net estimate to obtain
+\[
+ \frac1s\sum_{i\in I}w_U(Hv_i)^2
+ \le
+ \frac{64}{d}\left(L_N+b_s(\tau)+2\right).
+\]
+Taking the supremum over \(H\) proves the result.
+\end{proof}
+
+\section{Operator-norm upper bound}
+\label{sec:operator-upper}
+
+Define the global norm event
+\[
+ \mathcal E_{\mathrm{norm}}
+ :=
+ \left\{
+ \max_{j\in[N]}\norm{u_j}\le2,
+ \quad
+ \max_{i\in[N]}\norm{v_i}\le2
+ \right\}.
+\]
+By Lemma~\ref{lem:gaussian-vector} and a union bound,
+\begin{equation}
+ \Pp(\mathcal E_{\mathrm{norm}})
+ \ge1-2Ne^{-d/2}.
+ \label{eq:norm-event-probability}
+\end{equation}
+
+Assume \(N>d\).  For \(r=0,\ldots,J-1\), set
+\[
+ a_r:=2^r d,
+ \qquad
+ I_r:=\{a_r+1,\ldots,\min(2a_r,N)\},
+ \qquad
+ s_r:=\abs{I_r}.
+\]
+These nonempty, disjoint blocks partition \(\{d+1,\ldots,N\}\).  For each
+block, apply Lemma~\ref{lem:block-width} with \(\tau=d\).  Since
+\(T(d)=T_d\), conditionally on any output realization satisfying the output
+part of \(\mathcal E_{\mathrm{norm}}\), the simultaneous block event
+\[
+ \mathcal E_{\mathrm{width}}
+ :=
+ \bigcap_{r=0}^{J-1}\mathcal E_{I_r}(d)
+\]
+satisfies
+\begin{equation}
+ \Pp\left(\mathcal E_{\mathrm{width}}^c\mid U\right)
+ \le J e^{-d}.
+ \label{eq:width-event-probability}
+\end{equation}
+When \(N\le d\), define \(\mathcal E_{\mathrm{width}}\) to be the whole
+sample space.
+
+\begin{proposition}[Operator upper estimate on explicit events]
+\label{prop:operator-upper}
+On \(\mathcal E_{\mathrm{norm}}\),
+\[
+ \beta_{\op}\le16.
+\]
+If \(N>d\), then on
+\(\mathcal E_{\mathrm{norm}}\cap\mathcal E_{\mathrm{width}}\),
+\[
+ \beta_{\op}
+ \le
+ 16P_d
+ +\frac{2^{\alpha+4}(L_N+10)}{d}
+ +\frac{32T_d}{d^2}\,\Xi_{\alpha,J}P_d.
+\]
+\end{proposition}
+
+\begin{proof}
+On \(\mathcal E_{\mathrm{norm}}\),
+\[
+ R_u\le4,
+ \qquad
+ \Tr(M_v)=\sum_{i=1}^N p_i\norm{v_i}^2\le4.
+\]
+The second estimate in Lemma~\ref{lem:operator-reduction} gives
+\[
+ \beta_{\op}\le16.
+\]
+
+Assume now that \(N>d\).  For \(i\le d\) and
+\(\norm{H}_{\op}\le1\),
+\[
+ w_U(Hv_i)
+ \le
+ \max_{j,k}\norm{u_j-u_k}\norm{Hv_i}
+ \le4\cdot2=8.
+\]
+Thus the head contribution in Lemma~\ref{lem:operator-reduction} is at most
+\[
+ \frac14\sum_{i=1}^d p_iw_U(Hv_i)^2
+ \le16P_d.
+\]
+
+Fix a tail block \(I_r\).  Since \(p_i\) is nonincreasing,
+\[
+ \sum_{i\in I_r}p_iw_U(Hv_i)^2
+ \le
+ p_{a_r+1}\sum_{i\in I_r}w_U(Hv_i)^2.
+\]
+The block-width estimate with \(\tau=d\) yields
+\begin{align*}
+ \frac14\sum_{i\in I_r}p_iw_U(Hv_i)^2
+ &\le
+ \frac{16}{d}p_{a_r+1}s_r
+ \left[
+ L_N+\max\left\{8,\frac{2T_d}{s_r}\right\}+2
+ \right]\\
+ &\le
+ \frac{16(L_N+10)}d\,s_rp_{a_r+1}
+ +\frac{32T_d}{d}\,p_{a_r+1}.
+\end{align*}
+For every \(i\in I_r\), we have \(i\le2a_r\), and therefore
+\[
+ p_i
+ =\frac{i^{-\alpha}}{H_{N,\alpha}}
+ \ge
+ 2^{-\alpha}\frac{a_r^{-\alpha}}{H_{N,\alpha}}
+ \ge
+ 2^{-\alpha}p_{a_r+1}.
+\]
+Hence
+\[
+ s_rp_{a_r+1}
+ \le
+ 2^\alpha\sum_{i\in I_r}p_i,
+\]
+and summing over blocks gives
+\[
+ \sum_{r=0}^{J-1}s_rp_{a_r+1}\le2^\alpha.
+\]
+Also,
+\[
+ p_{a_r+1}
+ \le
+ \frac{a_r^{-\alpha}}{H_{N,\alpha}}
+ =p_d2^{-\alpha r}.
+\]
+Since \(P_d\ge dp_d\),
+\[
+ \sum_{r=0}^{J-1}p_{a_r+1}
+ \le
+ p_d\Xi_{\alpha,J}
+ \le
+ \frac{P_d}{d}\Xi_{\alpha,J}.
+\]
+Summing the preceding block estimate over \(r\) gives
+\[
+ \frac14
+ \sup_{\norm{H}_{\op}\le1}
+ \sum_{i=d+1}^N p_iw_U(Hv_i)^2
+ \le
+ \frac{2^{\alpha+4}(L_N+10)}d
+ +\frac{32T_d}{d^2}\Xi_{\alpha,J}P_d.
+\]
+Adding the head contribution and invoking
+Lemma~\ref{lem:operator-reduction} proves the claim.
+\end{proof}
+
+\section{Proof of the main theorem}
+\label{sec:main-proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Because \(m\ge512\), we have \(K\ge1\), \(K\le d/256\), and \(2K\le N\).
+Thus all selector and rectangular-matrix constructions above are valid.
+
+Consider the event
+\[
+ \mathcal G
+ :=
+ \mathcal E_{\mathrm{norm}}
+ \cap\mathcal E_M
+ \cap\mathcal E_{\mathrm{tr}}
+ \cap\mathcal E_{\mathrm{sel}}
+ \cap\mathcal E_V
+ \cap\mathcal E_G
+ \cap\mathcal E_{\mathrm{width}}.
+\]
+The individual failure bounds are:
+\begin{align*}
+ \Pp(\mathcal E_{\mathrm{norm}}^c)
+ &\le2Ne^{-d/2},\\
+ \Pp(\mathcal E_M^c)
+ &\le e^{-d},\\
+ \Pp(\mathcal E_{\mathrm{tr}}^c)
+ &\le e^{-d/16},\\
+ \Pp(\mathcal E_{\mathrm{sel}}^c)
+ &\le
+ 4K e^{-d/32}
+ +2K e^{-d/48}
+ +K(N-2)e^{-d/64},\\
+ \Pp(\mathcal E_V^c)+\Pp(\mathcal E_G^c)
+ &\le4\cdot17^K e^{-d/32}.
+\end{align*}
+For the width event, let
+\[
+ \mathcal E_{\mathrm{norm}}^U
+ :=
+ \left\{\max_j\norm{u_j}\le2\right\}.
+\]
+Equation~\eqref{eq:width-event-probability} and the tower property imply
+\[
+ \Pp\left(
+ \mathcal E_{\mathrm{norm}}^U
+ \cap\mathcal E_{\mathrm{width}}^c
+ \right)
+ \le J e^{-d}.
+\]
+Therefore a union bound gives
+\[
+ \Pp(\mathcal G^c)
+ \le
+ \varepsilon_{\mathrm{tot}}(d,N),
+\]
+with \(\varepsilon_{\mathrm{tot}}\) defined in
+\eqref{eq:total-failure}.
+
+On \(\mathcal G\), Proposition~\ref{prop:frobenius-upper} gives the
+Frobenius upper bound, and Proposition~\ref{prop:frobenius-lower} gives the
+Frobenius lower bound.  Proposition~\ref{prop:operator-lower} gives the
+operator lower bound.  Proposition~\ref{prop:operator-upper} gives both the
+universal operator upper bound \(16\) and, when \(N>d\), the sharper dyadic
+upper bound.  Hence all conclusions of Theorem~\ref{thm:main} hold
+simultaneously on \(\mathcal G\).
+\end{proof}
+
+\section{Zipf consequences in the polynomial-size regime}
+\label{sec:consequences}
+
+This section records consequences of Theorem~\ref{thm:main}; it is not used in
+its proof.
+
+\begin{corollary}[Polynomial-size summary]
+\label{cor:polynomial-size}
+Fix \(\alpha\ge0\).  Suppose \(N=d^{\Theta(1)}\) and
+\(m=\min\{d,N\}\ge512\).  Then
+\[
+ \varepsilon_{\mathrm{tot}}(d,N)=e^{-\Omega(d)}.
+\]
+On the event in Theorem~\ref{thm:main},
+\[
+ \beta_F
+ =\Theta\left(\frac1d+p_1\right),
+\]
+with universal implicit constants, and
+\[
+ \beta_{\op}
+ =\widetilde\Theta_\alpha\left(\frac1d+P_m\right),
+\]
+where the tilde hides factors polylogarithmic in \(d\).
+\end{corollary}
+
+\begin{proof}
+Since \(N\) is polynomial in \(d\), all polynomial prefactors in
+\eqref{eq:total-failure} are dominated by the displayed exponential tails.
+For the rectangular terms, use \(K\le d/256\):
+\[
+ 17^K e^{-d/32}
+ \le
+ \exp\left[-\left(\frac1{32}-\frac{\log17}{256}\right)d\right]
+ =e^{-\Omega(d)}.
+\]
+Thus \(\varepsilon_{\mathrm{tot}}(d,N)=e^{-\Omega(d)}\).
+
+The Frobenius assertion is exactly Theorem~\ref{thm:main}.  For the operator
+upper bound, if \(N\le d\), then \(P_m=P_N=1\), and the lower and upper bounds
+are both of constant order.  If \(N>d\), then \(m=d\),
+\[
+ L_N=O(\log d),
+ \qquad
+ \frac{T_d}{d^2}=O(\log d),
+ \qquad
+ J=O(\log d),
+\]
+and
+\[
+ \Xi_{\alpha,J}
+ =
+ \begin{cases}
+ O(\log d),&\alpha=0,\\
+ O_\alpha(1),&\alpha>0.
+ \end{cases}
+\]
+Therefore
+\[
+ \beta_{\op}
+ \lesssim_\alpha
+ \begin{cases}
+ P_d\log^2d+\dfrac{\log d}{d},&\alpha=0,\\[2mm]
+ P_d\log d+\dfrac{\log d}{d},&\alpha>0.
+ \end{cases}
+\]
+Combining with the lower bound proves the stated polylogarithmic equivalence.
+\end{proof}
+
+\begin{corollary}[Evaluation of the Zipf head masses]
+\label{cor:zipf-evaluation}
+For fixed \(\alpha\ge0\),
+\[
+ H_{n,\alpha}
+ =
+ \begin{cases}
+ \Theta_\alpha(n^{1-\alpha}),&0\le\alpha<1,\\
+ \Theta(\log n),&\alpha=1,\\
+ \Theta_\alpha(1),&\alpha>1.
+ \end{cases}
+\]
+Consequently,
+\[
+ \beta_F
+ =
+ \begin{cases}
+ \Theta_\alpha\!\left(d^{-1}+N^{\alpha-1}\right),&0\le\alpha<1,\\[1mm]
+ \Theta\!\left(d^{-1}+(\log N)^{-1}\right),&\alpha=1,\\[1mm]
+ \Theta_\alpha(1),&\alpha>1,
+ \end{cases}
+\]
+and, in the polynomial-size regime,
+\[
+ \beta_{\op}
+ =
+ \begin{cases}
+ \widetilde\Theta_\alpha\!\left(
+ d^{-1}+\left(\dfrac{m}{N}\right)^{1-\alpha}
+ \right),&0\le\alpha<1,\\[4mm]
+ \widetilde\Theta\!\left(
+ d^{-1}+\dfrac{\log m}{\log N}
+ \right),&\alpha=1,\\[4mm]
+ \Theta_\alpha(1),&\alpha>1,
+ \end{cases}
+ \qquad m=\min\{d,N\}.
+\]
+For \(0\le\alpha<1\) and \(N>d\), the exact identity is
+\[
+ P_d=H_{d,\alpha}p_1,
+\]
+and therefore
+\[
+ P_d
+ \asymp_\alpha
+ \left(\frac dN\right)^{1-\alpha}
+ \asymp_\alpha
+ d^{1-\alpha}p_1.
+\]
+The last two relations are asymptotic comparisons, not exact equalities in
+general.
+\end{corollary}
+
+\begin{proof}
+The harmonic-number estimates follow from elementary integral comparison.
+Substitute
+\[
+ p_1=H_{N,\alpha}^{-1},
+ \qquad
+ P_m=\frac{H_{m,\alpha}}{H_{N,\alpha}}
+\]
+into Theorem~\ref{thm:main} and Corollary~\ref{cor:polynomial-size}.  The
+identity \(P_d=H_{d,\alpha}p_1\) follows directly from the definitions.
+\end{proof}
+
+\end{document}
