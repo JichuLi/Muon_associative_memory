@@ -1,0 +1,2003 @@
+\documentclass[11pt]{article}
+
+% ============================================================
+% Packages
+% ============================================================
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{hyperref}
+
+% ============================================================
+% Theorem environments
+% ============================================================
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% ============================================================
+% Commands
+% ============================================================
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\F}{\mathrm{F}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand{\Sph}{\mathbb{S}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\vecop}{\operatorname{vec}}
+\newcommand{\Span}{\operatorname{span}}
+\newcommand{\diag}{\operatorname{diag}}
+
+% ============================================================
+% Title
+% ============================================================
+\title{
+A Technical Note on Existence and Uniqueness\\
+of the Finite-Population Softmax Associative-Memory Minimizer
+}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We study the finite-population softmax loss
+\[
+L(W)
+=
+\sum_{i=1}^{N}p_i
+\left(
+\log\sum_{j=1}^{N}
+\exp(u_j^\top Wv_i)
+-
+u_i^\top Wv_i
+\right),
+\qquad
+W\in\R^{d\times d},
+\]
+where all weights satisfy \(p_i>0\), and
+\[
+u_i,v_i\overset{\mathrm{iid}}{\sim}N(0,I_d/d),
+\]
+with the two Gaussian families mutually independent.
+
+The objective need not possess a finite minimizer for every realization:
+if there exists a nonzero matrix direction along which every correct class
+weakly dominates every incorrect class, the loss decreases toward its
+infimum. We prove that when \(N>d^2\), such a
+direction fails to exist with probability at least
+\[
+1-
+2^{1-N}
+\sum_{k=0}^{d^2-1}
+\binom{N-1}{k}.
+\]
+On the same event the loss is coercive. Gaussian spanning implies strict
+convexity almost surely, and consequently the minimizer exists, is finite,
+and is unique.
+
+For \(N=\lceil d^\beta\rceil\) with fixed \(\beta>2\), the exceptional
+probability is \(\exp[-\Omega(N)]\).
+\end{abstract}
+
+\tableofcontents
+
+% ============================================================
+\section{Model and main theorem}
+% ============================================================
+
+Fix integers
+\[
+d\ge 2,
+\qquad
+N>d^2.
+\]
+Let
+\[
+u_1,\dots,u_N,
+\qquad
+v_1,\dots,v_N
+\]
+be random vectors in \(\R^d\) satisfying
+\[
+u_i,v_i\overset{\mathrm{iid}}{\sim}N(0,I_d/d),
+\]
+where the family \((u_i)_{i=1}^N\) is independent of the family
+\((v_i)_{i=1}^N\).
+
+Let
+\[
+p_1,\dots,p_N>0,
+\qquad
+\sum_{i=1}^N p_i=1.
+\]
+The proof below only uses strict positivity of the weights. In particular,
+it applies to the power-law distribution
+\[
+p_i
+=
+\frac{i^{-\alpha}}
+{\sum_{k=1}^N k^{-\alpha}},
+\qquad
+\alpha\ge 0.
+\]
+
+For \(W\in\R^{d\times d}\), define the logits
+\[
+s_{ji}(W)=u_j^\top Wv_i,
+\qquad
+1\le i,j\le N,
+\]
+the per-item loss
+\[
+\ell_i(W)
+=
+\log\left(
+\sum_{j=1}^{N}e^{s_{ji}(W)}
+\right)
+-
+s_{ii}(W),
+\]
+and the total loss
+\[
+L(W)
+=
+\sum_{i=1}^{N}p_i\ell_i(W).
+\]
+
+Equivalently,
+\begin{equation}
+\ell_i(W)
+=
+\log\left(
+\sum_{j=1}^{N}
+\exp\bigl((u_j-u_i)^\top Wv_i\bigr)
+\right).
+\label{eq:relative-loss}
+\end{equation}
+
+We equip \(\R^{d\times d}\) with the Frobenius inner product
+\[
+\ip{A}{B}
+=
+\operatorname{Tr}(A^\top B)
+\]
+and Frobenius norm
+\[
+\norm{A}_{\F}
+=
+\sqrt{\ip{A}{A}}.
+\]
+
+\begin{theorem}[Finite existence and uniqueness]
+\label{thm:main}
+Assume \(N>d^2\). Then
+\begin{equation}
+\Pp\left(
+L\text{ has a unique finite minimizer }W_\star
+\right)
+\ge
+1-
+2^{1-N}
+\sum_{k=0}^{d^2-1}
+\binom{N-1}{k}.
+\label{eq:main-probability}
+\end{equation}
+
+Equivalently, except on an event of probability at most
+\[
+2^{1-N}
+\sum_{k=0}^{d^2-1}
+\binom{N-1}{k},
+\]
+there exists a unique matrix \(W_\star\in\R^{d\times d}\) such that
+\[
+L(W_\star)
+=
+\inf_{W\in\R^{d\times d}}L(W).
+\]
+
+In particular, if
+\[
+N=\left\lceil d^\beta\right\rceil
+\]
+for a fixed \(\beta>2\), then, for all sufficiently large \(d\),
+\begin{equation}
+\Pp\left(
+L\text{ has a unique finite minimizer}
+\right)
+\ge
+1-\exp\left(-\frac{N-1}{16}\right).
+\label{eq:main-exponential}
+\end{equation}
+Consequently,
+\[
+\Pp\left(
+L\text{ has a unique finite minimizer}
+\right)
+=
+1-\exp[-\Omega(N)].
+\]
+\end{theorem}
+
+The remainder of this note proves Theorem~\ref{thm:main} from first
+principles.
+
+% ============================================================
+\section{Deterministic geometry of the loss}
+% ============================================================
+
+\subsection{The recession functional}
+
+For \(H\in\R^{d\times d}\), define
+\begin{equation}
+L^\infty(H)
+=
+\sum_{i=1}^{N}p_i
+\left[
+\max_{1\le j\le N}u_j^\top Hv_i
+-
+u_i^\top Hv_i
+\right].
+\label{eq:recession}
+\end{equation}
+
+The notation \(L^\infty\) is justified because this is the recession
+function of \(L\). For the existence proof, we only need its explicit
+formula, continuity, and positive homogeneity.
+
+\begin{lemma}[Basic properties of the recession functional]
+\label{lem:recession-basic}
+For every \(H\in\R^{d\times d}\):
+
+\begin{enumerate}[label=(\roman*)]
+\item \(L^\infty(H)\ge 0\);
+
+\item for every \(t\ge 0\),
+\[
+L^\infty(tH)=tL^\infty(H);
+\]
+
+\item \(L^\infty\) is continuous;
+
+\item for every \(W\in\R^{d\times d}\),
+\begin{equation}
+L(W)\ge L^\infty(W).
+\label{eq:L-lower-recession}
+\end{equation}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+For each fixed \(i\), the index \(j=i\) is included in the maximum.
+Therefore
+\[
+\max_j u_j^\top Hv_i-u_i^\top Hv_i
+\ge
+u_i^\top Hv_i-u_i^\top Hv_i
+=
+0.
+\]
+Since \(p_i>0\), summing proves \(L^\infty(H)\ge 0\).
+
+For \(t\ge 0\),
+\[
+\max_j u_j^\top(tH)v_i-u_i^\top(tH)v_i
+=
+t
+\left(
+\max_j u_j^\top Hv_i-u_i^\top Hv_i
+\right),
+\]
+which proves positive homogeneity.
+
+Each map
+\[
+H\longmapsto u_j^\top Hv_i
+\]
+is linear and therefore continuous. A maximum of finitely many continuous
+functions is continuous. Hence each summand in
+\eqref{eq:recession} is continuous, and so is \(L^\infty\).
+
+Finally, for every collection of real numbers \(a_1,\dots,a_N\),
+\[
+\log\sum_{j=1}^{N}e^{a_j}
+\ge
+\max_j a_j.
+\]
+Applying this with
+\[
+a_j=u_j^\top Wv_i
+\]
+gives
+\[
+\ell_i(W)
+=
+\log\sum_j e^{u_j^\top Wv_i}
+-
+u_i^\top Wv_i
+\ge
+\max_j u_j^\top Wv_i-u_i^\top Wv_i.
+\]
+Multiplying by \(p_i\) and summing over \(i\) yields
+\eqref{eq:L-lower-recession}.
+\end{proof}
+
+\subsection{The weak-separator cone}
+
+Define the weak-separator cone
+\begin{equation}
+\cS
+=
+\left\{
+H\in\R^{d\times d}:
+u_i^\top Hv_i
+\ge
+u_j^\top Hv_i
+\text{ for every }i,j
+\right\}.
+\label{eq:separator-cone}
+\end{equation}
+
+Thus \(H\in\cS\) means that, in the direction \(H\), the correct candidate
+\(u_i\) weakly dominates every competing candidate \(u_j\) for every
+query \(v_i\).
+
+Also define the lineality space
+\begin{equation}
+\cN
+=
+\left\{
+H\in\R^{d\times d}:
+(u_j-u_1)^\top Hv_i=0
+\text{ for every }i,j
+\right\}.
+\label{eq:lineality}
+\end{equation}
+
+A direction \(H\in\cN\) adds the same logit to all candidates in each
+column and therefore leaves the loss unchanged.
+
+\begin{lemma}[Zero set of \(L^\infty\)]
+\label{lem:zero-set}
+For every \(H\in\R^{d\times d}\),
+\[
+L^\infty(H)=0
+\quad\Longleftrightarrow\quad
+H\in\cS.
+\]
+\end{lemma}
+
+\begin{proof}
+Every summand in \eqref{eq:recession} is nonnegative. Since every
+\(p_i>0\), the sum vanishes if and only if each summand vanishes:
+\[
+\max_j u_j^\top Hv_i-u_i^\top Hv_i=0
+\qquad
+\text{for every }i.
+\]
+This is equivalent to
+\[
+u_i^\top Hv_i
+\ge
+u_j^\top Hv_i
+\qquad
+\text{for every }i,j,
+\]
+which is exactly \(H\in\cS\).
+\end{proof}
+
+\subsection{Why a nonzero separator prevents finite minimization}
+
+\begin{lemma}[Strict descent along a nontrivial separator]
+\label{lem:strict-descent}
+Assume \(\cN=\{0\}\). If
+\[
+H\in\cS\setminus\{0\},
+\]
+then, for every fixed \(W\in\R^{d\times d}\), the function
+\[
+t\longmapsto L(W+tH)
+\]
+is strictly decreasing on \(\R\).
+
+Consequently, \(L\) cannot possess a finite minimizer.
+\end{lemma}
+
+\begin{proof}
+Fix \(W\) and \(H\in\cS\). Define
+\[
+\delta_{ji}
+=
+u_i^\top Hv_i-u_j^\top Hv_i.
+\]
+Because \(H\in\cS\),
+\[
+\delta_{ji}\ge 0
+\qquad
+\text{for every }i,j,
+\]
+and
+\[
+\delta_{ii}=0.
+\]
+
+Using the relative-logit representation
+\eqref{eq:relative-loss},
+\begin{align}
+\ell_i(W+tH)
+&=
+\log
+\sum_{j=1}^{N}
+\exp\left(
+(u_j-u_i)^\top(W+tH)v_i
+\right)
+\nonumber\\
+&=
+\log
+\sum_{j=1}^{N}
+\exp\left(
+(u_j-u_i)^\top Wv_i
+-
+t\delta_{ji}
+\right).
+\label{eq:loss-along-separator}
+\end{align}
+
+Every term inside the sum in \eqref{eq:loss-along-separator} is
+nonincreasing in \(t\). Therefore every
+\[
+t\longmapsto \ell_i(W+tH)
+\]
+is nonincreasing.
+
+We now show that at least one per-item loss is strictly decreasing.
+Suppose, to the contrary, that
+\[
+\delta_{ji}=0
+\qquad
+\text{for every }i,j.
+\]
+Then
+\[
+u_i^\top Hv_i=u_j^\top Hv_i
+\qquad
+\text{for every }i,j.
+\]
+In particular,
+\[
+(u_j-u_1)^\top Hv_i=0
+\qquad
+\text{for every }i,j,
+\]
+so \(H\in\cN\). Since \(\cN=\{0\}\), this would imply \(H=0\), contrary
+to the assumption.
+
+Hence there exist \(i_0,j_0\) such that
+\[
+\delta_{j_0i_0}>0.
+\]
+For this fixed \(i_0\), at least one positive term in the exponential
+sum is strictly decreasing in \(t\), while no term increases. Thus
+\[
+t\longmapsto \ell_{i_0}(W+tH)
+\]
+is strictly decreasing.
+
+Because \(p_{i_0}>0\), the weighted sum
+\[
+L(W+tH)=\sum_i p_i\ell_i(W+tH)
+\]
+is strictly decreasing.
+
+If \(W_\star\) were a finite minimizer, then for every \(t>0\),
+\[
+L(W_\star+tH)<L(W_\star),
+\]
+contradicting minimality. Hence no finite minimizer exists.
+\end{proof}
+
+\subsection{Coercivity when no separator exists}
+
+\begin{proposition}[Deterministic existence criterion]
+\label{prop:deterministic-existence}
+Assume
+\[
+\cS=\{0\}.
+\]
+Then \(L\) is coercive in Frobenius norm: there exists
+\(\kappa>0\) such that
+\begin{equation}
+L(W)\ge \kappa\norm{W}_{\F}
+\qquad
+\text{for every }W\in\R^{d\times d}.
+\label{eq:coercive-bound}
+\end{equation}
+Consequently, \(L\) attains its minimum at some finite matrix
+\(W_\star\in\R^{d\times d}\).
+\end{proposition}
+
+\begin{proof}
+Consider the Frobenius unit sphere
+\[
+\Sph_{\F}
+=
+\left\{
+H\in\R^{d\times d}:\norm{H}_{\F}=1
+\right\}.
+\]
+This is compact because \(\R^{d\times d}\) is finite-dimensional.
+
+By Lemma~\ref{lem:recession-basic}, \(L^\infty\) is continuous.
+By Lemma~\ref{lem:zero-set} and the assumption \(\cS=\{0\}\),
+\[
+L^\infty(H)>0
+\qquad
+\text{for every }H\in\Sph_{\F}.
+\]
+A continuous, strictly positive function on a compact set attains a
+strictly positive minimum. Define
+\[
+\kappa
+=
+\min_{H\in\Sph_{\F}}L^\infty(H)>0.
+\]
+
+Let \(W\neq 0\). By positive homogeneity,
+\[
+L^\infty(W)
+=
+\norm{W}_{\F}
+L^\infty\left(
+\frac{W}{\norm{W}_{\F}}
+\right)
+\ge
+\kappa\norm{W}_{\F}.
+\]
+For \(W=0\), the same inequality holds trivially. Using
+\eqref{eq:L-lower-recession},
+\[
+L(W)
+\ge
+L^\infty(W)
+\ge
+\kappa\norm{W}_{\F},
+\]
+which proves \eqref{eq:coercive-bound}.
+
+It remains to prove attainment. Let
+\[
+m=\inf_{W\in\R^{d\times d}}L(W).
+\]
+Since \(L(0)=\log N<\infty\), we have \(m<\infty\).
+Choose a minimizing sequence \((W_k)\) satisfying
+\[
+L(W_k)\longrightarrow m.
+\]
+For all sufficiently large \(k\),
+\[
+L(W_k)\le m+1.
+\]
+By \eqref{eq:coercive-bound},
+\[
+\kappa\norm{W_k}_{\F}
+\le
+L(W_k)
+\le
+m+1.
+\]
+Hence \((W_k)\) is bounded in the finite-dimensional space
+\(\R^{d\times d}\). It therefore has a convergent subsequence,
+still denoted \(W_k\), such that
+\[
+W_k\longrightarrow W_\star.
+\]
+The function \(L\) is continuous, because it is a finite sum of
+compositions of continuous functions. Consequently,
+\[
+L(W_\star)
+=
+\lim_{k\to\infty}L(W_k)
+=
+m.
+\]
+Thus \(W_\star\) is a finite minimizer.
+\end{proof}
+
+% ============================================================
+\section{Strict convexity and uniqueness}
+% ============================================================
+
+For \(W\in\R^{d\times d}\), define the softmax probabilities
+\begin{equation}
+\pi_{j\mid i}(W)
+=
+\frac{
+\exp(u_j^\top Wv_i)
+}{
+\sum_{k=1}^{N}\exp(u_k^\top Wv_i)
+}.
+\label{eq:softmax}
+\end{equation}
+For every finite \(W\),
+\[
+\pi_{j\mid i}(W)>0
+\qquad
+\text{for every }i,j.
+\]
+
+\begin{lemma}[Gradient and Hessian in a matrix direction]
+\label{lem:hessian}
+For every \(W,H\in\R^{d\times d}\),
+\begin{align}
+\frac{d}{dt}L(W+tH)\bigg|_{t=0}
+&=
+\sum_{i=1}^{N}p_i
+\left[
+\sum_{j=1}^{N}
+\pi_{j\mid i}(W)\,
+u_j^\top Hv_i
+-
+u_i^\top Hv_i
+\right],
+\label{eq:first-directional}
+\\
+\frac{d^2}{dt^2}L(W+tH)\bigg|_{t=0}
+&=
+\sum_{i=1}^{N}p_i
+\Var_{j\sim\pi_{\cdot\mid i}(W)}
+\left(
+u_j^\top Hv_i
+\right).
+\label{eq:second-directional}
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Fix \(i\), and define
+\[
+a_{ji}=u_j^\top Hv_i,
+\qquad
+b_{ji}=u_j^\top Wv_i.
+\]
+Then
+\[
+\ell_i(W+tH)
+=
+\log\sum_{j=1}^{N}e^{b_{ji}+ta_{ji}}
+-
+b_{ii}
+-
+ta_{ii}.
+\]
+
+Differentiating,
+\begin{align*}
+\frac{d}{dt}\ell_i(W+tH)
+&=
+\frac{
+\sum_j a_{ji}e^{b_{ji}+ta_{ji}}
+}{
+\sum_k e^{b_{ki}+ta_{ki}}
+}
+-
+a_{ii}.
+\end{align*}
+At \(t=0\), this becomes
+\[
+\sum_j\pi_{j\mid i}(W)a_{ji}-a_{ii}.
+\]
+Multiplying by \(p_i\) and summing proves
+\eqref{eq:first-directional}.
+
+For the second derivative, let
+\[
+\pi_{j\mid i}(t)
+=
+\frac{
+e^{b_{ji}+ta_{ji}}
+}{
+\sum_k e^{b_{ki}+ta_{ki}}
+}.
+\]
+Then
+\[
+\frac{d}{dt}\pi_{j\mid i}(t)
+=
+\pi_{j\mid i}(t)
+\left(
+a_{ji}
+-
+\sum_k\pi_{k\mid i}(t)a_{ki}
+\right).
+\]
+Therefore
+\begin{align*}
+\frac{d^2}{dt^2}\ell_i(W+tH)
+&=
+\sum_j
+\frac{d}{dt}\pi_{j\mid i}(t)\,a_{ji}
+\\
+&=
+\sum_j\pi_{j\mid i}(t)a_{ji}^2
+-
+\left(
+\sum_j\pi_{j\mid i}(t)a_{ji}
+\right)^2.
+\end{align*}
+At \(t=0\), this is exactly
+\[
+\Var_{j\sim\pi_{\cdot\mid i}(W)}
+\left(
+u_j^\top Hv_i
+\right).
+\]
+Summing with weights \(p_i\) proves
+\eqref{eq:second-directional}.
+\end{proof}
+
+\begin{proposition}[Strict convexity under two spanning conditions]
+\label{prop:strict-convexity}
+Assume
+\begin{equation}
+\Span\{u_j-u_1:2\le j\le N\}
+=
+\R^d
+\label{eq:u-span}
+\end{equation}
+and
+\begin{equation}
+\Span\{v_i:1\le i\le N\}
+=
+\R^d.
+\label{eq:v-span}
+\end{equation}
+Then:
+
+\begin{enumerate}[label=(\roman*)]
+\item the lineality space satisfies \(\cN=\{0\}\);
+
+\item for every \(W\in\R^{d\times d}\) and every nonzero
+\(H\in\R^{d\times d}\),
+\[
+\frac{d^2}{dt^2}L(W+tH)\bigg|_{t=0}>0;
+\]
+
+\item \(L\) is strictly convex on \(\R^{d\times d}\);
+
+\item \(L\) has at most one finite minimizer.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Suppose \(H\in\cN\). Then
+\[
+(u_j-u_1)^\top Hv_i=0
+\qquad
+\text{for every }i,j.
+\]
+Fix \(i\). By \eqref{eq:u-span}, the vectors
+\[
+u_j-u_1,\qquad 2\le j\le N,
+\]
+span \(\R^d\). Hence \(Hv_i\) is orthogonal to all of \(\R^d\), so
+\[
+Hv_i=0.
+\]
+This holds for every \(i\). Since the \(v_i\) span \(\R^d\) by
+\eqref{eq:v-span}, the linear map \(H\) vanishes on a spanning set.
+Therefore
+\[
+H=0.
+\]
+Thus \(\cN=\{0\}\).
+
+Now fix \(W\) and \(H\neq 0\). By Lemma~\ref{lem:hessian},
+\[
+\frac{d^2}{dt^2}L(W+tH)\bigg|_{t=0}
+=
+\sum_i p_i
+\Var_{j\sim\pi_{\cdot\mid i}(W)}
+\left(
+u_j^\top Hv_i
+\right).
+\]
+Every summand is nonnegative.
+
+Suppose the full sum were zero. Since \(p_i>0\), every variance would
+have to vanish:
+\[
+\Var_{j\sim\pi_{\cdot\mid i}(W)}
+\left(
+u_j^\top Hv_i
+\right)
+=
+0
+\qquad
+\text{for every }i.
+\]
+The distribution \(\pi_{\cdot\mid i}(W)\) has full support because all
+softmax probabilities are strictly positive. A finite random variable
+has zero variance if and only if it is constant on its support.
+Therefore, for every fixed \(i\),
+\[
+u_j^\top Hv_i
+=
+u_1^\top Hv_i
+\qquad
+\text{for every }j.
+\]
+Equivalently,
+\[
+(u_j-u_1)^\top Hv_i=0
+\qquad
+\text{for every }i,j.
+\]
+Thus \(H\in\cN\). Since \(\cN=\{0\}\), this implies \(H=0\), contradicting
+the assumption.
+
+Hence the second directional derivative is strictly positive in every
+nonzero direction.
+
+To prove strict convexity, take distinct matrices \(W_0,W_1\), set
+\[
+H=W_1-W_0\neq 0,
+\]
+and define
+\[
+g(t)=L(W_0+tH),
+\qquad
+t\in[0,1].
+\]
+The preceding argument gives
+\[
+g''(t)>0
+\qquad
+\text{for every }t\in[0,1].
+\]
+Thus \(g\) is strictly convex, and consequently, for every
+\(\lambda\in(0,1)\),
+\[
+L((1-\lambda)W_0+\lambda W_1)
+<
+(1-\lambda)L(W_0)+\lambda L(W_1).
+\]
+Therefore \(L\) is strictly convex.
+
+A strictly convex function has at most one minimizer: if \(W_0\neq W_1\)
+were both minimizers, then
+\[
+L\left(\frac{W_0+W_1}{2}\right)
+<
+\frac12L(W_0)+\frac12L(W_1),
+\]
+which would be strictly smaller than the minimum value. This is
+impossible.
+\end{proof}
+
+\begin{lemma}[Gaussian spanning]
+\label{lem:gaussian-spanning}
+If \(N\ge d+1\), then the spanning conditions
+\eqref{eq:u-span}--\eqref{eq:v-span} hold with probability one.
+\end{lemma}
+
+\begin{proof}
+Consider first \(v_1,\dots,v_d\). The determinant
+\[
+\det[v_1,\dots,v_d]
+\]
+is a polynomial in the entries of \(v_1,\dots,v_d\). It is not the zero
+polynomial, because at the deterministic choice
+\[
+v_i=e_i,\qquad 1\le i\le d,
+\]
+the determinant equals \(1\). Since the joint Gaussian law has a density
+with respect to Lebesgue measure, the zero set of a nonzero polynomial
+has probability zero. Therefore
+\[
+\det[v_1,\dots,v_d]\neq 0
+\]
+almost surely, and the \(v_i\) span \(\R^d\).
+
+Similarly, consider
+\[
+\det[u_2-u_1,\dots,u_{d+1}-u_1].
+\]
+This is a polynomial in the entries of \(u_1,\dots,u_{d+1}\). It is not
+identically zero: at the deterministic configuration
+\[
+u_1=0,
+\qquad
+u_{k+1}=e_k,
+\qquad
+1\le k\le d,
+\]
+the determinant equals \(1\). Hence the determinant is nonzero almost
+surely, and
+\[
+u_2-u_1,\dots,u_{d+1}-u_1
+\]
+span \(\R^d\).
+\end{proof}
+
+% ============================================================
+\section{Cyclic constraints and reduction to a hemisphere event}
+% ============================================================
+
+Set
+\[
+n=d^2.
+\]
+We identify \(\R^{d\times d}\) with \(\R^n\) using the vectorization map
+\[
+\vecop:\R^{d\times d}\to\R^{d^2}.
+\]
+The Frobenius inner product satisfies
+\[
+\ip{A}{B}
+=
+\vecop(A)^\top\vecop(B).
+\]
+
+Use cyclic indexing:
+\[
+u_{N+1}=u_1.
+\]
+Define
+\begin{equation}
+X_i
+=
+(u_i-u_{i+1})v_i^\top
+\in\R^{d\times d},
+\qquad
+1\le i\le N.
+\label{eq:cyclic-X}
+\end{equation}
+
+\begin{lemma}[Every separator satisfies the cyclic inequalities]
+\label{lem:separator-cyclic}
+If \(H\in\cS\), then
+\begin{equation}
+\ip{H}{X_i}\ge 0
+\qquad
+\text{for every }1\le i\le N.
+\label{eq:cyclic-inequality}
+\end{equation}
+Consequently,
+\begin{equation}
+\{\cS\neq\{0\}\}
+\subseteq
+\left\{
+\exists H\neq 0:
+\ip{H}{X_i}\ge 0
+\text{ for every }i
+\right\}.
+\label{eq:separator-subset}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+If \(H\in\cS\), then, for query \(v_i\), the correct candidate \(u_i\)
+weakly dominates the particular competitor \(u_{i+1}\):
+\[
+u_i^\top Hv_i
+\ge
+u_{i+1}^\top Hv_i.
+\]
+Therefore
+\[
+(u_i-u_{i+1})^\top Hv_i\ge 0.
+\]
+Using the Frobenius inner product,
+\begin{align*}
+\ip{H}{X_i}
+&=
+\operatorname{Tr}
+\left(
+H^\top
+(u_i-u_{i+1})v_i^\top
+\right)
+\\
+&=
+v_i^\top H^\top(u_i-u_{i+1})
+\\
+&=
+(u_i-u_{i+1})^\top Hv_i.
+\end{align*}
+This proves \eqref{eq:cyclic-inequality}. If \(\cS\) contains a nonzero
+matrix, the same matrix satisfies all cyclic inequalities, proving
+\eqref{eq:separator-subset}.
+\end{proof}
+
+% ============================================================
+\section{General position of the cyclic random matrices}
+% ============================================================
+
+\begin{definition}[General position]
+Vectors \(x_1,\dots,x_m\in\R^n\), with \(m\ge n\), are said to be in
+general position if every subset of \(n\) vectors is linearly independent.
+\end{definition}
+
+\begin{lemma}[General position of the cyclic constraints]
+\label{lem:general-position}
+Assume \(N>d^2\). Then the random matrices
+\[
+X_i=(u_i-u_{i+1})v_i^\top,
+\qquad
+1\le i\le N,
+\]
+viewed as vectors in \(\R^{d^2}\), are in general position with
+probability one.
+\end{lemma}
+
+\begin{proof}
+Let
+\[
+n=d^2.
+\]
+Fix a subset
+\[
+S\subseteq\{1,\dots,N\},
+\qquad
+|S|=n.
+\]
+Choose any ordering of \(S\) and form the \(n\times n\) matrix whose
+columns are the vectorized cyclic matrices:
+\[
+M_S(U,V)
+=
+\left[
+\vecop\bigl((u_i-u_{i+1})v_i^\top\bigr)
+\right]_{i\in S}.
+\]
+Define
+\[
+D_S(U,V)=\det M_S(U,V).
+\]
+Each entry of \(M_S(U,V)\) is a polynomial in the coordinates of
+\(u_1,\dots,u_N,v_1,\dots,v_N\), so \(D_S\) is a polynomial.
+
+We prove that \(D_S\) is not identically zero by constructing one
+deterministic configuration at which it is nonzero.
+
+Because
+\[
+|S|=d^2,
+\]
+we may choose a bijection
+\[
+S\longleftrightarrow\{(a,b):1\le a,b\le d\}.
+\]
+Write \(i_{ab}\in S\) for the index corresponding to \((a,b)\).
+
+Introduce cyclic differences
+\[
+\delta_i=u_i-u_{i+1},
+\qquad
+u_{N+1}=u_1.
+\]
+For each \(i_{ab}\in S\), prescribe
+\[
+\delta_{i_{ab}}=e_a,
+\qquad
+v_{i_{ab}}=e_b.
+\]
+
+Because \(N>|S|\), choose an index
+\[
+r\notin S.
+\]
+Set
+\[
+\delta_r
+=
+-\sum_{i\in S}\delta_i,
+\]
+and set
+\[
+\delta_i=0
+\qquad
+\text{for all }i\notin S\cup\{r\}.
+\]
+Then
+\[
+\sum_{i=1}^{N}\delta_i=0.
+\]
+
+We now verify that these prescribed cyclic differences are realizable.
+Set
+\[
+u_1=0,
+\]
+and recursively define
+\[
+u_{i+1}=u_i-\delta_i,
+\qquad
+1\le i\le N-1.
+\]
+Then
+\[
+u_N
+=
+-\sum_{i=1}^{N-1}\delta_i.
+\]
+Since
+\[
+\sum_{i=1}^{N}\delta_i=0,
+\]
+we have
+\[
+\delta_N
+=
+-\sum_{i=1}^{N-1}\delta_i
+=
+u_N-u_1.
+\]
+Thus
+\[
+\delta_i=u_i-u_{i+1}
+\]
+holds for every cyclic index \(i\).
+
+At this deterministic configuration, for \(i=i_{ab}\in S\),
+\[
+X_{i_{ab}}
+=
+\delta_{i_{ab}}v_{i_{ab}}^\top
+=
+e_ae_b^\top.
+\]
+The matrices
+\[
+\{e_ae_b^\top:1\le a,b\le d\}
+\]
+form the standard basis of \(\R^{d\times d}\). Their vectorizations form
+the standard basis of \(\R^{d^2}\). Therefore
+\[
+D_S(U,V)=\pm 1
+\]
+at this configuration. In particular, \(D_S\) is not the zero polynomial.
+
+The joint law of all Gaussian coordinates is absolutely continuous.
+The zero set of a nonzero polynomial has Lebesgue measure zero, hence
+\[
+\Pp(D_S(U,V)=0)=0.
+\]
+
+There are only finitely many subsets \(S\) of size \(d^2\). Taking a
+finite union,
+\[
+\Pp\left(
+\exists S,\ |S|=d^2,\ D_S(U,V)=0
+\right)
+=0.
+\]
+Therefore every collection of \(d^2\) vectors among
+\(\vecop(X_1),\dots,\vecop(X_N)\) is linearly independent almost surely.
+\end{proof}
+
+% ============================================================
+\section{Cover's homogeneous dichotomy count}
+% ============================================================
+
+We now prove the combinatorial formula needed for the hemisphere
+probability.
+
+Let
+\[
+m\ge n\ge 1,
+\]
+and let
+\[
+x_1,\dots,x_m\in\R^n
+\]
+be in general position. A sign vector
+\[
+\sigma=(\sigma_1,\dots,\sigma_m)\in\{-1,+1\}^m
+\]
+is called homogeneously linearly realizable if there exists
+\(h\in\R^n\) such that
+\[
+\sigma_i\ip{h}{x_i}>0
+\qquad
+\text{for every }i.
+\]
+
+For a fixed general-position configuration
+\[
+x=(x_1,\dots,x_m),
+\]
+let \(C_x(m,n)\) denote the number of homogeneously realizable sign
+vectors.
+
+\begin{lemma}[Cover's homogeneous counting formula]
+\label{lem:cover}
+Let
+\[
+m\ge n\ge1,
+\]
+and let
+\[
+x_1,\dots,x_m\in\R^n
+\]
+be in general position. Then
+\begin{equation}
+C_x(m,n)
+=
+2\sum_{k=0}^{n-1}\binom{m-1}{k}.
+\label{eq:cover-formula}
+\end{equation}
+In particular, the number of realizable homogeneous dichotomies depends
+only on \(m\) and \(n\), and not on the particular general-position
+configuration. We therefore denote this common number by \(C(m,n)\).
+\end{lemma}
+
+\begin{proof}
+We prove the result by strong induction on \(m+n\), over the parameter
+range
+\[
+m\ge n\ge1.
+\]
+
+We first establish the boundary cases.
+
+If \(n=1\), general position means that every \(x_i\) is nonzero.
+A homogeneous separator \(h\in\R\setminus\{0\}\) has only two possible
+orientations, corresponding to \(h>0\) and \(h<0\). Therefore
+\[
+C_x(m,1)=2.
+\]
+This agrees with
+\[
+2\sum_{k=0}^{0}\binom{m-1}{k}=2.
+\]
+
+Next suppose \(m=n\). General position implies that the \(n\times n\)
+matrix
+\[
+X=[x_1,\dots,x_n]
+\]
+is invertible. Given any sign vector
+\[
+\sigma\in\{-1,+1\}^n,
+\]
+define
+\[
+h=(X^\top)^{-1}\sigma.
+\]
+Then
+\[
+X^\top h=\sigma,
+\]
+and hence
+\[
+\ip{h}{x_i}=\sigma_i
+\qquad
+\text{for every }i.
+\]
+Thus every one of the \(2^n\) sign vectors is realizable, so
+\[
+C_x(n,n)=2^n.
+\]
+Again this agrees with the claimed formula:
+\[
+2\sum_{k=0}^{n-1}\binom{n-1}{k}
+=
+2\cdot 2^{n-1}
+=
+2^n.
+\]
+
+It remains to consider
+\[
+m>n\ge2.
+\]
+The first \(m-1\) vectors
+\[
+x_1,\dots,x_{m-1}
+\]
+are themselves in general position in \(\R^n\).
+
+Fix a realizable labeling
+\[
+(\sigma_1,\dots,\sigma_{m-1})
+\]
+of these first \(m-1\) vectors. The feasible set
+\[
+\mathcal K_\sigma
+=
+\left\{
+h\in\R^n:
+\sigma_i\ip{h}{x_i}>0
+\text{ for }1\le i\le m-1
+\right\}
+\]
+is a nonempty open subset of \(\R^n\). Since the hyperplane
+\(x_m^\perp\) has empty interior, there exists
+\[
+h\in\mathcal K_\sigma
+\]
+such that
+\[
+\ip{h}{x_m}\neq0.
+\]
+The sign of \(\ip{h}{x_m}\) gives at least one realizable extension of
+the labeling to \(x_m\).
+
+Some labelings of the first \(m-1\) vectors admit both possible labels
+on \(x_m\). We claim that such labelings are exactly those realizable by
+a vector in \(x_m^\perp\).
+
+Suppose first that both extensions are realizable. Then there exist
+\(h_+,h_-\in\R^n\) such that
+\[
+\sigma_i\ip{h_+}{x_i}>0,
+\qquad
+\sigma_i\ip{h_-}{x_i}>0,
+\qquad
+1\le i\le m-1,
+\]
+while
+\[
+\ip{h_+}{x_m}>0,
+\qquad
+\ip{h_-}{x_m}<0.
+\]
+For \(t\in[0,1]\), define
+\[
+h_t=(1-t)h_++th_-.
+\]
+For every \(i\le m-1\),
+\begin{align*}
+\sigma_i\ip{h_t}{x_i}
+&=
+(1-t)\sigma_i\ip{h_+}{x_i}
++
+t\sigma_i\ip{h_-}{x_i}
+\\
+&>0.
+\end{align*}
+Moreover,
+\[
+t\longmapsto\ip{h_t}{x_m}
+\]
+is continuous and changes sign. Therefore there exists
+\(t_0\in(0,1)\) such that
+\[
+\ip{h_{t_0}}{x_m}=0.
+\]
+Hence the labeling is realizable by a vector in \(x_m^\perp\).
+
+Conversely, suppose there exists
+\[
+h_0\in x_m^\perp
+\]
+such that
+\[
+\sigma_i\ip{h_0}{x_i}>0,
+\qquad
+1\le i\le m-1.
+\]
+Choose \(g\in\R^n\) satisfying
+\[
+\ip{g}{x_m}>0.
+\]
+Because there are only finitely many strict inequalities, there exists
+\(\varepsilon_0>0\) such that, whenever
+\(0<\varepsilon<\varepsilon_0\),
+\[
+\sigma_i\ip{h_0+\varepsilon g}{x_i}>0
+\]
+and
+\[
+\sigma_i\ip{h_0-\varepsilon g}{x_i}>0
+\]
+for every \(1\le i\le m-1\). Furthermore,
+\[
+\ip{h_0+\varepsilon g}{x_m}
+=
+\varepsilon\ip{g}{x_m}>0,
+\]
+whereas
+\[
+\ip{h_0-\varepsilon g}{x_m}
+=
+-\varepsilon\ip{g}{x_m}<0.
+\]
+Thus both labels on \(x_m\) are realizable.
+
+Let
+\[
+P:\R^n\to x_m^\perp
+\]
+be the orthogonal projection. For every \(h_0\in x_m^\perp\),
+\[
+\ip{h_0}{x_i}
+=
+\ip{h_0}{Px_i}.
+\]
+Therefore, the labelings of \(x_1,\dots,x_{m-1}\) that admit both
+extensions are exactly the homogeneously realizable labelings of
+\[
+Px_1,\dots,Px_{m-1}
+\]
+inside the \((n-1)\)-dimensional space \(x_m^\perp\).
+
+We verify that these projected vectors are in general position in
+\(x_m^\perp\). Choose any distinct indices
+\[
+i_1,\dots,i_{n-1}\in\{1,\dots,m-1\},
+\]
+and suppose
+\[
+\sum_{r=1}^{n-1}a_rPx_{i_r}=0.
+\]
+Then
+\[
+P\left(
+\sum_{r=1}^{n-1}a_rx_{i_r}
+\right)=0,
+\]
+so there exists a scalar \(c\) such that
+\[
+\sum_{r=1}^{n-1}a_rx_{i_r}=cx_m.
+\]
+Equivalently,
+\[
+\sum_{r=1}^{n-1}a_rx_{i_r}-cx_m=0.
+\]
+The \(n\) vectors
+\[
+x_{i_1},\dots,x_{i_{n-1}},x_m
+\]
+are linearly independent by general position. Hence
+\[
+a_1=\cdots=a_{n-1}=c=0.
+\]
+Thus every collection of \(n-1\) projected vectors is linearly
+independent, proving general position in \(x_m^\perp\).
+
+By the induction hypothesis, the number of realizable labelings of the
+first \(m-1\) vectors is
+\[
+2\sum_{k=0}^{n-1}\binom{m-2}{k},
+\]
+and the number of those labelings admitting both extensions is
+\[
+2\sum_{k=0}^{n-2}\binom{m-2}{k}.
+\]
+Every realizable labeling of the first \(m-1\) vectors has one extension,
+and precisely the latter labelings have one additional extension.
+Therefore
+\begin{align*}
+C_x(m,n)
+&=
+2\sum_{k=0}^{n-1}\binom{m-2}{k}
++
+2\sum_{k=0}^{n-2}\binom{m-2}{k}
+\\
+&=
+2\sum_{k=0}^{n-1}
+\left[
+\binom{m-2}{k}
++
+\binom{m-2}{k-1}
+\right]
+\\
+&=
+2\sum_{k=0}^{n-1}\binom{m-1}{k},
+\end{align*}
+where
+\[
+\binom{m-2}{-1}=0.
+\]
+This completes the induction.
+\end{proof}
+
+% ============================================================
+\section{The Wendel--Cover hemisphere probability}
+% ============================================================
+
+\begin{lemma}[Weak and strict hemisphere events coincide]
+\label{lem:weak-strict}
+Let
+\[
+x_1,\dots,x_m\in\R^n,
+\qquad
+m\ge n,
+\]
+be in general position. Then
+\[
+\exists h\neq 0:
+\ip{h}{x_i}\ge 0
+\text{ for all }i
+\]
+if and only if
+\[
+\exists \widetilde h:
+\ip{\widetilde h}{x_i}>0
+\text{ for all }i.
+\]
+\end{lemma}
+
+\begin{proof}
+The strict event trivially implies the weak event.
+
+For the converse, suppose \(h\neq 0\) satisfies
+\[
+\ip{h}{x_i}\ge 0
+\qquad
+\text{for all }i.
+\]
+Define
+\[
+Z=\{i:\ip{h}{x_i}=0\},
+\qquad
+P=\{i:\ip{h}{x_i}>0\}.
+\]
+
+Because all vectors \(x_i\) with \(i\in Z\) lie in the
+\((n-1)\)-dimensional hyperplane \(h^\perp\), general position implies
+\[
+|Z|\le n-1.
+\]
+Moreover, the vectors \((x_i)_{i\in Z}\) are linearly independent.
+
+Since they are linearly independent and \(|Z|\le n-1\), the linear
+system
+\[
+\ip{g}{x_i}=1,
+\qquad
+i\in Z,
+\]
+has a solution \(g\in\R^n\). One way to see this is to define a linear
+functional taking value \(1\) on each vector \(x_i\), extend it from
+their span to all of \(\R^n\), and represent the resulting functional by
+an inner product with some \(g\).
+
+For \(i\in Z\),
+\[
+\ip{h+\varepsilon g}{x_i}
+=
+\varepsilon>0.
+\]
+For \(i\in P\), the quantities \(\ip{h}{x_i}\) are strictly positive.
+Because \(P\) is finite, there exists \(\varepsilon_0>0\) such that,
+for every \(0<\varepsilon<\varepsilon_0\),
+\[
+\ip{h+\varepsilon g}{x_i}>0
+\qquad
+\text{for every }i\in P.
+\]
+Thus
+\[
+\widetilde h=h+\varepsilon g
+\]
+satisfies
+\[
+\ip{\widetilde h}{x_i}>0
+\qquad
+\text{for every }i.
+\]
+\end{proof}
+
+\begin{theorem}[Wendel--Cover formula]
+\label{thm:wendel-cover}
+Let
+\[
+Y_1,\dots,Y_m\in\R^n
+\]
+be independent random vectors. Assume:
+
+\begin{enumerate}[label=(\roman*)]
+\item each distribution is centrally symmetric:
+\[
+Y_i\overset{d}{=}-Y_i;
+\]
+
+\item \(Y_1,\dots,Y_m\) are in general position almost surely;
+
+\item \(m\ge n\).
+\end{enumerate}
+
+Then
+\begin{equation}
+\Pp\left(
+\exists h\neq 0:
+\ip{h}{Y_i}\ge 0
+\text{ for all }i
+\right)
+=
+2^{1-m}
+\sum_{k=0}^{n-1}\binom{m-1}{k}.
+\label{eq:wendel}
+\end{equation}
+The random vectors need not be identically distributed.
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{lem:weak-strict}, on the almost-sure general-position event,
+the weak hemisphere event is equivalent to
+\[
+\exists h:
+\ip{h}{Y_i}>0
+\qquad
+\text{for every }i.
+\]
+It therefore suffices to compute the probability of the strict event.
+
+Let
+\[
+\varepsilon_1,\dots,\varepsilon_m
+\]
+be independent Rademacher random variables, independent of
+\(Y_1,\dots,Y_m\):
+\[
+\Pp(\varepsilon_i=1)
+=
+\Pp(\varepsilon_i=-1)
+=
+\frac12.
+\]
+By independence and central symmetry,
+\[
+(\varepsilon_1Y_1,\dots,\varepsilon_mY_m)
+\overset{d}{=}
+(Y_1,\dots,Y_m).
+\]
+
+Let \(E(y_1,\dots,y_m)\) denote the event that the deterministic vectors
+\(y_1,\dots,y_m\) lie in a common open homogeneous halfspace:
+\[
+E(y_1,\dots,y_m)
+=
+\left\{
+\exists h:
+\ip{h}{y_i}>0
+\text{ for all }i
+\right\}.
+\]
+Then
+\begin{align}
+\Pp(E(Y_1,\dots,Y_m))
+&=
+\Pp(E(\varepsilon_1Y_1,\dots,\varepsilon_mY_m))
+\nonumber\\
+&=
+\E_Y
+\left[
+2^{-m}
+\sum_{\varepsilon\in\{-1,+1\}^m}
+\1\{
+E(\varepsilon_1Y_1,\dots,\varepsilon_mY_m)
+\}
+\right].
+\label{eq:sign-average}
+\end{align}
+
+Fix a deterministic general-position realization
+\[
+y_1,\dots,y_m.
+\]
+For a sign vector \(\varepsilon\),
+\[
+E(\varepsilon_1y_1,\dots,\varepsilon_my_m)
+\]
+holds if and only if there exists \(h\) such that
+\[
+\ip{h}{\varepsilon_i y_i}>0
+\qquad
+\text{for all }i,
+\]
+or equivalently,
+\[
+\varepsilon_i\ip{h}{y_i}>0
+\qquad
+\text{for all }i.
+\]
+Thus the number of sign vectors \(\varepsilon\) for which the event holds
+is exactly the number \(C(m,n)\) of homogeneously realizable dichotomies.
+
+By Lemma~\ref{lem:cover},
+\[
+C(m,n)
+=
+2\sum_{k=0}^{n-1}\binom{m-1}{k}.
+\]
+Therefore the bracket in \eqref{eq:sign-average} equals
+\[
+2^{-m}C(m,n)
+=
+2^{1-m}
+\sum_{k=0}^{n-1}\binom{m-1}{k}
+\]
+for every general-position realization. Since general position holds
+almost surely, taking expectation yields \eqref{eq:wendel}.
+\end{proof}
+
+% ============================================================
+\section{Application to the cyclic constraints}
+% ============================================================
+
+\begin{proposition}[Probability of a nonzero cyclic separator]
+\label{prop:cyclic-probability}
+Let
+\[
+X_i=(u_i-u_{i+1})v_i^\top,
+\qquad
+u_{N+1}=u_1.
+\]
+If \(N>d^2\), then
+\begin{equation}
+\Pp\left(
+\exists H\neq 0:
+\ip{H}{X_i}\ge 0
+\text{ for all }i
+\right)
+=
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}.
+\label{eq:cyclic-probability}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Condition on
+\[
+U=(u_1,\dots,u_N).
+\]
+For fixed \(U\),
+\[
+X_i=(u_i-u_{i+1})v_i^\top
+\]
+depends only on \(v_i\). Since \(v_1,\dots,v_N\) are independent, the
+conditional random matrices
+\[
+X_1,\dots,X_N
+\]
+are independent.
+
+Moreover,
+\[
+v_i\overset{d}{=}-v_i,
+\]
+so, conditionally on \(U\),
+\[
+X_i
+=
+(u_i-u_{i+1})v_i^\top
+\overset{d}{=}
+-(u_i-u_{i+1})v_i^\top
+=
+-X_i.
+\]
+Thus each conditional distribution is centrally symmetric.
+
+By Lemma~\ref{lem:general-position},
+\[
+\Pp_{U,V}
+\left(
+X_1,\dots,X_N
+\text{ are not in general position}
+\right)
+=0.
+\]
+By Fubini's theorem, for almost every fixed realization \(U\),
+\[
+\Pp_V
+\left(
+X_1,\dots,X_N
+\text{ are not in general position}
+\mid U
+\right)
+=0.
+\]
+
+Therefore, for almost every \(U\), the conditional distributions satisfy
+all assumptions of Theorem~\ref{thm:wendel-cover} with
+\[
+m=N,
+\qquad
+n=d^2.
+\]
+Hence
+\[
+\Pp\left(
+\exists H\neq 0:
+\ip{H}{X_i}\ge 0\ \forall i
+\mid U
+\right)
+=
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}.
+\]
+The right-hand side does not depend on \(U\). Taking expectation over
+\(U\) proves \eqref{eq:cyclic-probability}.
+\end{proof}
+
+\begin{corollary}[Probability of a nontrivial full separator]
+\label{cor:full-separator}
+If \(N>d^2\), then
+\begin{equation}
+\Pp(\cS\neq\{0\})
+\le
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}.
+\label{eq:full-separator-probability}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+By Lemma~\ref{lem:separator-cyclic},
+\[
+\{\cS\neq\{0\}\}
+\subseteq
+\left\{
+\exists H\neq 0:
+\ip{H}{X_i}\ge 0
+\text{ for all }i
+\right\}.
+\]
+Taking probabilities and applying
+Proposition~\ref{prop:cyclic-probability} gives the result.
+\end{proof}
+
+% ============================================================
+\section{Proof of the main theorem}
+% ============================================================
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Let
+\[
+\mathcal{E}_{\mathrm{span}}
+=
+\left\{
+\Span\{u_j-u_1:2\le j\le N\}=\R^d
+\right\}
+\cap
+\left\{
+\Span\{v_i:1\le i\le N\}=\R^d
+\right\}.
+\]
+Because \(N>d^2\ge d\), we have \(N\ge d+1\). By
+Lemma~\ref{lem:gaussian-spanning},
+\[
+\Pp(\mathcal{E}_{\mathrm{span}})=1.
+\]
+
+Let
+\[
+\mathcal{E}_{\mathrm{nosep}}
+=
+\{\cS=\{0\}\}.
+\]
+By Corollary~\ref{cor:full-separator},
+\[
+\Pp(\mathcal{E}_{\mathrm{nosep}}^c)
+=
+\Pp(\cS\neq\{0\})
+\le
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}.
+\]
+Therefore
+\[
+\Pp(\mathcal{E}_{\mathrm{nosep}})
+\ge
+1-
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}.
+\]
+
+On \(\mathcal{E}_{\mathrm{nosep}}\), Proposition
+\ref{prop:deterministic-existence} shows that \(L\) is coercive and
+attains its minimum at a finite matrix.
+
+On \(\mathcal{E}_{\mathrm{span}}\), Proposition
+\ref{prop:strict-convexity} shows that \(L\) is strictly convex and hence
+has at most one minimizer.
+
+Thus, on
+\[
+\mathcal{E}_{\mathrm{span}}
+\cap
+\mathcal{E}_{\mathrm{nosep}},
+\]
+the loss has exactly one finite minimizer. Since
+\(\mathcal{E}_{\mathrm{span}}\) has probability one,
+\begin{align*}
+\Pp\left(
+L\text{ has a unique finite minimizer}
+\right)
+&\ge
+\Pp(\mathcal{E}_{\mathrm{nosep}})
+\\
+&\ge
+1-
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}.
+\end{align*}
+This proves \eqref{eq:main-probability}.
+
+It remains to derive the exponential estimate when
+\[
+N=\lceil d^\beta\rceil,
+\qquad
+\beta>2.
+\]
+Let
+\[
+B\sim\operatorname{Bin}(N-1,1/2).
+\]
+Then
+\begin{align}
+2^{1-N}
+\sum_{k=0}^{d^2-1}\binom{N-1}{k}
+&=
+\Pp(B\le d^2-1).
+\label{eq:binomial-tail-identity}
+\end{align}
+
+Because \(\beta>2\),
+\[
+\frac{d^2}{N}
+\longrightarrow 0.
+\]
+Hence, for all sufficiently large \(d\),
+\[
+d^2-1
+\le
+\frac{N-1}{4}.
+\]
+The mean of \(B\) is
+\[
+\mu=\E B=\frac{N-1}{2}.
+\]
+Therefore
+\[
+d^2-1
+\le
+\frac{\mu}{2}.
+\]
+Using the multiplicative Chernoff bound
+\[
+\Pp(B\le(1-\delta)\mu)
+\le
+\exp\left(-\frac{\delta^2\mu}{2}\right),
+\qquad
+0<\delta<1,
+\]
+with \(\delta=1/2\), we obtain
+\begin{align*}
+\Pp(B\le d^2-1)
+&\le
+\Pp\left(B\le\frac{\mu}{2}\right)
+\\
+&\le
+\exp\left(-\frac{\mu}{8}\right)
+\\
+&=
+\exp\left(-\frac{N-1}{16}\right).
+\end{align*}
+Combining this with \eqref{eq:binomial-tail-identity} proves
+\eqref{eq:main-exponential}.
+\end{proof}
+
+\end{document}
