@@ -69,24 +69,14 @@
 \newcommand{\Hop}{H_{\mathrm{op}}}
 \DeclareMathOperator{\polar}{polar}
 
-\title{A Schedule-Robust $\Omega(d)$ Hitting-Time Separation\\
-between Stable Gradient Descent and Spectral-Frank-Wolfe}
+\title{Provable Benefit of Spectral Optimizer over Stable Gradient Descent in Gaussian Associative Memory}
 \date{}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We study a over-capacity Gaussian associative-memory loss with Zipf weights, where
-$N=\operatorname{poly}(d)$ and $N\gtrsim d^2$.  On the target accuracy range
-$\frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
- \lesssim\eps\lesssim
- \frac{\log N}{d^{\alpha-1}},
-$ the standard Frank-Wolfe
-smoothness-radius certificate for NGD is a factor $d$ larger than the Muon
- certificate.  We also prove an actual $\Omega(d)$ hitting-time separation
- between any fixed stable GD schedule prescribed before the sample, with
- steps at most $3$, and Muon-Frank-Wolfe.  Finally, we show that the Muon's hitting-time order remains valid after the effective learning rate is capped by an arbitrary fixed positive constant.
+We study optimization of an over-capacity Gaussian associativ -memory loss with Zipf weights, in the regime $N=\operatorname{poly}(d)$, $N\gtrsim d^2$, and $\alpha>1$. Over the accuracy range $\frac{(\log N)^\alpha}{d^{2(\alpha-1)}} \lesssim \varepsilon \lesssim \frac{\log N}{d^{\alpha-1}},$ we first show that the intrinsic Frobenius and operator-norm radii satisfy $R_{\mathrm F}(\varepsilon)^2\asymp d\,R_{\mathrm{op}}(\varepsilon)^2$. Since the corresponding global smoothness constants are both of constant order, this yields a factor-$d$ separation between the standard Frank-Wolfe smoothness-radius certificates in the two geometries. More importantly, we prove an actual optimization-time separation. For any deterministic, time-varying stable GD learning-rate schedule prescribed before the Gaussian sample, with $0\leq\eta_t\leq3$, we establish a uniform lower bound on its learning curve, while a target-free Muon-Frank-Wolfe trajectory satisfies a matching faster upper bound. Consequently, throughout the same accuracy range, $\tau_{\mathrm{GD}}(\varepsilon) \gtrsim d\,\tau_{\mathrm{Muon}}(\varepsilon).$ The GD lower bound also extends to weight decay under the corresponding stability condition. Finally, we show that the Muon learning-curve order is unchanged, up to constants, when its effective spectral learning rate is capped by an arbitrary prescribed constant $\bar\eta>0$. Thus the separation cannot be attributed merely to allowing Muon to take large effective steps.
 \end{abstract}
 
 % ============================================================
@@ -144,27 +134,59 @@ are
  \frac{\nabla^2L(\Wb)[\Ab,\Ab]}{\normop{\Ab}^2}.
 \end{align*}
 
-\paragraph{Frank-wolfe.} For $X\in\{\mathrm F,\mathrm{op}\}$, Frank-Wolfe for target $\eps$ is
-run on the ball of radius $R_X(\eps/2)$.  Starting from
-$\Wb_0^X=\mathbf 0$, let $\gamma_t=2/(t+2)$ and define
+% \paragraph{Frank-wolfe.} For $X\in\{\mathrm F,\mathrm{op}\}$, Frank-Wolfe for target $\eps$ is
+% run on the ball of radius $R_X(\eps/2)$.  Starting from
+% $\Wb_0^X=\mathbf 0$, let $\gamma_t=2/(t+2)$ and define
+% \[
+%  \Sb_t^X
+%  \in\mathop{\arg\min}_{\|\Sb\|_X\leq R_t}
+%  \left\langle\nabla L(\Wb_t^X),\Sb\right\rangle_{\mathrm F},
+%  \quad
+%  \Wb_{t+1}^X=(1-\gamma_t)\Wb_t^X+\gamma_t\Sb_t^X.
+% \]
+% The operator-ball oracle is
+% $-R_{\mathrm{op}}(\eps/2)\polar(\nabla L)$ and is called
+% Muon-Frank-Wolfe.  The Frobenius-ball oracle is
+% $-R_{\mathrm F}(\eps/2)\nabla L/\normF{\nabla L}$ and is called
+% NGD-Frank-Wolfe; the fraction is zero when the gradient is zero.  Write
+% \[
+%  \tau_X(\eps):=\inf\{t\in\mathbb N:L(\Wb_t^X)\leq\eps\},
+%  \quad
+%  \tau_{\mathrm{Muon}}(\eps):=\tau_{\mathrm{op}}(\eps),
+%  \quad
+%  \tau_{\mathrm{NGD}}(\eps):=\tau_{\mathrm F}(\eps).
+% \]
+% If $\Gb=\Ub\Sigma\Vb^\top$ is a compact singular-value decomposition,
+% define $\polar(\Gb):=\Ub\Vb^\top$, and set
+% $\polar(\mathbf0):=\mathbf0$.  Then
+% $\normop{\polar(\Gb)}\leq1$ and
+% $\langle\Gb,\polar(\Gb)\rangle_{\mathrm F}=\|\Gb\|_*$.
+\paragraph{Frank-Wolfe.}
+For $X\in\{\mathrm F,\mathrm{op}\}$, let
+$\{R_t\}_{t\geq0}$ be a prescribed nonnegative radius schedule.
+Starting from $\Wb_0^X=\mathbf 0$, let $\{\gamma_t\}_{t\geq0}\subset(0,1]$
+be a prescribed mixing schedule and define
 \[
- \Sb_t^X
- \in\mathop{\arg\min}_{\|\Sb\|_X\leq R_X(\eps/2)}
- \left\langle\nabla L(\Wb_t^X),\Sb\right\rangle_{\mathrm F},
+ \Sb_t^X\in \mathop{\arg\min}_{\|\Sb\|_X\leq R_t} \left\langle
+ \nabla L(\Wb_t^X),\Sb
+ \right\rangle_{\mathrm F},
  \quad
  \Wb_{t+1}^X=(1-\gamma_t)\Wb_t^X+\gamma_t\Sb_t^X.
 \]
-The operator-ball oracle is
-$-R_{\mathrm{op}}(\eps/2)\polar(\nabla L)$ and is called
-Muon-Frank-Wolfe.  The Frobenius-ball oracle is
-$-R_{\mathrm F}(\eps/2)\nabla L/\normF{\nabla L}$ and is called
-NGD-Frank-Wolfe; the fraction is zero when the gradient is zero.  Write
+The corresponding linear minimization oracles are
+$\Sb_t^{\mathrm{op}}=-R_t\polar\left(\nabla L(\Wb_t^{\mathrm{op}})\right)$
+for the operator geometry, and
+$\Sb_t^{\mathrm F}=-R_t\nabla L(\Wb_t^{\mathrm F})/\normF{\nabla L(\Wb_t^{\mathrm F})}
+$
+for the Frobenius geometry, with the latter fraction interpreted as zero
+when the gradient is zero. For any target $0<\eps<\log N$, define hitting time:
 \[
- \tau_X(\eps):=\inf\{t\in\mathbb N:L(\Wb_t^X)\leq\eps\},
- \quad
- \tau_{\mathrm{Muon}}(\eps):=\tau_{\mathrm{op}}(\eps),
- \quad
- \tau_{\mathrm{NGD}}(\eps):=\tau_{\mathrm F}(\eps).
+ \tau_X(\eps)
+ :=
+ \inf\left\{
+ t\in\mathbb N:
+ L(\Wb_t^X)\leq\eps
+ \right\}.
 \]
 If $\Gb=\Ub\Sigma\Vb^\top$ is a compact singular-value decomposition,
 define $\polar(\Gb):=\Ub\Vb^\top$, and set
@@ -172,38 +194,66 @@ $\polar(\mathbf0):=\mathbf0$.  Then
 $\normop{\polar(\Gb)}\leq1$ and
 $\langle\Gb,\polar(\Gb)\rangle_{\mathrm F}=\|\Gb\|_*$.
 
+% \paragraph{Stable GD.}
+% For a target $0<\varepsilon<\log N$, prescribe a deterministic sequence
+% $\{\eta_t(\varepsilon)\}_{t\geq0}$ before drawing the Gaussian sample.  The
+% sequence may depend arbitrarily on $(t,\varepsilon,d,N)$ and the fixed model
+% parameters, and must only satisfy
+% \begin{equation}
+%  0\leq\eta_t(\varepsilon)\leq 3
+%  \quad\text{for every }t\geq0.
+%  \label{eq:eta-cap}
+% \end{equation}
+% Starting from $\bm W^{\mathrm{GD}}_0=\bm 0$, define
+% \begin{align*}
+%  \bm W^{\mathrm{GD}}_{t+1}
+%  &=
+%  \bm W^{\mathrm{GD}}_t
+%  -\eta_t(\varepsilon)\nabla L(\bm W^{\mathrm{GD}}_t),
+%  \\
+%  \tau_{\mathrm{GD}}(\varepsilon)
+%  &:=
+%  \inf\{t\in\mathbb N:L(\bm W^{\mathrm{GD}}_t)\leq\varepsilon\}.
+% \end{align*}
+% The fixed schedule is suppressed from the hitting-time notation.  As usual,
+% $\inf\varnothing=+\infty$.  The pre-sample requirement is needed
+% only for the sign-conditioning step in the lower bound; it still permits an
+% arbitrary target-dependent schedule.  Data-adaptive line searches are not
+% included in this definition.
 \paragraph{Stable GD.}
-For a target $0<\varepsilon<\log N$, prescribe a deterministic sequence
-$\{\eta_t(\varepsilon)\}_{t\geq0}$ before drawing the Gaussian sample.  The
-sequence may depend arbitrarily on $(t,\varepsilon,d,N)$ and the fixed model
-parameters, and must only satisfy
-\begin{equation}
- 0\leq\eta_t(\varepsilon)\leq 3
- \quad\text{for every }t\geq0.
- \label{eq:eta-cap}
-\end{equation}
-Starting from $\bm W^{\mathrm{GD}}_0=\bm 0$, define
-\begin{align*}
- \bm W^{\mathrm{GD}}_{t+1}
- &=
- \bm W^{\mathrm{GD}}_t
- -\eta_t(\varepsilon)\nabla L(\bm W^{\mathrm{GD}}_t),
- \\
- \tau_{\mathrm{GD}}(\varepsilon)
- &:=
- \inf\{t\in\mathbb N:L(\bm W^{\mathrm{GD}}_t)\leq\varepsilon\}.
-\end{align*}
-The fixed schedule is suppressed from the hitting-time notation.  As usual,
-$\inf\varnothing=+\infty$.  The pre-sample requirement is needed
-only for the sign-conditioning step in the lower bound; it still permits an
-arbitrary target-dependent schedule.  Data-adaptive line searches are not
-included in this definition.
+Prescribe a deterministic learning-rate sequence
+$\{\eta_t\}_{t\geq 0}$ before drawing the Gaussian sample.  The sequence may
+depend arbitrarily on $(t,d,N)$ and the fixed model parameters, but not on
+the realized sample, and must satisfy
+\begin{equation*}
+    0\leq \eta_t\leq 3
+    \qquad\text{for every }t\geq 0.
+    \label{eq:eta-cap}
+\end{equation*}
+Starting from $\bm W^{\mathrm{GD}}_0=\bm 0$, define the single GD trajectory
+\begin{equation*}
+    \bm W^{\mathrm{GD}}_{t+1}
+    =
+    \bm W^{\mathrm{GD}}_t
+    -\eta_t\nabla L(\bm W^{\mathrm{GD}}_t).
+    \label{eq:gd-update}
+\end{equation*}
+
+The pre-sample requirement is used only in the sign-conditioning argument
+for the lower bound; it still allows an arbitrary time-varying stable
+learning-rate schedule.  In particular, the GD trajectory is independent of
+the evaluation target $\varepsilon$.  Data-adaptive line searches are not
+included.
 
 \subsection*{Main results}
 
+\paragraph{Overview.}
+
+
 \begin{theorem}[Muon and NGD Frank-Wolfe bounds]
 \label{thm:fw}
-Fix $q>0$.  There exist $C_{\mathrm{low}},c_{\mathrm{up}}>0$ such that,
+Fix $q>0$. For the Frank-Wolfe recursion above, for each $X\in\{\mathrm F,\mathrm{op}\}$ and target $\eps$, take
+$R_t\equiv R_X(\eps/2)$ and $\gamma_t=2/(t+2).$ There exist $C_{\mathrm{low}},c_{\mathrm{up}}>0$ such that,
 with probability at least $1-O(d^{-q})$, simultaneously for every
 $
  C_{\mathrm{low}}
@@ -223,84 +273,161 @@ one has
 In particular, the two standard Frank-Wolfe certificates satisfy
 \[
  \frac{\HF R_{\mathrm F}(\eps/2)^2}{\eps}
- \eqsim (\log N)
- \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)} \eqsim
+ \eqsim
  d\,\frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}.
 \]
 \end{theorem}
 
-\begin{theorem}[GD lower bound and actual $\Omega(d)$ separation]
-\label{thm:gd}
-Fix $q>0$.  There exist $C_{\mathrm{low}},c_{\mathrm{up}}>0$, which may be
-chosen so that \Cref{thm:fw} holds on the same range, such that for every
-target satisfying
-$
- C_{\mathrm{low}}
- \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
- \leq\eps\leq
- c_{\mathrm{up}}
- \frac{\log N}{d^{\alpha-1}},
-$
-and every deterministic schedule prescribed before the sample satisfying
-$0\leq\eta_t(\eps)\leq3$, the following holds with probability at least
-$1-O(d^{-q})$:
+\begin{theorem}[Target-free Muon loss upper bound]
+\label{thm:Muon-upper bound}
+Fix $q>0$, and set the explicit deterministic constant $C_\alpha:=288(\alpha+2)$.  Starting from $\Wb_0^{\mathrm{Muon}}=\mathbf 0$, define, for every $t\geq0$,
 \[
- \tau_{\mathrm{GD}}(\eps)
- \gtrsim
- (\log N)
- \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}
- \gtrsim
- d\,\tau_{\mathrm{Muon}}(\eps).
+\gamma_t=\frac{2}{t+2},
+\quad R_t=C_\alpha(\log N)\max\left\{1,\left(
+\frac{t+1}{(\log N)d^{\alpha-1}}
+\right)^{1/(2\alpha)}
+\right\},
+\]
+and run the operator-norm Frank--Wolfe recursion
+\[
+\Wb_{t+1}^{\mathrm{Muon}}=
+(1-\gamma_t)\Wb_t^{\mathrm{Muon}}
+-\gamma_tR_t
+\polar\!\left(\nabla L(\Wb_t^{\mathrm{Muon}})\right).
+\]
+There exist constants $C_{\mathrm{low}},c_{\mathrm{up}}>0$ such that,
+with probability at least $1-O(d^{-q})$, simultaneously for every integer
+$t$ satisfying
+\[
+C_{\mathrm{low}}(\log N)d^{\alpha-1}
+\leq t
+\leq
+c_{\mathrm{up}}
+\frac{d^{2\alpha-1}}{(\log N)^{\alpha-1}},
+\]
+one has
+\[
+L(\Wb_t^{\mathrm{Muon}})
+\lesssim
+(\log N)
+\left(
+\frac{dt}{\log N}
+\right)^{-(\alpha-1)/\alpha}.
 \]
 \end{theorem}
+
+\begin{theorem}[GD lower bound and actual separation]
+\label{thm:gd}
+Fix $q>0$.  Let $\{\eta_t\}_{t\geq0}$ be any deterministic GD schedule prescribed before the Gaussian sample and satisfying $0\leq \eta_t\leq 3.$ There exist $C_{\mathrm{low}},c_{\mathrm{up}}>0$, which may be chosen consistently with \Cref{thm:Muon-upper bound}, such that, with probability at least $1-O(d^{-q})$, simultaneously for every
+\[
+C_{\mathrm{low}}(\log N)d^\alpha
+\leq t
+\leq
+c_{\mathrm{up}}
+\frac{d^{2\alpha-1}}{(\log N)^{\alpha-1}},
+\]
+one has
+\[
+L(\Wb_t^{\mathrm{GD}})\gtrsim(\log N)\left(\frac{t}{\log N}\right)^{-(\alpha-1)/\alpha}\gtrsim
+d^{(\alpha-1)/\alpha}
+L(\Wb_t^{\mathrm{Muon}}).
+\]
+
+After adjusting $C_{\mathrm{low}}$ and $c_{\mathrm{up}}$ if necessary,
+equivalently, for every
+\[
+C_{\mathrm{low}}
+\frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+\le \eps\le
+c_{\mathrm{up}}
+\frac{\log N}{d^{\alpha-1}},
+\]
+the corresponding hitting times satisfy
+\[
+\tau_{\mathrm{GD}}(\eps)
+\gtrsim
+(\log N)
+\left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}
+\gtrsim
+d\,\tau_{\mathrm{Muon}}(\eps).
+\]
+\end{theorem}
+
+\begin{corollary}[GD with weight decay]
+\label{cor:gd-weight-decay}
+Let $\{\eta_t\}_{t\geq0}$ and $\{\lambda_t\}_{t\geq0}$ be arbitrary
+nonnegative deterministic schedules prescribed before the Gaussian sample,
+and consider
+\[
+\Wb^{\mathrm{GD+WD}}_{t+1}
+=
+(1-\eta_t\lambda_t)\Wb^{\mathrm{GD+WD}}_t
+-\eta_t\nabla L(\Wb^{\mathrm{GD+WD}}_t),
+\qquad
+\Wb^{\mathrm{GD+WD}}_0=\mathbf 0.
+\]
+Suppose that, for every $t\geq0$,
+$\eta_t\left(\lambda_t+\frac23\right)\leq 2.$
+Then all the conclusions of \Cref{thm:gd} remain valid with
+$\Wb_t^{\mathrm{GD}}$ replaced by $\Wb_t^{\mathrm{GD+WD}}$. 
+% In particular,
+% with probability at least $1-O(d^{-q})$, simultaneously for every $t$ in the iteration range of \Cref{thm:gd},
+% one has
+% \[
+% L(\Wb_t^{\mathrm{GD+WD}})
+% \gtrsim
+% (\log N)
+% \left(\frac{t}{\log N}\right)^{-(\alpha-1)/\alpha}
+% \gtrsim
+% d^{(\alpha-1)/\alpha}
+% L(\Wb_t^{\mathrm{Muon}}).
+% \]
+% Equivalently, throughout the corresponding accuracy range,
+% \[
+% \tau_{\mathrm{GD+WD}}(\eps)
+% \gtrsim
+% (\log N)
+% \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}
+% \gtrsim
+% d\,\tau_{\mathrm{Muon}}(\eps).
+% \]
+\end{corollary}
 
 \begin{theorem}[Muon with an arbitrarily capped effective learning rate]
 \label{thm:capped}
-Fix $q>0$ and any constant $\bar\eta>0$.  There exist
-$C_{\mathrm{low}},c_{\mathrm{up}}>0$, which may be chosen so that
-\Cref{thm:fw} holds on the same range, such that for every target in the range
-$
- C_{\mathrm{low}}
- \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
- \leq\eps\leq
- c_{\mathrm{up}}
- \frac{\log N}{d^{\alpha-1}}.
-$
-In the same Muon-Frank-Wolfe recursion, replace only the mixing schedule
-by
+Fix $q>0$ and any constant $\bar\eta>0$.  Keep the same radius schedule
+$R_t$ as in \Cref{thm:Muon-upper bound}, but replace the mixing schedule by
 \[
- \gamma_t=\frac2{t+2+a},
- \quad
- a=\max\!\left\{
- 0,\frac{2R_{\mathrm{op}}(\eps/2)}{\bar\eta}-2
- \right\}.
+\gamma_t=\frac{2}{t+2+a},
+\quad
+a=\max\left\{
+0,\frac{2C_\alpha\log N}{\bar\eta}-2
+\right\}.
 \]
-Write $\tau_{\mathrm{Muon}}(\eps;\gamma)$ for the hitting time of this same
-recursion with the displayed schedule.  Then, for every $t\geq0$,
+Then, for all sufficiently large $d$,
 \[
- \gamma_tR_{\mathrm{op}}(\eps/2)\leq\bar\eta,
- \qquad
- \normop{\Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
- \leq2\bar\eta.
+\gamma_tR_t\leq\bar\eta,
+\quad
+\normop{\Wb_{t+1}^{\mathrm{Muon}}-\Wb_t^{\mathrm{Muon}}}
+\leq2\bar\eta.
 \]
-With probability at least $1-O(d^{-q})$,
+Moreover, with
+probability at least $1-O(d^{-q})$, simultaneously for every $t$ in the iteration range of \Cref{thm:Muon-upper bound} and \Cref{thm:gd},
+one has
 \[
- \tau_{\mathrm{Muon}}(\eps;\gamma)
- \lesssim_{\bar\eta}
- \frac{\Hop R_{\mathrm{op}}(\eps)^2}{\eps}
- \lesssim_{\bar\eta}
- \frac{\log N}{d}
- \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+L(\Wb_t^{\mathrm{Muon}})
+\lesssim_{\bar\eta}
+(\log N)\left(\frac{dt}{\log N}\right)^{-(\alpha-1)/\alpha}.
 \]
 \end{theorem}
 
-\begin{remark}[What the two separations mean]
-The factor $d$ in \Cref{thm:fw} compares the standard Frank-Wolfe
-smoothness-radius certificates; it is not a lower bound on the actual NGD
-hitting time.  The factor $d$ in \Cref{thm:gd} is an actual hitting-time
-separation.  In \Cref{thm:capped}, the quantity being capped is the
-effective learning rate $R_{\mathrm{op}}(\eps/2)\gamma_t$, not merely the mixing coefficient $\gamma_t\leq1$.
-\end{remark}
+% \begin{remark}[What the two separations mean]
+% The factor $d$ in \Cref{thm:fw} compares the standard Frank-Wolfe
+% smoothness-radius certificates; it is not a lower bound on the actual NGD
+% hitting time.  The factor $d$ in \Cref{thm:gd} is an actual hitting-time
+% separation.  In \Cref{thm:capped}, the quantity being capped is the
+% effective learning rate $R_{\mathrm{op}}(\eps/2)\gamma_t$, not merely the mixing coefficient $\gamma_t\leq1$.
+% \end{remark}
 
 % ============================================================
 \section{Proof of \Cref{thm:fw}}
@@ -927,7 +1054,7 @@ Choosing
 t=C\|\widehat\Wb_K\|_{\mathrm{op}}
 \sqrt{\frac{\bigl(\sum_{i>K}p_i^2\bigr)\log N}{d}}
 \]
-with a sufficiently large absolute constant $C$ (e.g.\ $C=3\sqrt{2(q+5)}$)
+with a sufficiently large absolute constant $C$ (e.g.\ $C=3\sqrt{2(q+4)}$)
 makes the right-hand side at most $N^{-q-4}$. 
 Therefore, with conditional probability at least $1-N^{-q-4}$,
 \begin{align*}
@@ -1155,17 +1282,15 @@ For every $i$, Jensen's inequality gives
 Rearranging this inequality, summing from $1$ to $K$, and then using the
 preceding loss bound gives
 \begin{align*}
- &\left\langle
+ \left\langle
   \Wb,
   \sum_{i=1}^K
   \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)\vb_i^\top
- \right\rangle_{\mathrm F}\\
- &\qquad=
+ \right\rangle_{\mathrm F} &=
  \sum_{i=1}^K
  \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)^\top\Wb\vb_i\\
- &\qquad\geq
- K\log N-\sum_{i=1}^K\ell_i(\Wb)\\
- &\qquad\geq\frac78K\log N.
+ &\geq
+ K\log N-\sum_{i=1}^K\ell_i(\Wb)\geq\frac78K\log N.
 \end{align*}
 Frobenius Cauchy--Schwarz and the centered-prefix bound in
 \Cref{prop:prefix-v2} now give
@@ -1293,6 +1418,529 @@ This is a comparison of the standard Frank-Wolfe smoothness-radius
 certificates, not a lower bound on $\tau_{\mathrm{NGD}}(\eps)$.  This
 completes the proof.
 \end{proof}
+
+% ============================================================
+
+\section{Proof of \Cref{thm:Muon-upper bound}}
+% ============================================================
+
+We first extract from \Cref{prop:prefix-v2} a comparator at the scale
+required by each iteration.  We then prove a deterministic
+changing-radius Frank--Wolfe inequality and the two scalar summation bounds
+needed to solve it.
+Through this section, we write $M:=(\log N)d^{\alpha-1}.$
+Since $N\gtrsim d^2$ and $\alpha>1$, one has $M\geq1$ for all
+sufficiently large $d$.
+
+\begin{lemma}[Time-dependent Gaussian comparators]
+\label{lem:Muon-time-comparators}
+Fix $q>0$, and let $C_\alpha=288(\alpha+2)$.  For every integer $s\geq0$,
+define
+\[
+ K_s
+ :=
+ \left\lceil
+  d\max\left\{
+    1,
+    \left(
+    \frac{s+1}{M}
+   \right)^{1/\alpha}
+  \right\}
+ \right\rceil.
+\]
+There exist constants $A_{\alpha,q},c_*>0$ such that, on the event in
+\Cref{prop:prefix-v2}, simultaneously for every integer
+\[
+ 1\leq t
+ \leq
+ c_*
+ \frac{d^{2\alpha-1}}{(\log N)^{\alpha-1}}
+\]
+and every $0\leq s<t$, the integer $K_s$ lies in the admissible range of
+\Cref{prop:prefix-v2} and satisfies
+\begin{align*}
+ \normop{\widehat\Wb_{K_s}}
+ &\leq
+ C_\alpha(\log N)
+ \max\left\{
+  1,
+  \left(
+   \frac{s+1}{M}
+  \right)^{1/(2\alpha)}
+ \right\},\\
+ L(\widehat\Wb_{K_s})
+ &\leq
+ A_{\alpha,q}(\log N)d^{1-\alpha}
+ \max\left\{
+  1,
+  \frac{s+1}{M}
+ \right\}^{-(\alpha-1)/\alpha}.
+\end{align*}
+\end{lemma}
+\begin{proof}
+By \Cref{prop:prefix-v2}, on an event of probability at least
+$1-O(d^{-q})$, there exist $A_{\alpha,q},c_0>0$ such that,
+simultaneously for every integer
+$d\leq K\leq c_0\frac{d^2}{\log N},$
+The loss satisfies
+\[
+L(\widehat\Wb_K)
+\leq
+A_{\alpha,q}(\log N)K^{1-\alpha},
+\]
+and the explicit operator-norm estimate in the proof of \Cref{prop:prefix-v2} gives
+\[
+\normop{\widehat\Wb_K}
+\leq
+48(\alpha+2)(\log N)
+\left(2+\sqrt{K/d}\right)
+\leq
+144(\alpha+2)(\log N)\sqrt{K/d},
+\]
+where the last inequality uses $K\geq d$.
+
+From the definition of $K_s$,
+\[
+d\max\left\{
+1,\left(\frac{s+1}{M}\right)^{1/\alpha}
+\right\}
+\leq K_s
+\leq
+2d\max\left\{
+1,\left(\frac{s+1}{M}\right)^{1/\alpha}
+\right\}.
+\]
+In particular, $K_s\geq d$.  Moreover, if
+$t\leq c_*\frac{d^{2\alpha-1}}{(\log N)^{\alpha-1}}$ and $0\le s<t$,
+then, using $M=(\log N)d^{\alpha-1}$,
+\[
+\left(\frac{s+1}{M}\right)^{1/\alpha}
+\leq
+c_*^{1/\alpha}\frac{d}{\log N}.
+\]
+Hence
+\[
+K_s
+\leq
+2d+2c_*^{1/\alpha}\frac{d^2}{\log N}.
+\]
+Choosing $c_*>0$ sufficiently small, and then $d$ sufficiently large,
+ensures
+\[
+K_s\leq c_0\frac{d^2}{\log N},
+\]
+so every $K_s$ lies in the simultaneous range of
+\Cref{prop:prefix-v2}.
+
+Therefore, since $C_\alpha=288(\alpha+2)$, we have
+\begin{align*}
+\normop{\widehat\Wb_{K_s}}
+&\leq
+144(\alpha+2)(\log N)\sqrt{K_s/d}\\
+&\leq
+144\sqrt2(\alpha+2)(\log N)
+\max\left\{
+1,
+\left(\frac{s+1}{M}\right)^{1/(2\alpha)}
+\right\}\\
+&\leq
+C_\alpha(\log N)
+\max\left\{
+1,
+\left(\frac{s+1}{M}\right)^{1/(2\alpha)}
+\right\},
+\end{align*}
+
+Finally, because $1-\alpha<0$,
+\begin{align*}
+L(\widehat\Wb_{K_s})
+&\leq
+A_{\alpha,q}(\log N)K_s^{1-\alpha}\\
+&\leq
+A_{\alpha,q}(\log N)d^{1-\alpha}
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-(\alpha-1)/\alpha}.
+\end{align*}
+This proves the lemma.
+\end{proof}
+
+\begin{lemma}[Changing-radius Frank-Wolfe inequality]
+\label{lem:Muon-changing-radius}
+Let $R_0\leq R_1\leq\cdots$ and let
+$\gamma_s=2/(s+2)$.  Starting from $\Wb_0=\mathbf0$, let
+\begin{align*}
+ \Sb_s\in\mathop{\arg\min}_{\normop{\Sb}\leq R_s}
+ \left\langle\nabla L(\Wb_s),\Sb\right\rangle_{\mathrm F}, \quad\Wb_{s+1}
+ &=(1-\gamma_s)\Wb_s+\gamma_s\Sb_s.
+\end{align*}
+Fix an integer $t\geq1$.  Suppose that, for every $0\leq s<t$, there is a
+prefix comparator $\widehat\Wb_{K_s}$ satisfying
+$\normop{\widehat\Wb_{K_s}}\leq R_s$.  Then
+\begin{align*}
+ t(t+1)L(\Wb_t)
+ &\leq
+ 2\sum_{s=0}^{t-1}(s+1)L(\widehat\Wb_{K_s})
+ +8\Hop
+ \sum_{s=0}^{t-1}\frac{s+1}{s+2}R_s^2.
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+We first show that the iterate at time $s$ lies in the current ball.  The
+claim holds at $s=0$ because $\Wb_0=\mathbf0$.  If
+$\normop{\Wb_s}\leq R_s$, then the oracle satisfies
+$\normop{\Sb_s}\leq R_s$, and hence
+\begin{align*}
+ \normop{\Wb_{s+1}}
+ &=\normop{(1-\gamma_s)\Wb_s+\gamma_s\Sb_s}\\
+ &\leq
+ (1-\gamma_s)\normop{\Wb_s}
+ +\gamma_s\normop{\Sb_s}\\
+ &\leq
+ (1-\gamma_s)R_s+\gamma_sR_s\\
+ &=R_s\leq R_{s+1}.
+\end{align*}
+Induction therefore gives, for every $s\geq0$,
+\begin{align*}
+ \normop{\Wb_s}&\leq R_s,\\
+ \normop{\Sb_s-\Wb_s}
+ &\leq
+ \normop{\Sb_s}+\normop{\Wb_s}
+ \leq2R_s.
+\end{align*}
+
+The exact linear minimization oracle and the feasibility of
+$\widehat\Wb_{K_s}$ give
+\begin{align}
+\nonumber
+ \left\langle
+  \nabla L(\Wb_s),\Sb_s-\Wb_s
+ \right\rangle_{\mathrm F}
+ &=
+ \min_{\normop{\Sb}\leq R_s}
+ \left\langle\nabla L(\Wb_s),\Sb\right\rangle_{\mathrm F}
+ -\left\langle\nabla L(\Wb_s),\Wb_s\right\rangle_{\mathrm F}\\
+ &\leq
+ \left\langle
+  \nabla L(\Wb_s),\widehat\Wb_{K_s}-\Wb_s
+ \right\rangle_{\mathrm F}.\label{eq:fw-comparater}
+\end{align}
+Convexity at $\Wb_s$ gives
+\begin{align}
+ L(\widehat\Wb_{K_s})\geq
+ L(\Wb_s)
+ +\left\langle
+  \nabla L(\Wb_s),\widehat\Wb_{K_s}-\Wb_s
+ \right\rangle_{\mathrm F}.\label{eq:fw-convex}
+\end{align}
+Combining \Cref{eq:fw-comparater} with \Cref{eq:fw-convex} yields
+\begin{align*}
+ \left\langle
+  \nabla L(\Wb_s),\Sb_s-\Wb_s
+ \right\rangle_{\mathrm F}
+ &\leq
+ L(\widehat\Wb_{K_s})-L(\Wb_s).
+\end{align*}
+
+Since
+$\Wb_{s+1}-\Wb_s=\gamma_s(\Sb_s-\Wb_s)$, the operator-norm smoothness
+inequality gives
+\begin{align*}
+ L(\Wb_{s+1})
+ &\leq
+ L(\Wb_s)
+ +\gamma_s
+ \left\langle
+  \nabla L(\Wb_s),\Sb_s-\Wb_s
+ \right\rangle_{\mathrm F}
+ +\frac{\Hop\gamma_s^2}{2}
+ \normop{\Sb_s-\Wb_s}^2\\
+ &\leq
+ L(\Wb_s)
+ +\gamma_s\bigl(L(\widehat\Wb_{K_s})-L(\Wb_s)\bigr)
+ +2\Hop\gamma_s^2R_s^2\\
+ &=(1-\gamma_s)L(\Wb_s)
+ +\gamma_sL(\widehat\Wb_{K_s})
+ +2\Hop\gamma_s^2R_s^2.
+\end{align*}
+Substituting $\gamma_s=2/(s+2)$ gives
+\begin{align*}
+ L(\Wb_{s+1})
+ &\leq
+ \frac{s}{s+2}L(\Wb_s)
+ +\frac{2}{s+2}L(\widehat\Wb_{K_s})
+ +\frac{8\Hop}{(s+2)^2}R_s^2.
+\end{align*}
+Multiplying by $(s+1)(s+2)$ yields
+\begin{align*}
+ (s+1)(s+2)L(\Wb_{s+1})\leq
+ s(s+1)L(\Wb_s)
+ +2(s+1)L(\widehat\Wb_{K_s})
+ +8\Hop\frac{s+1}{s+2}R_s^2.
+\end{align*}
+Summing from $s=0$ to $s=t-1$ gives
+\begin{align*}
+ &\sum_{s=0}^{t-1}
+ \Bigl[(s+1)(s+2)L(\Wb_{s+1})-s(s+1)L(\Wb_s)
+ \Bigr]\leq
+ 2\sum_{s=0}^{t-1}(s+1)L(\widehat\Wb_{K_s})
+ +8\Hop \sum_{s=0}^{t-1}\frac{s+1}{s+2}R_s^2.
+\end{align*}
+The sum on the left telescopes, and its initial term is
+$0\cdot1\cdot L(\Wb_0)=0$.  Hence
+\begin{align*}
+ t(t+1)L(\Wb_t)
+ &\leq
+ 2\sum_{s=0}^{t-1}(s+1)L(\widehat\Wb_{K_s})
+ +8\Hop
+ \sum_{s=0}^{t-1}\frac{s+1}{s+2}R_s^2,
+\end{align*}
+which is the claimed inequality.
+\end{proof}
+
+\begin{lemma}[Two scalar sums]
+\label{lem:Muon-scalar-sums}
+Let $M\geq1$ and let $t\geq M$ be an integer.  Then
+\begin{align*}
+ \sum_{s=0}^{t-1}
+ (s+1)
+ \max\left\{1,\frac{s+1}{M}\right\}^{-(\alpha-1)/\alpha}
+ &\leq
+ M^{(\alpha-1)/\alpha}t^{1+1/\alpha},\\
+ \sum_{s=0}^{t-1}
+ \max\left\{1,\frac{s+1}{M}\right\}^{1/\alpha}
+ &\leq
+ M^{-1/\alpha}t^{1+1/\alpha}.
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+Set $m=s+1$, so that $m=1,\ldots,t$. For the first sum, we claim that for every $1\le m\le t$,
+\begin{equation}
+m\max\left\{1,\frac{m}{M}\right\}^{-(\alpha-1)/\alpha}
+\le
+M^{(\alpha-1)/\alpha}m^{1/\alpha}.
+\label{eq:first-sum-pointwise}
+\end{equation}
+Indeed, if $m\le M$, then
+\[
+m\max\left\{1,\frac{m}{M}\right\}^{-(\alpha-1)/\alpha}
+=
+m.
+\]
+Since $\alpha>1$, we have $(\alpha-1)/\alpha>0$, and hence
+\[
+M^{(\alpha-1)/\alpha}m^{1/\alpha}
+=
+m\left(\frac{M}{m}\right)^{(\alpha-1)/\alpha}
+\ge m.
+\]
+Thus \eqref{eq:first-sum-pointwise} holds when $m\le M$.
+
+If $m>M$, then
+\begin{align*}
+m\max\left\{1,\frac{m}{M}\right\}^{-(\alpha-1)/\alpha}
+&=
+m\left(\frac{m}{M}\right)^{-(\alpha-1)/\alpha}\\
+&=
+M^{(\alpha-1)/\alpha}
+m^{1-(\alpha-1)/\alpha}\\
+&=
+M^{(\alpha-1)/\alpha}m^{1/\alpha},
+\end{align*}
+so in this case equality holds in \eqref{eq:first-sum-pointwise}.
+Therefore, using $m\le t$,
+\begin{align*}
+\sum_{s=0}^{t-1}
+(s+1)
+\max\left\{1,\frac{s+1}{M}\right\}^{-(\alpha-1)/\alpha}
+&=
+\sum_{m=1}^{t}
+m\max\left\{1,\frac{m}{M}\right\}^{-(\alpha-1)/\alpha}\\
+&\le
+M^{(\alpha-1)/\alpha}
+\sum_{m=1}^{t}m^{1/\alpha}\\
+&\le
+M^{(\alpha-1)/\alpha}
+t \cdot t^{1/\alpha}=
+M^{(\alpha-1)/\alpha}t^{1+1/\alpha}.
+\end{align*}
+
+For the second sum, since $t\ge M$, we have $\frac{t}{M}\ge1.$ We again verify the required bound pointwise.  If $m\le M$, then
+\[
+\max\left\{1,\frac{m}{M}\right\}^{1/\alpha}
+=
+1
+\le
+\left(\frac{t}{M}\right)^{1/\alpha}.
+\]
+If $M<m\le t$, then
+\[
+\max\left\{1,\frac{m}{M}\right\}^{1/\alpha}
+=
+\left(\frac{m}{M}\right)^{1/\alpha}
+\le
+\left(\frac{t}{M}\right)^{1/\alpha}.
+\]
+Hence, for every $1\le m\le t$,
+\[
+\max\left\{1,\frac{m}{M}\right\}^{1/\alpha}
+\le
+\left(\frac{t}{M}\right)^{1/\alpha}.
+\]
+Summing over $m=1,\ldots,t$ gives
+\begin{align*}
+\sum_{s=0}^{t-1}
+\max\left\{1,\frac{s+1}{M}\right\}^{1/\alpha}
+&=
+\sum_{m=1}^{t}
+\max\left\{1,\frac{m}{M}\right\}^{1/\alpha}\\
+&\le
+t\left(\frac{t}{M}\right)^{1/\alpha}= M^{-1/\alpha}t^{1+1/\alpha}.
+\end{align*}
+This proves both bounds.
+\end{proof}
+
+\begin{proof}[Proof of \Cref{thm:Muon-upper bound}]
+Work on the intersection of the event in \Cref{prop:prefix-v2} and the
+regularity event in \Cref{lem:regularity-v2}.  Its probability is at least
+$1-O(d^{-q})$, and \Cref{lem:smoothness-v2} gives $\Hop\leq\frac{1221}{2000}.$
+Let $A_{\alpha,q}$ and $c_*$ be the constants in \Cref{lem:Muon-time-comparators}.  Choose
+\begin{align*}
+ C_{\mathrm{low}}
+ &\geq1,
+ \qquad
+ c_{\mathrm{up}}\leq c_*.
+\end{align*}
+Fix an integer $t$ in the range of the theorem.
+The lower time bound and $C_{\mathrm{low}}\geq1$ give $t\geq M$.
+
+The radius sequence is nondecreasing.  For every $0\leq s<t$, write the
+oracle point in the theorem as
+\begin{align*}
+ \Sb_s
+ &:=-R_s\polar\!\left(\nabla L(\Wb_s^{\mathrm{Muon}})\right).
+\end{align*}
+The defining properties of the polar factor and operator--nuclear norm
+duality give
+\begin{align*}
+ \normop{\Sb_s}
+ &\leq R_s,\\
+ \left\langle
+  \nabla L(\Wb_s^{\mathrm{Muon}}),\Sb_s
+ \right\rangle_{\mathrm F}
+ &=-R_s\left\|\nabla L(\Wb_s^{\mathrm{Muon}})\right\|_*\\
+ &=
+ \min_{\normop{\Sb}\leq R_s}
+ \left\langle
+  \nabla L(\Wb_s^{\mathrm{Muon}}),\Sb
+ \right\rangle_{\mathrm F}.
+\end{align*}
+Moreover, the recursion in the theorem is exactly
+\begin{align*}
+ \Wb_{s+1}^{\mathrm{Muon}}
+ &=(1-\gamma_s)\Wb_s^{\mathrm{Muon}}+\gamma_s\Sb_s.
+\end{align*}
+
+For every $0\leq s<t$, use the prefix comparator
+$\widehat\Wb_{K_s}$ from \Cref{lem:Muon-time-comparators}.  The first
+conclusion of that lemma gives
+\begin{align*}
+ \normop{\widehat\Wb_{K_s}}\leq
+ C_\alpha(\log N)
+ \max\left\{1,\left(\frac{s+1}{M}\right)^{1/(2\alpha)}\right\}=R_s.
+\end{align*}
+Therefore \Cref{lem:Muon-changing-radius} yields
+\begin{align*}
+ t(t+1)L(\Wb_t^{\mathrm{Muon}})
+ &\leq
+ 2\sum_{s=0}^{t-1}(s+1)L(\widehat\Wb_{K_s})
+ +8\Hop
+ \sum_{s=0}^{t-1}\frac{s+1}{s+2}R_s^2.
+\end{align*}
+
+We bound the comparator contribution first.  The second conclusion of
+\Cref{lem:Muon-time-comparators} and the first estimate in
+\Cref{lem:Muon-scalar-sums} give
+\begin{align*}
+ \sum_{s=0}^{t-1}(s+1)L(\widehat\Wb_{K_s})
+ &\leq
+ A_{\alpha,q}(\log N)d^{1-\alpha}
+ \sum_{s=0}^{t-1}
+ (s+1)
+ \max\left\{1,\frac{s+1}{M}\right\}^{-(\alpha-1)/\alpha}\\
+ &\leq
+ A_{\alpha,q}(\log N)d^{1-\alpha}
+ M^{(\alpha-1)/\alpha}t^{1+1/\alpha}.
+\end{align*}
+
+For the curvature contribution, the definition of $R_s$ gives
+\begin{align*}
+ R_s^2
+ &=C_\alpha^2(\log N)^2
+ \max\left\{1,\frac{s+1}{M}\right\}^{1/\alpha}.
+\end{align*}
+Using $(s+1)/(s+2)\leq1$ and the second estimate in
+\Cref{lem:Muon-scalar-sums}, we obtain
+\begin{align*}
+ \sum_{s=0}^{t-1}\frac{s+1}{s+2}R_s^2
+ &\leq
+ C_\alpha^2(\log N)^2
+ \sum_{s=0}^{t-1}
+ \max\left\{1,\frac{s+1}{M}\right\}^{1/\alpha}\\
+ &\leq
+ C_\alpha^2(\log N)^2
+ M^{-1/\alpha}t^{1+1/\alpha}.
+\end{align*}
+
+Substituting the last two estimates into the changing-radius inequality and
+using $t(t+1)\geq t^2$ gives
+\begin{align*}
+ L(\Wb_t^{\mathrm{Muon}})
+ &\leq
+ 2A_{\alpha,q}(\log N)d^{1-\alpha}
+ M^{(\alpha-1)/\alpha}t^{-(\alpha-1)/\alpha}\\
+ &\qquad+
+ 8\Hop C_\alpha^2(\log N)^2
+ M^{-1/\alpha}t^{-(\alpha-1)/\alpha}.
+\end{align*}
+The two coefficients have exactly the same scale.  Indeed, since
+$M=(\log N)d^{\alpha-1}$,
+\begin{align*}
+ \frac{(\log N)^2M^{-1/\alpha}}
+ {(\log N)d^{1-\alpha}M^{(\alpha-1)/\alpha}}
+ &=(\log N)d^{\alpha-1}
+ M^{-1/\alpha-(\alpha-1)/\alpha}\\
+ &=M\cdot M^{-1}=1.
+\end{align*}
+Consequently, the bound $\Hop\leq1221/2000$ gives
+\begin{align*}
+ L(\Wb_t^{\mathrm{Muon}})
+ &\leq
+ \left(
+  2A_{\alpha,q}
+  +\frac{1221}{250}C_\alpha^2
+ \right)
+ (\log N)d^{1-\alpha}
+ M^{(\alpha-1)/\alpha}t^{-(\alpha-1)/\alpha}.
+\end{align*}
+Finally, substituting $M=(\log N)d^{\alpha-1}$ and simplifying each power
+gives
+\begin{align*}
+ (\log N)d^{1-\alpha}
+ M^{(\alpha-1)/\alpha}t^{-(\alpha-1)/\alpha}=
+ (\log N)\left(\frac{dt}{\log N}\right)^{-(\alpha-1)/\alpha}.
+\end{align*}
+This proves the asserted loss bound for the fixed $t$.  Since \Cref{prop:prefix-v2} holds on a single event simultaneously for all
+admissible $K$, all comparator bounds used above hold simultaneously for
+every $K_s$. The remaining argument is deterministic, so the resulting
+loss bound holds on the same event for every integer $t$ in the stated range.
+\end{proof}
+
+% ============================================================
+
+
 
 % ============================================================
 \section{Proof of \Cref{thm:gd}}
@@ -1487,7 +2135,7 @@ Fix a block $B$ and run the same schedule after deleting that block:
  \qquad
  \widetilde\Wb_{t+1}^{(B)}
  =\widetilde\Wb_t^{(B)}
- -\eta_t(\eps)\nabla(L-L_B)(\widetilde\Wb_t^{(B)}).
+ -\eta_t\nabla(L-L_B)(\widetilde\Wb_t^{(B)}).
 \]
 
 \begin{lemma}[Leave-block stability]
@@ -1496,12 +2144,12 @@ On the regularity event, every block in \Cref{lem:block-v2} satisfies
 \begin{align*}
  \normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}
  &\lesssim
- \left(\sum_{s<t}\eta_s(\eps)\right)
+ \left(\sum_{s<t}\eta_s\right)
  \left(\sum_{i\in B}p_i^2\right)^{1/2},\\
  L_B(\Wb_t^{\mathrm{GD}})
  &\geq L_B(\widetilde\Wb_t^{(B)})
  -O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \left(\sum_{s<t}\eta_s\right)
   \sum_{i\in B}p_i^2
  \right).
 \end{align*}
@@ -1509,28 +2157,28 @@ On the regularity event, every block in \Cref{lem:block-v2} satisfies
 
 \begin{proof}
 Let
-$T_t(\Wb):=\Wb-\eta_t(\eps)\nabla L(\Wb)$.  By
+$T_t(\Wb):=\Wb-\eta_t\nabla L(\Wb)$.  By
 \Cref{lem:smoothness-v2,lem:cocoercive-v2}, $T_t$ is nonexpansive.  The
 reduced update is exactly
 \[
  \widetilde\Wb_{t+1}^{(B)}
  =T_t(\widetilde\Wb_t^{(B)})
- +\eta_t(\eps)\nabla L_B(\widetilde\Wb_t^{(B)}).
+ +\eta_t\nabla L_B(\widetilde\Wb_t^{(B)}).
 \]
 Subtracting it from the full update gives
 \begin{align*}
  \Wb_{t+1}^{\mathrm{GD}}-\widetilde\Wb_{t+1}^{(B)}
- &=T_t(\Wb_t^{\mathrm{GD}})-T_t(\widetilde\Wb_t^{(B)})-\eta_t(\eps)\nabla L_B(\widetilde\Wb_t^{(B)}).
+ &=T_t(\Wb_t^{\mathrm{GD}})-T_t(\widetilde\Wb_t^{(B)})-\eta_t\nabla L_B(\widetilde\Wb_t^{(B)}).
 \end{align*}
 Taking Frobenius norms, using nonexpansiveness, and then applying
 \Cref{lem:block-v2} gives
 \begin{align*}
  \normF{\Wb_{t+1}^{\mathrm{GD}}-\widetilde\Wb_{t+1}^{(B)}}
- &\leq\normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}+\eta_t(\eps)
+ &\leq\normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}+\eta_t
  \sup_{\Zb}\normF{\nabla L_B(\Zb)}\\
  &\leq\normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}
  +O\!\left(
-  \eta_t(\eps)\left(\sum_{i\in B}p_i^2\right)^{1/2}
+  \eta_t\left(\sum_{i\in B}p_i^2\right)^{1/2}
  \right).
 \end{align*}
 The initial distance is zero.  Summing this scalar recurrence from
@@ -1622,7 +2270,7 @@ $1-e^{-\Omega(d)}$, simultaneously for $0\leq t\leq T$,
 \begin{align*}
  \sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}})
  &\geq(1-\rho)(\log N)\sum_{i=r}^Np_i-O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \left(\sum_{s<t}\eta_s\right)
   \sum_{i=r}^Np_i^2
  \right).
 \end{align*}
@@ -1665,7 +2313,7 @@ Recall that the leave-block trajectory is defined by
  =
  \widetilde\Wb^{(B)}_s
  -
- \eta_s(\eps)\,
+ \eta_s\,
  \nabla(L-L_B)(\widetilde\Wb^{(B)}_s),
  \qquad
  \widetilde\Wb^{(B)}_0=\mathbf 0.
@@ -1673,7 +2321,7 @@ Recall that the leave-block trajectory is defined by
 The objective $L-L_B$ contains no loss term indexed by $i\in B$ and hence
 does not involve the corresponding query vectors
 $\vb_i=\sigma_i\zb_i$, $i\in B$.  Since the schedule
-$(\eta_s(\eps))_{s\ge0}$ is prescribed before the sample is drawn, it is
+$(\eta_s)_{s\ge0}$ is prescribed before the sample is drawn, it is
 also independent of these signs.  Consequently,
 $\widetilde\Wb^{(B)}_s$ is $\mathcal C_B$-measurable for every $s$,
 and in particular $\widetilde\Wb^{(B)}_t$ is fixed when we condition on
@@ -1697,12 +2345,12 @@ probability $e^{-c_{\alpha,\rho}d}$,
  L_B(\Wb_t^{\mathrm{GD}})
  &\geq L_B(\widetilde\Wb_t^{(B)})
  -O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \left(\sum_{s<t}\eta_s\right)
   \sum_{i\in B}p_i^2
  \right)\\
  &\geq(1-\rho)(\log N)\sum_{i\in B}p_i
  -O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \left(\sum_{s<t}\eta_s\right)
   \sum_{i\in B}p_i^2
  \right).
 \end{align*}
@@ -1784,13 +2432,13 @@ Substitution proves the proposition.
 %  &\geq\sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}})\\
 %  &\geq(1-\rho)(\log N)\sum_{i=r}^Np_i
 %  -O\!\left(
-%   \left(\sum_{s<t}\eta_s(\eps)\right)
+%   \left(\sum_{s<t}\eta_s\right)
 %   \sum_{i=r}^Np_i^2
 %  \right)\\
 %  &= (\log N)\sum_{i>K}p_i
 %  +(\log N)\sum_{i=r}^Kp_i
 %  -\rho(\log N)\sum_{i=r}^Np_i-O\!\left(
-%   \left(\sum_{s<t}\eta_s(\eps)\right)
+%   \left(\sum_{s<t}\eta_s\right)
 %   \sum_{i=r}^Np_i^2
 %  \right)\\
 %  &\geq(\log N)\sum_{i>K}p_i
@@ -1799,12 +2447,12 @@ Substitution proves the proposition.
 %   -\rho(\log N)\sum_{i=r}^Np_i
 %  \right]-
 %  O\!\left(
-%   \left(\sum_{s<t}\eta_s(\eps)\right)Kp_K^2
+%   \left(\sum_{s<t}\eta_s\right)Kp_K^2
 %  \right).
 % \end{align*}
 % If
 % \[
-%  \sum_{s<t}\eta_s(\eps)
+%  \sum_{s<t}\eta_s
 %  \lesssim\frac{\log N}{p_K},
 % \]
 % where the implicit constant on the left is chosen sufficiently small, the
@@ -1822,9 +2470,9 @@ Substitution proves the proposition.
 % where the strict last inequality is ensured by the fixed implicit constant
 % in the choice of $K$.
 
-% Because $\eta_s(\eps)\leq3$,
+% Because $\eta_s\leq3$,
 % \[
-%  \sum_{s<t}\eta_s(\eps)\leq3t.
+%  \sum_{s<t}\eta_s\leq3t.
 % \]
 % Consequently, every $t\lesssim(\log N)/p_K$, with a sufficiently small
 % implicit constant, lies in the preceding cumulative-step regime and has
@@ -1851,7 +2499,7 @@ Substitution proves the proposition.
 
 
 \begin{proof}[Proof of \Cref{thm:gd}]
-Fix an arbitrary target $\eps$ in the stated range and an arbitrary deterministic pre-sample schedule satisfying $\eta_t(\eps)<3.$ We first prove a $K$-parameterized lower bound that holds for every integer $d\leq K\leq\frac{d^2}{\log N},$ without yet relating $K$ to $\eps$. For each such $K$,  Put $r=\lfloor K/2\rfloor+1$, which is admissible in \Cref{prop:tail-v2}.
+Fix an arbitrary target $\eps$ in the stated range and an arbitrary deterministic pre-sample schedule satisfying $\eta_t<3.$ We first prove a $K$-parameterized lower bound that holds for every integer $d\leq K\leq\frac{d^2}{\log N},$ without yet relating $K$ to $\eps$. For each such $K$,  Put $r=\lfloor K/2\rfloor+1$, which is admissible in \Cref{prop:tail-v2}.
 
 We record the three weight estimates with their derivations.  There are at
 least $K/3$ indices in $\{r,\ldots,K\}$ for large $K$, and each has weight
@@ -1889,13 +2537,13 @@ $\sum_{i=r}^Np_i=\sum_{i>K}p_i+\sum_{i=r}^Kp_i$, we obtain
  &\geq\sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}})\\
  &\geq(1-\rho)(\log N)\sum_{i=r}^Np_i
  -O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \left(\sum_{s<t}\eta_s\right)
   \sum_{i=r}^Np_i^2
  \right)\\
  &= (\log N)\sum_{i>K}p_i
  +(\log N)\sum_{i=r}^Kp_i
  -\rho(\log N)\sum_{i=r}^Np_i-O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \left(\sum_{s<t}\eta_s\right)
   \sum_{i=r}^Np_i^2
  \right)\\
  &\geq(\log N)\sum_{i>K}p_i
@@ -1904,12 +2552,12 @@ $\sum_{i=r}^Np_i=\sum_{i>K}p_i+\sum_{i=r}^Kp_i$, we obtain
   -\rho(\log N)\sum_{i=r}^Np_i
  \right]-
  O\!\left(
-  \left(\sum_{s<t}\eta_s(\eps)\right)Kp_K^2
+  \left(\sum_{s<t}\eta_s\right)Kp_K^2
  \right).
 \end{align*}
 
 Consequently, if
-$ \sum_{s<t}\eta_s(\eps)
+$ \sum_{s<t}\eta_s
  \lesssim\frac{\log N}{p_K},
 $
 where the implicit constant is chosen sufficiently small, the
@@ -1929,10 +2577,10 @@ In the application of \Cref{prop:tail-v2}, take $T=\lceil d^{2\alpha+2}\rceil$. 
 integer values of $K$, a union bound shows that, with probability at least $1-e^{-\Omega(d)},$ the preceding estimate holds simultaneously for every admissible $K$ and
 every $0\leq t\leq T$.
 
-Since $0\leq\eta_s(\eps)\leq3$, whenever $t$ is at most a sufficiently
+Since $0\leq\eta_s\leq3$, whenever $t$ is at most a sufficiently
 small fixed multiple of $(\log N)/p_K$, we have
 $
- \sum_{s<t}\eta_s(\eps)\leq 3t \lesssim\frac{\log N}{p_K}.
+ \sum_{s<t}\eta_s\leq 3t \lesssim\frac{\log N}{p_K}.
 $
 This time is within the horizon in
 \Cref{prop:tail-v2}, because
@@ -1950,60 +2598,157 @@ For every $t\lesssim\frac{\log N}{p_K},$ we have
  L(\Wb_t^{\mathrm{GD}})
  \gtrsim Kp_K\log N.
 \]
-Equivalently, if $\eps$ is at most a sufficiently small fixed multiple of
-$Kp_K\log N$, then $L(\Wb_t^{\mathrm{GD}})
- >\eps$ and we get
-\[
- \tau_{\mathrm{GD}}(\eps)
- \gtrsim\frac{\log N}{p_K}.
-\]
+% Equivalently, if $\eps$ is at most a sufficiently small fixed multiple of
+% $Kp_K\log N$, then $L(\Wb_t^{\mathrm{GD}})
+%  >\eps$ and we get
+% \[
+%  \tau_{\mathrm{GD}}(\eps)
+%  \gtrsim\frac{\log N}{p_K}.
+% \]
 
-We now use the target $\eps$ to select $K$.  For an arbitrary
-$
- C_{\mathrm{low}}
- \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
- \leq\eps\leq
- c_{\mathrm{up}}
- \frac{\log N}{d^{\alpha-1}},
-$
-choose an integer
+% We now use the target $\eps$ to select $K$.  For an arbitrary
+% $
+%  C_{\mathrm{low}}
+%  \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+%  \leq\eps\leq
+%  c_{\mathrm{up}}
+%  \frac{\log N}{d^{\alpha-1}},
+% $
+% choose an integer
+% \[
+%  K\eqsim
+%  \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)},
+% \]
+% where the fixed implicit multiplicative constant is chosen sufficiently
+% small. The target range, after increasing $C_{\mathrm{low}}$ and decreasing $c_{\mathrm{up}}$ to
+% leave fixed-factor slack, therefore ensures
+% $d\leq K\leq c d^2/\log N$.
+
+% Moreover, 
+% \begin{align*}
+%  Kp_K\log N
+%  &\eqsim(\log N)K^{1-\alpha}\eqsim\eps.
+% \end{align*}
+% Since $1-\alpha<0$, decreasing the fixed multiplicative constant in the
+% choice of $K$ increases the ratio
+% $(Kp_K\log N)/\eps$.  We may therefore choose it sufficiently small that
+% $Kp_K\log N$ is a sufficiently large fixed multiple of $\eps$.  The
+% $K$-parameterized lower bound then gives, for every
+% $t\lesssim(\log N)/p_K$,
+% \[
+%  L(\Wb_t^{\mathrm{GD}})
+%  \gtrsim Kp_K\log N
+%  >\eps.
+% \]
+% None of these times can be the hitting time.  Hence
+% \begin{align*}
+%  \tau_{\mathrm{GD}}(\eps)
+%  &\gtrsim\frac{\log N}{p_K}\eqsim(\log N)K^\alpha\eqsim(\log N)
+%  \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+% \end{align*}
+% Intersecting this pointwise schedule event with the common event in
+% \Cref{thm:fw} and applying the Muon upper bound there proves
+% $\tau_{\mathrm{GD}}(\eps)\gtrsim d\,\tau_{\mathrm{Muon}}(\eps)$.
+% The probability statement remains pointwise in the fixed target-schedule
+% pair because the leave-block trajectory is independent of the removed signs
+% only for a schedule fixed before the sample.
+We now eliminate $K$ in favor of the iteration number $t$.
+Fix
 \[
- K\eqsim
- \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)},
+C_{\mathrm{low}}(\log N)d^\alpha
+\leq t
+\leq
+c_{\mathrm{up}}
+\frac{d^{2\alpha}}{(\log N)^{\alpha-1}},
+\]
+and choose an integer
+\[
+K\eqsim
+\left(\frac{t}{\log N}\right)^{1/\alpha},
 \]
 where the fixed implicit multiplicative constant is chosen sufficiently
-small. The target range, after increasing $C_{\mathrm{low}}$ and decreasing $c_{\mathrm{up}}$ to
-leave fixed-factor slack, therefore ensures
-$d\leq K\leq c d^2/\log N$.
-
-Moreover, 
-\begin{align*}
- Kp_K\log N
- &\eqsim(\log N)K^{1-\alpha}\eqsim\eps.
-\end{align*}
-Since $1-\alpha<0$, decreasing the fixed multiplicative constant in the
-choice of $K$ increases the ratio
-$(Kp_K\log N)/\eps$.  We may therefore choose it sufficiently small that
-$Kp_K\log N$ is a sufficiently large fixed multiple of $\eps$.  The
-$K$-parameterized lower bound then gives, for every
-$t\lesssim(\log N)/p_K$,
+large. After increasing $C_{\mathrm{low}}$ and decreasing $c_{\mathrm{up}}$
+to leave fixed-factor slack, this choice satisfies
 \[
- L(\Wb_t^{\mathrm{GD}})
- \gtrsim Kp_K\log N
- >\eps.
+d\leq K\leq c\frac{d^2}{\log N}.
 \]
-None of these times can be the hitting time.  Hence
+Moreover, since $p_K\eqsim K^{-\alpha}$,
+\[
+\frac{\log N}{p_K}
+\eqsim
+(\log N)K^\alpha
+\eqsim t.
+\]
+By choosing the implicit constant in $K$ sufficiently large, we can ensure
+\[
+t\lesssim \frac{\log N}{p_K},
+\]
+and hence the $K$-parameterized lower bound applies. Therefore
 \begin{align*}
- \tau_{\mathrm{GD}}(\eps)
- &\gtrsim\frac{\log N}{p_K}\eqsim(\log N)K^\alpha\eqsim(\log N)
- \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+L(\Wb_t^{\mathrm{GD}})
+&\gtrsim
+Kp_K\log N\\
+&\eqsim
+(\log N)K^{1-\alpha}\\
+&\eqsim
+(\log N)
+\left(\frac{t}{\log N}\right)^{-(\alpha-1)/\alpha}.
 \end{align*}
-Intersecting this pointwise schedule event with the common event in
-\Cref{thm:fw} and applying the Muon upper bound there proves
-$\tau_{\mathrm{GD}}(\eps)\gtrsim d\,\tau_{\mathrm{Muon}}(\eps)$.
-The probability statement remains pointwise in the fixed target-schedule
-pair because the leave-block trajectory is independent of the removed signs
-only for a schedule fixed before the sample.
+Thus, with high probability, simultaneously for every
+$
+C_{\mathrm{low}}(\log N)d^\alpha
+\leq t
+\leq
+c_{\mathrm{up}}
+\frac{d^{2\alpha}}{(\log N)^{\alpha-1}},
+$
+we have
+\[
+L(\Wb_t^{\mathrm{GD}})
+\gtrsim
+(\log N)
+\left(\frac{t}{\log N}\right)^{-(\alpha-1)/\alpha}.
+\]
+
+\end{proof}
+
+
+
+% ============================================================
+\section{Proof of \Cref{cor:gd-weight-decay}}
+% ============================================================
+\begin{proof}
+For each $t$, define
+\[
+F_t(\Wb)
+:=
+L(\Wb)+\frac{\lambda_t}{2}\normF{\Wb}^2.
+\]
+On the regularity event of \Cref{lem:regularity-v2},
+\Cref{lem:smoothness-v2} gives $\HF<2/3$, so $F_t$ is convex and
+$(\HF+\lambda_t)$-smooth in Frobenius norm.  The assumed condition implies
+\[
+\eta_t
+\leq
+\frac{2}{\HF+\lambda_t},
+\]
+and hence the map
+\[
+\Wb\mapsto
+\Wb-\eta_t\nabla F_t(\Wb)
+=
+(1-\eta_t\lambda_t)\Wb-\eta_t\nabla L(\Wb)
+\]
+is nonexpansive in Frobenius norm by \Cref{lem:cocoercive-v2}.
+
+For a block $B$, the corresponding leave-block update can be written as
+the same nonexpansive map plus
+$\eta_t\nabla L_B$.  Therefore the leave-block stability bound in
+\Cref{lem:block-v2} holds unchanged.  Moreover, the assumption above
+implies $\eta_t\leq3$, so all subsequent tail-preservation and
+$K$-parameterized lower-bound arguments apply verbatim.  The claimed
+learning-curve and hitting-time bounds then follow exactly as in
+\Cref{thm:gd}.
 \end{proof}
 
 % ============================================================
@@ -2011,196 +2756,581 @@ only for a schedule fixed before the sample.
 % ============================================================
 
 \begin{proof}[Proof of \Cref{thm:capped}]
-Work on the common event of probability $1-O(d^{-q})$ from
-\Cref{thm:fw}.  Only the mixing schedule changes; the operator ball and its
-polar oracle are the same.  Since $a\geq0$, one has
-$0<\gamma_t\leq1$.  Moreover, $t\mapsto\gamma_t$ is decreasing and the
-chosen $a$ satisfies
-$2+a\geq2R_{\mathrm{op}}(\eps/2)/\bar\eta$,
-\begin{align*}
- R_{\mathrm{op}}(\eps/2)\gamma_t
- &=\frac{2R_{\mathrm{op}}(\eps/2)}{t+2+a}\leq\frac{2R_{\mathrm{op}}(\eps/2)}{2+a}\leq\bar\eta.
-\end{align*}
-Every oracle point satisfies
-$\normop{\Sb_t^{\mathrm{op}}}\leq R_{\mathrm{op}}(\eps/2)$.  Starting from
-$\Wb_0^{\mathrm{op}}=\mathbf0$, feasibility follows by induction: if the
-$t$th iterate is feasible, then
-\begin{align*}
- \normop{\Wb_{t+1}^{\mathrm{op}}}
- &=\normop{
-  (1-\gamma_t)\Wb_t^{\mathrm{op}}+\gamma_t\Sb_t^{\mathrm{op}}
- }\\
- &\leq
- (1-\gamma_t)\normop{\Wb_t^{\mathrm{op}}}
- +\gamma_t\normop{\Sb_t^{\mathrm{op}}}\\
- &\leq
- (1-\gamma_t)R_{\mathrm{op}}(\eps/2)
- +\gamma_tR_{\mathrm{op}}(\eps/2)\\
- &=R_{\mathrm{op}}(\eps/2).
-\end{align*}
-Thus both the iterate and oracle point lie in the operator ball.  Therefore
-\begin{align*}
- \normop{\Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
- &=\gamma_t\normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}\\
- &\leq\gamma_t
- \left(\normop{\Sb_t^{\mathrm{op}}}+\normop{\Wb_t^{\mathrm{op}}}\right)\\
- &\leq2R_{\mathrm{op}}(\eps/2)\gamma_t\leq2\bar\eta.
-\end{align*}
-
-Let $\Wb_R^*$ minimize $L$ on this ball and put
-$h_t:=L(\Wb_t^{\mathrm{op}})-L(\Wb_R^*)$.  The ball contains a point of
-loss at most $\eps/2$, so $L(\Wb_R^*)\leq\eps/2$.  Repeating the oracle and
-convexity argument with every line displayed gives
-\begin{align*}
- &\left\langle
-  \nabla L(\Wb_t^{\mathrm{op}}),
-  \Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
- \right\rangle_{\mathrm F}\\
- &\quad=
- \min_{\normop{\Sb}\leq R_{\mathrm{op}}(\eps/2)}
- \left\langle\nabla L(\Wb_t^{\mathrm{op}}),\Sb\right\rangle_{\mathrm F}
- -\left\langle
-  \nabla L(\Wb_t^{\mathrm{op}}),\Wb_t^{\mathrm{op}}
- \right\rangle_{\mathrm F}\\
- &\quad\leq
- \left\langle
-  \nabla L(\Wb_t^{\mathrm{op}}),\Wb_R^*-\Wb_t^{\mathrm{op}}
- \right\rangle_{\mathrm F}\\
- &\quad\leq L(\Wb_R^*)-L(\Wb_t^{\mathrm{op}})=-h_t.
-\end{align*}
-The last inequality is exactly the convexity inequality
+Recall from the proof of \Cref{thm:Muon-upper bound} that $M:=(\log N)d^{\alpha-1},$
+and that the radius schedule is
 \[
- L(\Wb_R^*)\geq L(\Wb_t^{\mathrm{op}})
- +\left\langle
-  \nabla L(\Wb_t^{\mathrm{op}}),\Wb_R^*-\Wb_t^{\mathrm{op}}
- \right\rangle_{\mathrm F}.
+R_t
+=
+C_\alpha(\log N)
+\max\left\{
+1,
+\left(\frac{t+1}{M}\right)^{1/(2\alpha)}
+\right\}.
 \]
+The only change from \Cref{thm:Muon-upper bound} is the mixing schedule:
+\[
+\gamma_t=\frac{2}{t+2+a},
+\qquad
+a=
+\max\left\{
+0,\frac{2C_\alpha\log N}{\bar\eta}-2
+\right\}.
+\]
+In particular, \(a\ge0\), so \(0<\gamma_t\le1\).
 
-The displacement identity and the ball diameter give
-\begin{align*}
- \Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
- &=\gamma_t(\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}),\\
- \normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
- &\leq2R_{\mathrm{op}}(\eps/2).
-\end{align*}
-Substituting these facts into operator smoothness yields
-\begin{align*}
- h_{t+1}
- &\leq h_t
- +\gamma_t\left\langle
-  \nabla L(\Wb_t^{\mathrm{op}}),
-  \Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
- \right\rangle_{\mathrm F}+
- \frac{\Hop\gamma_t^2}{2}
- \normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}^2\\
- &\leq(1-\gamma_t)h_t
- +2\Hop R_{\mathrm{op}}(\eps/2)^2\gamma_t^2\\
- &=\frac{t+a}{t+a+2}h_t
- +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{(t+a+2)^2}.
-\end{align*}
-
-Multiply the recurrence at time $s$ by $(s+a+1)(s+a+2)$.  Summing the
-resulting differences explicitly gives
-\begin{align*}
- &(t+a)(t+a+1)h_t-a(a+1)h_0\\
- &\quad=
- \sum_{s=0}^{t-1}
- \Bigl[
-  (s+a+1)(s+a+2)h_{s+1}
-  -(s+a)(s+a+1)h_s
- \Bigr]\\
- &\quad\leq
- 8\Hop R_{\mathrm{op}}(\eps/2)^2
- \sum_{s=0}^{t-1}\frac{s+a+1}{s+a+2}\\
- &\quad\leq8\Hop R_{\mathrm{op}}(\eps/2)^2t.
-\end{align*}
-Because $h_0=L(\mathbf0)-L(\Wb_R^*)\leq\log N$, for every $t\geq1$ division
-by $(t+a)(t+a+1)\geq t^2$ gives
-\begin{equation}\label{eq:h_t}
- h_t
- \leq
- \frac{a(a+1)\log N}{t^2}
- +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}.
+We first prove the deterministic effective-learning-rate bound. By construction
+\begin{equation}
+\frac{2C_\alpha\log N}{a+2}\le\bar\eta.
+\label{eq:capped-a-choice}
+\end{equation}
+Moreover,
+\[
+a+2
+\le
+2+\frac{2C_\alpha\log N}{\bar\eta}
+=
+O_{\bar\eta}(\log N),
+\]
+whereas \(M=(\log N)d^{\alpha-1}\).  Since \(\alpha>1\), for all
+sufficiently large \(d\),
+\begin{equation}
+M\ge a+2.
+\label{eq:capped-M-a}
 \end{equation}
 
-The choice of $a$ gives
-$a+1\le 2R_{\mathrm{op}}(\eps/2)/\bar \eta$. Therefore we have
-$
- a(a+1)\le 4R_{\mathrm{op}}(\eps/2)^2/(\bar \eta)^2.
-$
-Putting this back into Eq.~\ref{eq:h_t} and get,
-\begin{equation}\nonumber
- h_t
- \leq
- \frac{4R_{\mathrm{op}}(\eps/2)^2\log N}{\bar \eta^2t^2}
- +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}.
-\end{equation}
-To make the first term at most $\eps/4$, it suffices to require
+We now show that \(\gamma_tR_t\le\bar\eta\) for every \(t\ge0\).
+If \(t+1\le M\), then \(R_t=C_\alpha\log N\), and therefore
 \[
- \frac{4R_{\mathrm{op}}(\eps/2)^2\log N}
- {\bar\eta^2 t^2}
- \leq \frac{\eps}{4},
+\gamma_tR_t
+=
+\frac{2C_\alpha\log N}{t+2+a}
+\le
+\frac{2C_\alpha\log N}{a+2}
+\le
+\bar\eta.
 \]
-or equivalently,
+If \(t+1>M\), then, since \(1/(2\alpha)<1\),
 \[
- t\geq
- t_1:=
- \frac{4R_{\mathrm{op}}(\eps/2)}{\bar\eta}
- \sqrt{\frac{\log N}{\eps}}.
+\left(\frac{t+1}{M}\right)^{1/(2\alpha)}
+\le
+\frac{t+1}{M}.
 \]
-Similarly, to make the second term at most $\eps/4$, it suffices to require
-\[
- \frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}
- \leq\frac{\eps}{4},
-\]
-or equivalently,
-\[
- t\geq
- t_2:=
- \frac{32\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}.
-\]
-
-We now compare these two time scales.  Their ratio is
+Hence, using \eqref{eq:capped-M-a},
 \begin{align*}
- \frac{t_1}{t_2}
- &=
- \frac{
- \frac{4R_{\mathrm{op}}(\eps/2)}{\bar\eta}
- \sqrt{\frac{\log N}{\eps}}
- }{
- \frac{32\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}
- }
- =
- \frac{1}{8\bar\eta\Hop}
- \frac{\sqrt{\eps\log N}}
- {R_{\mathrm{op}}(\eps/2)}.
+\gamma_tR_t
+&=
+\frac{2C_\alpha\log N}{t+2+a}
+\left(\frac{t+1}{M}\right)^{1/(2\alpha)}\\
+&\le
+\frac{2C_\alpha\log N}{a+2}
+\frac{t+1}{t+2+a}\\
+&\le
+\frac{2C_\alpha\log N}{a+2}
+\le
+\bar\eta.
 \end{align*}
-The sharp operator radius formula and the upper endpoint of the target range give \begin{align*} 
-R_{\mathrm{op}}(\eps/2)^2 &\eqsim \frac{(\log N)^2}{d} \left(\frac{\log N}{\eps/2}\right)^{1/(\alpha-1)}\\ &\gtrsim \frac{(\log N)^2}{d}\,d =(\log N)^2. \end{align*} 
-Thus $R_{\mathrm{op}}(\eps/2)\gtrsim\log N$
-and $\Hop\eqsim1$.  Hence
-\[
- \frac{t_1}{t_2}
- \lesssim_{\bar\eta}
- \sqrt{\frac{\eps}{\log N}}=o(1).
-\]
+Thus, for all sufficiently large \(d\),
+\begin{equation}
+\gamma_tR_t\le\bar\eta
+\qquad\text{for every }t\ge0.
+\label{eq:capped-effective}
+\end{equation}
 
-In particular, for all sufficiently large $d$, taking $t\geq t_2$
-automatically ensures $t\geq t_1$ as well.  Consequently both terms are at
-most $\eps/4$, and hence $h_t\leq\frac{\eps}{2}.$ 
+We next control the actual displacement of the Muon iterates.  Since
+\(R_t\) is nondecreasing, the same feasibility induction used in
+\Cref{lem:Muon-changing-radius} applies.  Starting from
+\(\Wb_0^{\mathrm{Muon}}=\mathbf0\), if
+\(\normop{\Wb_t^{\mathrm{Muon}}}\le R_t\), then the operator-ball oracle
 \[
- L(\Wb_t^{\mathrm{op}})
- =L(\Wb_R^*)+h_t
- \leq\frac\eps2+\frac\eps2=\eps.
+\Sb_t
+:=
+-R_t\polar\!\left(\nabla L(\Wb_t^{\mathrm{Muon}})\right)
+\]
+satisfies \(\normop{\Sb_t}\le R_t\), and therefore
+\begin{align*}
+\normop{\Wb_{t+1}^{\mathrm{Muon}}}
+&=
+\normop{
+(1-\gamma_t)\Wb_t^{\mathrm{Muon}}
++\gamma_t\Sb_t
+}\\
+&\leq
+(1-\gamma_t)\normop{\Wb_t^{\mathrm{Muon}}}
++\gamma_t\normop{\Sb_t}\\
+&\leq R_t
+\leq R_{t+1}.
+\end{align*}
+Hence
+\[
+\normop{\Wb_t^{\mathrm{Muon}}}\le R_t
+\qquad
+\text{for every }t\ge0.
 \]
 Consequently,
+\begin{align*}
+\normop{
+\Wb_{t+1}^{\mathrm{Muon}}
+-\Wb_t^{\mathrm{Muon}}
+}
+&=
+\gamma_t
+\normop{
+\Sb_t-\Wb_t^{\mathrm{Muon}}
+}\\
+&\leq
+\gamma_t
+\left(
+\normop{\Sb_t}
++\normop{\Wb_t^{\mathrm{Muon}}}
+\right)\\
+&\leq
+2\gamma_tR_t\\
+&\leq2\bar\eta,
+\end{align*}
+where the last step uses \eqref{eq:capped-effective}.
+
+It remains to prove the loss bound.  We work on the same event used in the
+proof of \Cref{thm:Muon-upper bound}: the intersection of the event in
+\Cref{prop:prefix-v2} and the regularity event in
+\Cref{lem:regularity-v2}.  This event has probability at least
+\(1-O(d^{-q})\), and on it, $\Hop\leq\frac{1221}{2000}.$
+No new probabilistic event is needed below.
+
+Fix \(t\) in the iteration range stated in the theorem.  In particular,
+\(t\) lies in the range of \Cref{thm:Muon-upper bound}, so, after the same
+choice of endpoint constants as there,
 \[
- \tau_{\mathrm{Muon}}(\eps;\gamma)
- \lesssim t_2\eqsim \frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps} \lesssim \frac{\log N}{d}
- \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+t\geq M.
 \]
-This proves the theorem.
+For every \(0\le s<t\), use exactly the same prefix comparator
+\(\widehat\Wb_{K_s}\) as in \Cref{lem:Muon-time-comparators}.  Thus
+\begin{align}
+\normop{\widehat\Wb_{K_s}}
+&\leq R_s,
+\label{eq:capped-comparator-feasible}\\
+L(\widehat\Wb_{K_s})
+&\leq
+A_{\alpha,q}(\log N)d^{1-\alpha}
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-(\alpha-1)/\alpha}.
+\label{eq:capped-comparator-loss}
+\end{align}
+
+The exact linear minimization oracle, comparator feasibility
+\eqref{eq:capped-comparator-feasible}, convexity, and operator smoothness
+give exactly as in the proof of \Cref{lem:Muon-changing-radius}
+\begin{align*}
+L(\Wb_{s+1}^{\mathrm{Muon}})
+&\leq
+(1-\gamma_s)L(\Wb_s^{\mathrm{Muon}})
++\gamma_sL(\widehat\Wb_{K_s})
++2\Hop\gamma_s^2R_s^2\\
+&=
+\frac{s+a}{s+a+2}L(\Wb_s^{\mathrm{Muon}})
++\frac{2}{s+a+2}L(\widehat\Wb_{K_s})
++\frac{8\Hop}{(s+a+2)^2}R_s^2.
+\end{align*}
+Multiplying by \((s+a+1)(s+a+2)\) yields
+\begin{align*}
+&(s+a+1)(s+a+2)L(\Wb_{s+1}^{\mathrm{Muon}})\\
+&\qquad\leq
+(s+a)(s+a+1)L(\Wb_s^{\mathrm{Muon}})
++2(s+a+1)L(\widehat\Wb_{K_s})+
+8\Hop\frac{s+a+1}{s+a+2}R_s^2.
+\end{align*}
+Summing from \(s=0\) to \(s=t-1\) telescopes and gives
+\begin{align}
+&(t+a)(t+a+1)L(\Wb_t^{\mathrm{Muon}})\nonumber\\
+&\qquad\leq
+a(a+1)L(\Wb_0^{\mathrm{Muon}})
++2\sum_{s=0}^{t-1}
+(s+a+1)L(\widehat\Wb_{K_s})
++8\Hop\sum_{s=0}^{t-1}\frac{s+a+1}{s+a+2}R_s^2.\label{eq:capped-master}
+\end{align}
+Since \(L(\Wb_0^{\mathrm{Muon}})=\log N\) and
+\((t+a)(t+a+1)\ge t^2\), it remains to bound the three terms on the
+right-hand side.
+
+We begin with the comparator contribution.  Write $p:=\frac{\alpha-1}{\alpha}\in(0,1).$
+Using \eqref{eq:capped-comparator-loss},
+\begin{align*}
+&\sum_{s=0}^{t-1}
+(s+a+1)L(\widehat\Wb_{K_s})\\
+&\qquad\leq
+A_{\alpha,q}(\log N)d^{1-\alpha}
+\sum_{s=0}^{t-1}
+(s+a+1)
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-p}\\
+&\qquad=
+A_{\alpha,q}(\log N)d^{1-\alpha}
+\left[
+\sum_{s=0}^{t-1}
+(s+1)
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-p}+
+a\sum_{s=0}^{t-1}
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-p}
+\right].
+\end{align*}
+The first sum is exactly the first scalar sum in
+\Cref{lem:Muon-scalar-sums}:
+\[
+\sum_{s=0}^{t-1}
+(s+1)
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-p}
+\leq
+M^p t^{1+1/\alpha}.
+\]
+For the second sum, setting \(m=s+1\) and using
+\[
+\max\left\{1,\frac mM\right\}^{-p}
+\leq M^pm^{-p},
+\]
+we obtain
+\begin{align*}
+\sum_{s=0}^{t-1}
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{-p}
+&\leq
+M^p\sum_{m=1}^tm^{-p}\leq
+\alpha M^pt^{1/\alpha}.
+\end{align*}
+Therefore
+\begin{align}
+\sum_{s=0}^{t-1}
+(s+a+1)L(\widehat\Wb_{K_s})
+&\leq
+A_{\alpha,q}(\log N)d^{1-\alpha}
+M^pt^{1+1/\alpha}
+\left(
+1+\alpha\frac at
+\right).
+\label{eq:capped-comparator-sum}
+\end{align}
+Since
+\[
+a=O_{\bar\eta}(\log N)
+\qquad\text{and}\qquad
+t\geq M=(\log N)d^{\alpha-1},
+\]
+we have
+\begin{equation}
+\frac at
+\lesssim_{\bar\eta}
+d^{-(\alpha-1)}
+=o(1).
+\label{eq:capped-a-over-t}
+\end{equation}
+Hence
+\begin{equation}
+\sum_{s=0}^{t-1}
+(s+a+1)L(\widehat\Wb_{K_s})
+\lesssim_{\bar\eta}
+(\log N)d^{1-\alpha}
+M^pt^{1+1/\alpha}.
+\label{eq:capped-comparator-final}
+\end{equation}
+
+For the curvature contribution, the shift causes no loss in the estimate,
+because
+\[
+\frac{s+a+1}{s+a+2}\leq1.
+\]
+Using the same radius identity and the same second scalar sum as in the
+proof of \Cref{thm:Muon-upper bound},
+\begin{align}
+\sum_{s=0}^{t-1}
+\frac{s+a+1}{s+a+2}R_s^2
+&\leq
+C_\alpha^2(\log N)^2
+\sum_{s=0}^{t-1}
+\max\left\{
+1,\frac{s+1}{M}
+\right\}^{1/\alpha}
+\notag\\
+&\leq
+C_\alpha^2(\log N)^2
+M^{-1/\alpha}t^{1+1/\alpha}.
+\label{eq:capped-curvature}
+\end{align}
+
+Finally, we control the new initial term created by the shifted
+telescoping.  Since \(a=O_{\bar\eta}(\log N)\),
+\[
+\frac{a(a+1)\log N}{t^2}
+\lesssim_{\bar\eta}
+\frac{(\log N)^3}{t^2}.
+\]
+We compare this with the scale of the comparator term.  Since \(t\ge M\)
+and \(p-2<0\),
+\begin{align*}
+\frac{
+a(a+1)(\log N)t^{-2}
+}{
+(\log N)d^{1-\alpha}M^pt^{-p}
+} &=
+a(a+1)d^{\alpha-1}M^{-p}t^{p-2}\\
+&\leq
+a(a+1)d^{\alpha-1}M^{-2}\\
+&=
+\frac{a(a+1)}
+{(\log N)^2d^{\alpha-1}}
+\lesssim_{\bar\eta}
+d^{-(\alpha-1)}
+=o(1).
+\end{align*}
+Thus
+\begin{equation}
+\frac{a(a+1)\log N}{t^2}
+\lesssim_{\bar\eta}
+(\log N)d^{1-\alpha}M^pt^{-p}.
+\label{eq:capped-initial-term}
+\end{equation}
+
+Substituting
+\eqref{eq:capped-comparator-final},
+\eqref{eq:capped-curvature}, and
+\eqref{eq:capped-initial-term}
+into \eqref{eq:capped-master}, and using
+\((t+a)(t+a+1)\ge t^2\), gives
+\begin{align*}
+L(\Wb_t^{\mathrm{Muon}})
+&\lesssim_{\bar\eta}
+(\log N)d^{1-\alpha}
+M^pt^{-p}\\
+&\qquad+
+(\log N)^2
+M^{-1/\alpha}t^{-p}.
+\end{align*}
+Exactly as in the final simplification in the proof of
+\Cref{thm:Muon-upper bound}, the two coefficients have the same scale:
+\begin{align*}
+(\log N)^2M^{-1/\alpha}
+&=
+(\log N)d^{1-\alpha}M^{(\alpha-1)/\alpha}.
+\end{align*}
+Therefore
+\begin{align*}
+L(\Wb_t^{\mathrm{Muon}})
+&\lesssim_{\bar\eta}
+(\log N)d^{1-\alpha}
+M^{(\alpha-1)/\alpha}
+t^{-(\alpha-1)/\alpha}=
+(\log N)\left(\frac{dt}{\log N}\right)^{-(\alpha-1)/\alpha}.
+\end{align*}
+
+The comparator event used above is the same single event from
+\Cref{prop:prefix-v2} used in the proof of
+\Cref{thm:Muon-upper bound}, and all remaining steps are deterministic.
+Hence the loss bound holds simultaneously for every \(t\) in the stated
+iteration range on an event of probability at least \(1-O(d^{-q})\).
+This completes the proof.
 \end{proof}
+
+% ============================================================
+% \section{Proof of \Cref{thm:capped}}
+% % ============================================================
+
+% \begin{proof}[Proof of \Cref{thm:capped}]
+% Work on the common event of probability $1-O(d^{-q})$ from
+% \Cref{thm:fw}.  Only the mixing schedule changes; the operator ball and its
+% polar oracle are the same.  Since $a\geq0$, one has
+% $0<\gamma_t\leq1$.  Moreover, $t\mapsto\gamma_t$ is decreasing and the
+% chosen $a$ satisfies
+% $2+a\geq2R_{\mathrm{op}}(\eps/2)/\bar\eta$,
+% \begin{align*}
+%  R_{\mathrm{op}}(\eps/2)\gamma_t
+%  &=\frac{2R_{\mathrm{op}}(\eps/2)}{t+2+a}\leq\frac{2R_{\mathrm{op}}(\eps/2)}{2+a}\leq\bar\eta.
+% \end{align*}
+% Every oracle point satisfies
+% $\normop{\Sb_t^{\mathrm{op}}}\leq R_{\mathrm{op}}(\eps/2)$.  Starting from
+% $\Wb_0^{\mathrm{op}}=\mathbf0$, feasibility follows by induction: if the
+% $t$th iterate is feasible, then
+% \begin{align*}
+%  \normop{\Wb_{t+1}^{\mathrm{op}}}
+%  &=\normop{
+%   (1-\gamma_t)\Wb_t^{\mathrm{op}}+\gamma_t\Sb_t^{\mathrm{op}}
+%  }\\
+%  &\leq
+%  (1-\gamma_t)\normop{\Wb_t^{\mathrm{op}}}
+%  +\gamma_t\normop{\Sb_t^{\mathrm{op}}}\\
+%  &\leq
+%  (1-\gamma_t)R_{\mathrm{op}}(\eps/2)
+%  +\gamma_tR_{\mathrm{op}}(\eps/2)\\
+%  &=R_{\mathrm{op}}(\eps/2).
+% \end{align*}
+% Thus both the iterate and oracle point lie in the operator ball.  Therefore
+% \begin{align*}
+%  \normop{\Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
+%  &=\gamma_t\normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}\\
+%  &\leq\gamma_t
+%  \left(\normop{\Sb_t^{\mathrm{op}}}+\normop{\Wb_t^{\mathrm{op}}}\right)\\
+%  &\leq2R_{\mathrm{op}}(\eps/2)\gamma_t\leq2\bar\eta.
+% \end{align*}
+
+% Let $\Wb_R^*$ minimize $L$ on this ball and put
+% $h_t:=L(\Wb_t^{\mathrm{op}})-L(\Wb_R^*)$.  The ball contains a point of
+% loss at most $\eps/2$, so $L(\Wb_R^*)\leq\eps/2$.  Repeating the oracle and
+% convexity argument with every line displayed gives
+% \begin{align*}
+%  &\left\langle
+%   \nabla L(\Wb_t^{\mathrm{op}}),
+%   \Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
+%  \right\rangle_{\mathrm F}\\
+%  &\quad=
+%  \min_{\normop{\Sb}\leq R_{\mathrm{op}}(\eps/2)}
+%  \left\langle\nabla L(\Wb_t^{\mathrm{op}}),\Sb\right\rangle_{\mathrm F}
+%  -\left\langle
+%   \nabla L(\Wb_t^{\mathrm{op}}),\Wb_t^{\mathrm{op}}
+%  \right\rangle_{\mathrm F}\\
+%  &\quad\leq
+%  \left\langle
+%   \nabla L(\Wb_t^{\mathrm{op}}),\Wb_R^*-\Wb_t^{\mathrm{op}}
+%  \right\rangle_{\mathrm F}\\
+%  &\quad\leq L(\Wb_R^*)-L(\Wb_t^{\mathrm{op}})=-h_t.
+% \end{align*}
+% The last inequality is exactly the convexity inequality
+% \[
+%  L(\Wb_R^*)\geq L(\Wb_t^{\mathrm{op}})
+%  +\left\langle
+%   \nabla L(\Wb_t^{\mathrm{op}}),\Wb_R^*-\Wb_t^{\mathrm{op}}
+%  \right\rangle_{\mathrm F}.
+% \]
+
+% The displacement identity and the ball diameter give
+% \begin{align*}
+%  \Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
+%  &=\gamma_t(\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}),\\
+%  \normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
+%  &\leq2R_{\mathrm{op}}(\eps/2).
+% \end{align*}
+% Substituting these facts into operator smoothness yields
+% \begin{align*}
+%  h_{t+1}
+%  &\leq h_t
+%  +\gamma_t\left\langle
+%   \nabla L(\Wb_t^{\mathrm{op}}),
+%   \Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
+%  \right\rangle_{\mathrm F}+
+%  \frac{\Hop\gamma_t^2}{2}
+%  \normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}^2\\
+%  &\leq(1-\gamma_t)h_t
+%  +2\Hop R_{\mathrm{op}}(\eps/2)^2\gamma_t^2\\
+%  &=\frac{t+a}{t+a+2}h_t
+%  +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{(t+a+2)^2}.
+% \end{align*}
+
+% Multiply the recurrence at time $s$ by $(s+a+1)(s+a+2)$.  Summing the
+% resulting differences explicitly gives
+% \begin{align*}
+%  &(t+a)(t+a+1)h_t-a(a+1)h_0\\
+%  &\quad=
+%  \sum_{s=0}^{t-1}
+%  \Bigl[
+%   (s+a+1)(s+a+2)h_{s+1}
+%   -(s+a)(s+a+1)h_s
+%  \Bigr]\\
+%  &\quad\leq
+%  8\Hop R_{\mathrm{op}}(\eps/2)^2
+%  \sum_{s=0}^{t-1}\frac{s+a+1}{s+a+2}\\
+%  &\quad\leq8\Hop R_{\mathrm{op}}(\eps/2)^2t.
+% \end{align*}
+% Because $h_0=L(\mathbf0)-L(\Wb_R^*)\leq\log N$, for every $t\geq1$ division
+% by $(t+a)(t+a+1)\geq t^2$ gives
+% \begin{equation}\label{eq:h_t}
+%  h_t
+%  \leq
+%  \frac{a(a+1)\log N}{t^2}
+%  +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}.
+% \end{equation}
+
+% The choice of $a$ gives
+% $a+1\le 2R_{\mathrm{op}}(\eps/2)/\bar \eta$. Therefore we have
+% $
+%  a(a+1)\le 4R_{\mathrm{op}}(\eps/2)^2/(\bar \eta)^2.
+% $
+% Putting this back into Eq.~\ref{eq:h_t} and get,
+% \begin{equation}\nonumber
+%  h_t
+%  \leq
+%  \frac{4R_{\mathrm{op}}(\eps/2)^2\log N}{\bar \eta^2t^2}
+%  +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}.
+% \end{equation}
+% To make the first term at most $\eps/4$, it suffices to require
+% \[
+%  \frac{4R_{\mathrm{op}}(\eps/2)^2\log N}
+%  {\bar\eta^2 t^2}
+%  \leq \frac{\eps}{4},
+% \]
+% or equivalently,
+% \[
+%  t\geq
+%  t_1:=
+%  \frac{4R_{\mathrm{op}}(\eps/2)}{\bar\eta}
+%  \sqrt{\frac{\log N}{\eps}}.
+% \]
+% Similarly, to make the second term at most $\eps/4$, it suffices to require
+% \[
+%  \frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}
+%  \leq\frac{\eps}{4},
+% \]
+% or equivalently,
+% \[
+%  t\geq
+%  t_2:=
+%  \frac{32\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}.
+% \]
+
+% We now compare these two time scales.  Their ratio is
+% \begin{align*}
+%  \frac{t_1}{t_2}
+%  &=
+%  \frac{
+%  \frac{4R_{\mathrm{op}}(\eps/2)}{\bar\eta}
+%  \sqrt{\frac{\log N}{\eps}}
+%  }{
+%  \frac{32\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}
+%  }
+%  =
+%  \frac{1}{8\bar\eta\Hop}
+%  \frac{\sqrt{\eps\log N}}
+%  {R_{\mathrm{op}}(\eps/2)}.
+% \end{align*}
+% The sharp operator radius formula and the upper endpoint of the target range give \begin{align*} 
+% R_{\mathrm{op}}(\eps/2)^2 &\eqsim \frac{(\log N)^2}{d} \left(\frac{\log N}{\eps/2}\right)^{1/(\alpha-1)}\\ &\gtrsim \frac{(\log N)^2}{d}\,d =(\log N)^2. \end{align*} 
+% Thus $R_{\mathrm{op}}(\eps/2)\gtrsim\log N$
+% and $\Hop\eqsim1$.  Hence
+% \[
+%  \frac{t_1}{t_2}
+%  \lesssim_{\bar\eta}
+%  \sqrt{\frac{\eps}{\log N}}=o(1).
+% \]
+
+% In particular, for all sufficiently large $d$, taking $t\geq t_2$
+% automatically ensures $t\geq t_1$ as well.  Consequently both terms are at
+% most $\eps/4$, and hence $h_t\leq\frac{\eps}{2}.$ 
+% \[
+%  L(\Wb_t^{\mathrm{op}})
+%  =L(\Wb_R^*)+h_t
+%  \leq\frac\eps2+\frac\eps2=\eps.
+% \]
+% Consequently,
+% \[
+%  \tau_{\mathrm{Muon}}(\eps;\gamma)
+%  \lesssim t_2\eqsim \frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps} \lesssim \frac{\log N}{d}
+%  \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+% \]
+% This proves the theorem.
+% \end{proof}
 
 \begin{thebibliography}{9}
 
