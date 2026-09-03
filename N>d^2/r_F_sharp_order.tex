@@ -1,0 +1,1976 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\F}{\mathrm{F}}
+\newcommand{\1}{\mathbf 1}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\vecop}{\operatorname{vec}}
+\newcommand{\psiOne}{\psi_1}
+\newcommand{\psiTwo}{\psi_2}
+
+\title{Sharp Frobenius Radius of the Gaussian Softmax\\
+Associative-Memory Minimizer for Zipf Frequencies\\
+$0\leq \alpha\leq 1$ Above Capacity}
+\author{Technical note}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $N=\lceil d^\beta\rceil$ with fixed $\beta>2$, and let
+$p_i=i^{-\alpha}/H_{N,\alpha}$ with fixed $0\leq\alpha\leq1$.
+For the Gaussian softmax associative-memory loss, let $W_\star$ denote
+its unique finite minimizer on the event supplied by the previously
+proved existence-and-uniqueness theorem.  We prove that, with high
+probability,
+\[
+ \norm{W_\star}_{\F}
+ =\widetilde\Theta_{\alpha,\beta}\!\left(
+ d^2\Bigg[\sum_{i=1}^N\bigl(p_i\wedge d^{-2}\bigr)^2\Bigg]^{1/2}
+ \right).
+\]
+The proof is uniform in the adaptive minimizer.  For $\alpha<1$, the
+upper bound follows from coercivity on a deterministic diffuse tail,
+while the lower bound follows from a deterministic clipped comparison
+matrix and a deterministic weighted capped-support inequality.  The
+endpoint $\alpha=1$ is treated by a head-memory comparison and a
+blockwise coercivity estimate.  All nonstandard probabilistic claims
+used in these arguments are proved below; only standard concentration
+inequalities and the previously established existence-and-uniqueness
+theorem are imported.
+\end{abstract}
+
+\section{Model and main result}
+
+Fix constants
+\[
+ 0\leq\alpha\leq1,
+ \qquad \beta>2,
+ \qquad N=\lceil d^\beta\rceil,
+ \qquad D=d^2,
+ \qquad h=\log N.
+\]
+Let
+\[
+ u_1,\ldots,u_N,v_1,\ldots,v_N
+ \overset{\mathrm{ind}}{\sim}\mathcal N(0,I_d/d),
+ \qquad
+ p_i=\frac{i^{-\alpha}}{H_{N,\alpha}},
+ \qquad
+ H_{N,\alpha}=\sum_{k=1}^N k^{-\alpha}.
+\]
+For $W\in\R^{d\times d}$, define
+\[
+ \ell_i(W)
+ =\log\!\left(1+\sum_{j\neq i}
+ \exp\bigl((u_j-u_i)^\top Wv_i\bigr)\right),
+ \qquad
+ L(W)=\sum_{i=1}^N p_i\ell_i(W).
+\]
+We use the following theorem proved in the companion existence note.
+
+\begin{theorem}[Imported existence and uniqueness theorem]
+\label{thm:existence}
+If $N>D$, define
+\[
+ \mathcal E_{\rm ex}
+ :=\{L\text{ has a unique finite minimizer in }\R^{d\times d}\}.
+\]
+Then
+\[
+ \Pp(\mathcal E_{\rm ex})
+ \geq
+ 1-2^{1-N}\sum_{k=0}^{D-1}\binom{N-1}{k}.
+\]
+For $N=\lceil d^\beta\rceil$ with $\beta>2$, there exists
+$c_{\rm ex}=c_{\rm ex}(\beta)>0$ such that, for all sufficiently large
+$d$,
+\[
+ \Pp(\mathcal E_{\rm ex}^c)\leq e^{-c_{\rm ex}N}.
+\]
+\end{theorem}
+
+For an outcome $\omega$, write $L_\omega$ for the corresponding
+random loss and define
+\[
+ W_\star(\omega)
+ :=
+ \begin{cases}
+ \displaystyle\arg\min_{W\in\R^{d\times d}}L_\omega(W),
+ &\omega\in\mathcal E_{\rm ex},\\[2mm]
+ 0,&\omega\notin\mathcal E_{\rm ex}.
+ \end{cases}
+\]
+This is a measurable random matrix: $L_\omega(W)$ is jointly measurable
+in $\omega$, continuous in $W$, and on $\mathcal E_{\rm ex}$ has a
+unique attained minimum, so the measurable-argmin theorem applies
+(after localization to increasing compact balls).  Every use of
+optimality below is explicitly restricted to $\mathcal E_{\rm ex}$;
+the arbitrary extension on its complement has no mathematical role.
+
+Define the clipped Frobenius scale
+\begin{equation}
+ R_F
+ :=D\left(\sum_{i=1}^N (p_i\wedge D^{-1})^2\right)^{1/2}.
+ \label{eq:RF-def}
+\end{equation}
+
+\begin{theorem}[Sharp Frobenius scale]
+\label{thm:main}
+For every fixed $0\leq\alpha\leq1$ and $\beta>2$, there exist constants
+$c,C,c_0>0$, depending only on $(\alpha,\beta)$, such that, for all
+sufficiently large $d$,
+\[
+ \Pp\!\left(
+ \mathcal E_{\rm ex}\cap
+ \left\{h^{-C}R_F\leq\norm{W_\star}_{\F}\leq h^C R_F\right\}
+ \right)
+ \geq 1-d^{-c_0}-e^{-cN}.
+\]
+Consequently,
+\[
+ \norm{W_\star}_{\F}=\widetilde\Theta_{\alpha,\beta}(R_F).
+\]
+More explicitly,
+\[
+ R_F\asymp_{\alpha,\beta}
+ \begin{cases}
+ d^{2-\beta/2},
+   &0\leq\alpha<\frac12,\\[2mm]
+ d^{2-\beta/2}\sqrt{\log N},
+   &\alpha=\frac12,\\[2mm]
+ d^{2-\beta(1-\alpha)},
+   &\frac12<\alpha<1,\ \beta(1-\alpha)\geq2,\\[2mm]
+ d^{\frac{2-\beta(1-\alpha)}{2\alpha}},
+   &\frac12<\alpha<1,\ \beta(1-\alpha)<2,\\[2mm]
+ d/\sqrt{\log N},
+   &\alpha=1.
+ \end{cases}
+\]
+\end{theorem}
+
+All subsequent assertions are understood for sufficiently large $d$.
+Constants denoted by $c,C$ may change from line to line; dependence on
+fixed $(\alpha,\beta)$ is suppressed.
+
+\section{Centered representation and deterministic inequalities}
+
+Set
+\[
+ \bar u=\frac1N\sum_{j=1}^N u_j,
+ \qquad
+ x_j=u_j-\bar u,
+ \qquad
+ \Phi(y)=\log\!\left(\frac1N\sum_{j=1}^N e^{x_j^\top y}\right).
+\]
+Since $\sum_jx_j=0$, Jensen's inequality gives $\Phi(y)\geq0$.  Moreover,
+\begin{equation}
+ \ell_i(W)=h+\Phi(Wv_i)-x_i^\top Wv_i.
+ \label{eq:centered-loss}
+\end{equation}
+Indeed,
+\[
+ 1+\sum_{j\neq i}e^{(u_j-u_i)^\top Wv_i}
+ =\sum_{j=1}^Ne^{(x_j-x_i)^\top Wv_i}
+ =N e^{-x_i^\top Wv_i+\Phi(Wv_i)}.
+\]
+For a deterministic set $T\subseteq[N]$, write
+\[
+ P_T=\sum_{i\in T}p_i,
+ \qquad
+ S_T=\sum_{i\in T}p_i^2,
+ \qquad
+ G_T=\sum_{i\in T}p_i x_iv_i^\top.
+\]
+Because every loss is nonnegative, summing only over $T$ in
+\eqref{eq:centered-loss} yields
+\begin{equation}
+ L(W)\geq P_T h+\sum_{i\in T}p_i\Phi(Wv_i)-\ip{G_T}{W}_{\F}.
+ \label{eq:subset-lower}
+\end{equation}
+Define the improvement over $W=0$ by
+\[
+ I(W)=h-L(W)
+ =\sum_{i=1}^Np_i\bigl(x_i^\top Wv_i-\Phi(Wv_i)\bigr).
+\]
+Since $\Phi\geq0$ and $\ell_i(W)\geq0$, if
+$s_i(W)=x_i^\top Wv_i$, then
+\begin{equation}
+ p_i\bigl(s_i(W)-\Phi(Wv_i)\bigr)
+ \leq p_i\min\{h,(s_i(W))_+\}.
+ \label{eq:deterministic-cap}
+\end{equation}
+This deterministic cap is the only clipping statement used for the
+adaptive minimizer.
+
+\section{Zipf arithmetic for $0\leq\alpha<1$}
+
+Throughout this section, $0\leq\alpha<1$.  Integral comparison gives
+\begin{equation}
+ H_{N,\alpha}\asymp_\alpha N^{1-\alpha},
+ \qquad
+ p_i\asymp_\alpha N^{\alpha-1}i^{-\alpha}.
+ \label{eq:zipf-basic}
+\end{equation}
+Set
+\begin{equation}
+ b_i=\min\{1,Dp_i\},
+ \qquad
+ R^2=\sum_{i=1}^N b_i^2,
+ \qquad
+ J=\sum_{i=1}^Np_ib_i.
+ \label{eq:bRJ}
+\end{equation}
+By definition, $R=R_F$.  Let
+\[
+ m=\max\{i:p_i\geq D^{-1}\},
+\]
+with $m=0$ if the set is empty.  Then
+\begin{equation}
+ R^2=m+D^2\sum_{i>m}p_i^2.
+ \label{eq:R-decomp}
+\end{equation}
+
+\begin{lemma}[Clipped energy]
+\label{lem:arithmetic}
+For fixed $0\leq\alpha<1$ and $\beta>2$,
+\begin{align}
+ J&\asymp_\alpha R^2/D,
+ \label{eq:J-R}\\
+ \sum_{i\leq m}p_i&\asymp_\alpha m/D
+ \quad\text{when }m\geq1,
+ \label{eq:head-mass}\\
+ \frac{\norm{p}_2R}{dJ}&\leq d^{-c}h^C
+ \quad\text{for some }c>0,
+ \label{eq:cross-small}\\
+ R/d&\leq Ch^{1/2}d^{-\eta}
+ \quad\text{for some }\eta=\eta(\alpha,\beta)>0.
+ \label{eq:R-small}
+\end{align}
+Consequently, for every fixed $B>0$,
+\begin{equation}
+ h^B R/d\longrightarrow0.
+ \label{eq:R-polylog-small}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For $i>m$, $b_i=Dp_i$, hence
+\[
+ \sum_{i>m}p_ib_i
+ =D\sum_{i>m}p_i^2
+ =\frac1D\sum_{i>m}b_i^2.
+\]
+If $m=0$, this proves \eqref{eq:J-R}.  Suppose $m\geq1$.  Notice first
+that $m<N$: indeed,
+$p_N=N^{-\alpha}/H_{N,\alpha}\leq N^{-1}<D^{-1}$ because $N>D$.
+Monotonicity and $p_{m+1}<D^{-1}\leq p_m$ imply
+$D^{-1}\leq p_m\leq 2^\alpha D^{-1}$.  Therefore
+\[
+ \sum_{i\leq m}p_i\asymp_\alpha mp_m\asymp_\alpha m/D,
+\]
+which proves \eqref{eq:head-mass}; comparing the head and tail
+contributions proves \eqref{eq:J-R}.
+
+If $m=0$, then $R=D\norm p_2$ and $J=D\norm p_2^2$, so
+\[
+ \frac{\norm p_2R}{dJ}=\frac1d.
+\]
+Now assume $m\geq1$.
+
+If $0\leq\alpha<1/2$, then $\norm p_2\asymp N^{-1/2}$.  Moreover,
+$p_m\asymp D^{-1}$ gives
+\[
+ m\asymp(DN^{\alpha-1})^{1/\alpha}
+ \quad(\alpha>0),
+\]
+and
+\[
+ \frac{m}{D^2/N}
+ \asymp d^{\frac{(\beta-2)(2\alpha-1)}{\alpha}}=o(1).
+\]
+Thus the tail in \eqref{eq:R-decomp} satisfies
+$D^2\sum_{i>m}p_i^2\asymp D^2/N$, so
+$R\asymp D/\sqrt N$ and $J\asymp D/N$.  Hence the ratio in
+\eqref{eq:cross-small} is $O(d^{-1})$.  The case $\alpha=0$ cannot
+have $m\geq1$ for large $d$ because $N>D$.
+
+If $\alpha=1/2$, then
+$\norm p_2\asymp\sqrt{h/N}$ and, whether or not clipping occurs,
+\[
+ R\asymp D\sqrt{h/N},
+ \qquad
+ J\asymp Dh/N.
+\]
+Indeed, in the clipped case $m\asymp D^2/N$ and
+$\sum_{i>m}p_i^2\asymp h/N$.  Again
+\eqref{eq:cross-small} is $O(d^{-1})$ up to an absolute logarithmic
+factor.
+
+Finally let $1/2<\alpha<1$.  Since
+$\sum_i i^{-2\alpha}\asymp1$, one has
+$\norm p_2\asymp p_1$.  The relation $p_m\asymp D^{-1}$ gives
+$p_1\asymp m^\alpha/D$.  Also
+\[
+ D^2\sum_{i>m}p_i^2\asymp m,
+ \qquad R\asymp\sqrt m,
+ \qquad J\asymp m/D.
+\]
+Consequently,
+\[
+ \frac{\norm p_2R}{dJ}\asymp\frac{m^{\alpha-1/2}}d.
+\]
+If $m$ grows polynomially, write
+\[
+ m\asymp d^\kappa,
+ \qquad
+ \kappa=\frac{2-\beta(1-\alpha)}{\alpha}<2.
+\]
+Then
+\[
+ \kappa\left(\alpha-\frac12\right)-1
+ =\frac{(\alpha-1)(2\alpha\beta-\beta+2)}{2\alpha}<0.
+\]
+If $m$ is bounded, the ratio is $O(d^{-1})$.  This proves
+\eqref{eq:cross-small}.
+
+It remains to prove \eqref{eq:R-small}.  If $\alpha\leq1/2$, the
+preceding estimates give
+\[
+ \frac Rd\lesssim d^{1-\beta/2}\sqrt h,
+\]
+which remains $o(1)$ after multiplication by any fixed power of $h$
+because $\beta>2$.  If $1/2<\alpha<1$ and $m=0$, then
+$R=D\norm{p}_2=O(1)$, so $R/d=O(d^{-1})$.  If $m\geq1$ is bounded,
+the same conclusion holds.  Finally, if $m$ grows polynomially, then
+$R\asymp d^{\kappa/2}$ and
+\[
+ 1-\frac\kappa2
+ =\frac{(\beta-2)(1-\alpha)}{2\alpha}>0.
+\]
+Thus, in every case, there is an
+$\eta=\eta(\alpha,\beta)>0$ such that
+\[
+ \frac Rd\leq Ch^{1/2}d^{-\eta},
+\]
+which proves \eqref{eq:R-small}.  Since $h=\beta\log d+o(1)$, every
+fixed power of $h$ is dominated by $d^{\eta/2}$ for all sufficiently
+large $d$, and \eqref{eq:R-polylog-small} follows.
+\end{proof}
+
+We also need a tail on which every normalized weight is much smaller
+than $D^{-1}$.  Fix once and for all
+\[
+ A=24,
+ \qquad
+ T=\{i:p_i\leq(Dh^A)^{-1}\},
+ \qquad
+ H=[N]\setminus T.
+\]
+
+\begin{lemma}[Strongly diffuse tail]
+\label{lem:strong-tail}
+For fixed $0\leq\alpha<1$ and $\beta>2$,
+\begin{align}
+ P_T&\geq\frac12,
+ &P_Hh&=o(1),
+ &d\sqrt{S_T}&\leq h^{-A/2},
+ \label{eq:strong-tail-basic}\\
+ D\sqrt{S_T}+d\sqrt{P_Hh}&\leq h^C R
+ \label{eq:strong-tail-compare}
+\end{align}
+for sufficiently large $d$ and a constant $C=C(\alpha,\beta)$.
+\end{lemma}
+
+\begin{proof}
+For $\alpha=0$, $p_i=N^{-1}<(Dh^A)^{-1}$ for large $d$, so $H$ is
+empty.  Assume $0<\alpha<1$ and let $r=|H|$.  If $r=0$, then
+$H=\varnothing$, $P_T=1$, $P_H=0$, and
+\[
+ S_T\leq(Dh^A)^{-1},
+ \qquad
+ D^2S_T=\sum_i(Dp_i)^2\leq R^2;
+\]
+hence all the asserted inequalities are immediate.  We may therefore
+assume $r\geq1$.  Then \eqref{eq:zipf-basic} and the definition of $H$
+give
+\begin{equation}
+ r\asymp_\alpha(Dh^A N^{\alpha-1})^{1/\alpha},
+ \qquad
+ \frac rD\lesssim
+ h^{A/\alpha}d^{-\frac{(\beta-2)(1-\alpha)}{\alpha}}=o(1).
+ \label{eq:strong-head-size}
+\end{equation}
+Regular variation gives
+\[
+ P_H\asymp_\alpha r p_r\asymp_\alpha\frac{r}{Dh^A}.
+\]
+Together with \eqref{eq:strong-head-size}, this implies $P_Hh=o(1)$
+and hence $P_T\geq1/2$.  Since $p_i\leq(Dh^A)^{-1}$ on $T$,
+\[
+ S_T\leq \max_{i\in T}p_i\,P_T\leq(Dh^A)^{-1},
+\]
+which proves the third claim in \eqref{eq:strong-tail-basic}.
+Moreover, $p_i<D^{-1}$ on $T$, so
+\[
+ D^2S_T=\sum_{i\in T}(Dp_i)^2\leq R^2.
+\]
+Thus the first term in \eqref{eq:strong-tail-compare} is at most $R$.
+
+It remains to control $d\sqrt{P_Hh}$.  If the natural clipping index
+$m$ is positive, then comparison of the thresholds $D^{-1}$ and
+$(Dh^A)^{-1}$ gives $r\leq C h^{A/\alpha}m$.  Hence
+\[
+ d\sqrt{P_Hh}
+ \lesssim \sqrt r\,h^{(1-A)/2}
+ \leq h^{A/(2\alpha)+(1-A)/2}\sqrt m
+ \leq h^C R.
+\]
+Suppose $m=0$.  If $2-\beta(1-\alpha)<0$, then
+$Dp_1\leq Cd^{2-\beta(1-\alpha)}<h^{-A}$ for large $d$, so $H$ is
+empty.  If $2-\beta(1-\alpha)=0$, then $r\leq Ch^{A/\alpha}$ and
+$d\sqrt{P_Hh}\leq h^C$.  In this critical case, $R=D\norm p_2$ is
+bounded below by a positive constant when $\alpha>1/2$, is of order
+$\sqrt h$ when $\alpha=1/2$, and grows polynomially when
+$\alpha<1/2$.  Therefore $d\sqrt{P_Hh}\leq h^C R$.  The remaining
+case $2-\beta(1-\alpha)>0$ forces $m\geq1$ for large $d$ and was
+already treated.
+\end{proof}
+
+\section{Concentration tools}
+
+For $r\in\{1,2\}$, we use the Orlicz norms
+\[
+ \norm X_{\psi_r}
+ :=\inf\left\{s>0:
+ \E\exp\!\left(\frac{|X|^r}{s^r}\right)\leq2\right\}.
+\]
+Conditional Orlicz norms are defined by replacing $\E$ with conditional
+expectation; they are measurable with respect to the conditioning
+sigma-field.
+
+We use the following standard inequalities in their usual forms.
+They are stated to make every later parameter choice explicit.
+
+\begin{lemma}[Standard concentration inequalities]
+\label{lem:standard-tools}
+There are absolute constants $c,C>0$ such that the following hold.
+\begin{enumerate}[label=(\roman*)]
+\item If $X$ is a centered polynomial of total degree at most $q_0$ in
+independent standard Gaussian variables, then, for every $q\geq2$,
+\[
+ \norm X_{L^q}\leq(q-1)^{q_0/2}\norm X_{L^2}.
+\]
+\item If $X_1,\ldots,X_n$ are independent centered subexponential
+random variables, put
+\[
+ K_i=\norm{X_i}_{\psiOne},\qquad
+ V^2=\sum_iK_i^2,\qquad K_\ast=\max_iK_i.
+\]
+Then, for every $t\geq1$,
+\[
+ \Pp\!\left(\left|\sum_iX_i\right|
+ >C(V\sqrt t+K_\ast t)\right)\leq2e^{-t}.
+\]
+The same assertion applies under a conditional law whenever the
+variables are conditionally independent and centered and the displayed
+conditional Orlicz-norm bounds hold almost surely.
+\item If $Y_i$ are independent centered self-adjoint $M\times M$
+matrices with $\norm{Y_i}_{\op}\leq L$ almost surely and
+$\sigma^2=\norm{\sum_i\E Y_i^2}_{\op}$, then
+\[
+ \Pp\!\left(\norm{\sum_iY_i}_{\op}\geq t\right)
+ \leq2M\exp\!\left(-\frac{t^2/2}{\sigma^2+Lt/3}\right).
+\]
+\item If $g\sim\mathcal N(0,I_m)$ and $B\succeq0$, then, for every
+$x>0$,
+\[
+ \Pp\bigl(g^\top Bg-\tr B
+ \geq2\norm B_{\F}\sqrt x+2\norm B_{\op}x\bigr)\leq e^{-x}.
+\]
+\item If $F:\R^M\to\R$ is $L$-Lipschitz and $g\sim\mathcal N(0,I_M)$,
+then
+\[
+ \Pp(F(g)\geq\E F(g)+t)\leq e^{-t^2/(2L^2)}.
+\]
+\item If $G$ is a $d\times n$ standard Gaussian matrix, then, for
+$t\geq0$,
+\[
+ \Pp\bigl(\norm G_{\op}>\sqrt n+\sqrt d+t\bigr)\leq e^{-t^2/2}.
+\]
+\end{enumerate}
+\end{lemma}
+
+We repeatedly use the elementary Gaussian tail consequence
+\begin{equation}
+ \E\bigl[(1+\norm v^8)\1_{\{\norm v>2\}}\bigr]\leq Ce^{-cd},
+ \qquad v\sim\mathcal N(0,I_d/d),
+ \label{eq:gaussian-trunc-tail}
+\end{equation}
+and the fact that, for $q\leq cd$ and independent
+$v,w\sim\mathcal N(0,I_d/d)$,
+\begin{equation}
+ \norm{v^\top w}_{L^q}\leq C\sqrt{q/d}.
+ \label{eq:inner-product-moment}
+\end{equation}
+Both follow directly from the chi-square tail bound and conditioning.
+We also use the elementary Orlicz-product inequality
+\begin{equation}
+ \norm{XY}_{\psiOne}
+ \leq C\norm X_{\psiTwo}\norm Y_{\psiTwo}.
+ \label{eq:orlicz-product}
+\end{equation}
+Indeed, after normalizing the two $\psi_2$ norms, this follows from
+$2|XY|\leq X^2+Y^2$ and Cauchy--Schwarz.  The same proof applies under
+a conditional law.
+
+\subsection{Uniform lower bound for the empirical key free energy}
+
+Let
+\[
+ \psi(t)=\min\{t^2,t\},\qquad t\geq0.
+\]
+
+\begin{lemma}[Uniform empirical free-energy lower bound]
+\label{lem:free-energy}
+With probability at least $1-e^{-cN}-e^{-cd}$,
+\begin{equation}
+ \Phi(y)\geq c\psi\!\left(\frac{\norm y_2}{\sqrt d}\right)
+ \qquad\text{for every }y\in\R^d.
+ \label{eq:free-energy-lower}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Choose a nonzero nonnegative Lipschitz function
+$\rho:\R\to[0,1]$, supported on $[-3,3]$, such that
+$\rho(z)\leq z^2$ for every $z$.  Put
+$c_\rho=\E\rho(g)>0$ for $g\sim\mathcal N(0,1)$, and let
+$L_\rho$ be the Lipschitz constant.  Let $\mathcal N$ be a
+$\delta$-net of the unit sphere with
+$\delta=c_\rho/(64L_\rho\sqrt d)$.  Then
+$|\mathcal N|\leq(C\sqrt d)^d$.
+
+For fixed $a\in\mathcal N$, the variables
+$\rho(\sqrt d\,a^\top u_j)$ are i.i.d., bounded by one, and have mean
+$c_\rho$.  Hoeffding's inequality gives
+\[
+ \Pp\!\left(\frac1N\sum_{j=1}^N
+ \rho(\sqrt d\,a^\top u_j)<\frac{3c_\rho}{4}\right)
+ \leq e^{-cN}.
+\]
+Because $N=d^\beta$ with $\beta>2$, the union bound over
+$\mathcal N$ is still at most $e^{-cN}$.  Also,
+\[
+ \Pp\!\left(\max_j\norm{u_j}_2>2\right)\leq e^{-cd},
+ \qquad
+ \Pp\!\left(\sqrt d\,\norm{\bar u}_2>\frac{c_\rho}{32L_\rho}
+ \right)\leq e^{-cN}.
+\]
+On the intersection of these events, for every unit vector $a$, choose
+$a_0\in\mathcal N$ with $\norm{a-a_0}_2\leq\delta$.  Then, for every
+$j$,
+\[
+ \left|\sqrt d\,a^\top x_j-
+ \sqrt d\,a_0^\top u_j\right|
+ \leq\sqrt d\,\norm{a-a_0}_2\norm{u_j}_2
+      +\sqrt d\,\norm{\bar u}_2
+ \leq\frac{c_\rho}{16L_\rho}.
+\]
+The Lipschitz property therefore implies
+\begin{equation}
+ \frac1N\sum_{j=1}^N\rho(\sqrt d\,a^\top x_j)
+ \geq\frac{c_\rho}{2}
+ \qquad\text{for every unit }a.
+ \label{eq:truncated-variance}
+\end{equation}
+
+Fix a unit vector $a$ and set
+$f_a(t)=\Phi(t\sqrt d\,a)$ for $t\geq0$.  Since $\sum_jx_j=0$,
+$f_a(0)=f_a'(0)=0$.  There is an absolute $c_1>0$ such that
+\[
+ e^z\geq1+z+c_1z^2\1_{\{|z|\leq1\}}
+ \qquad(z\in\R).
+\]
+For $0\leq t\leq1/3$, apply this inequality to
+$z_j=t\sqrt d\,a^\top x_j$.  Since $\rho$ is supported on $[-3,3]$,
+\eqref{eq:truncated-variance} gives
+\[
+ e^{f_a(t)}
+ =\frac1N\sum_je^{z_j}
+ \geq1+c_1t^2\frac1N\sum_j\rho(\sqrt d\,a^\top x_j)
+ \geq1+ct^2.
+\]
+Hence $f_a(t)\geq ct^2$ for $0\leq t\leq1/3$.  Since $f_a$ is convex
+and $f_a(0)=0$, $f_a(t)/t$ is nondecreasing on $(0,\infty)$; therefore
+$f_a(t)\geq ct$ for $t\geq1/3$.  Writing
+$y=t\sqrt d\,a$ proves \eqref{eq:free-energy-lower}.
+\end{proof}
+
+\subsection{Uniform weighted query regularity}
+
+\begin{lemma}[Diffuse weighted query moments]
+\label{lem:weighted-query}
+Let $q_i\geq0$ be deterministic, $\sum_iq_i=1$, and
+\begin{equation}
+ q_{\max}:=\max_iq_i\leq(Dh^{12})^{-1}.
+ \label{eq:qmax}
+\end{equation}
+Then, with probability at least $1-d^{-30}$,
+\begin{align}
+ \frac1{2d}I_d
+ &\preceq\sum_iq_iv_iv_i^\top
+ \preceq\frac2dI_d,
+ \label{eq:weighted-cov}\\
+ \sum_iq_i(v_i^\top Av_i)^2
+ &\leq\frac{C}{d^2}(\tr A)^2
+ \qquad\text{for every }A\succeq0.
+ \label{eq:weighted-fourth}
+\end{align}
+Consequently, on the same event,
+\begin{equation}
+ \sum_iq_i\psi\!\left(\frac{\norm{Wv_i}_2}{\sqrt d}\right)
+ \geq c\psi\!\left(\frac{\norm W_{\F}}d\right)
+ \qquad\text{for every }W\in\R^{d\times d}.
+ \label{eq:weighted-coercivity}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+We first prove \eqref{eq:weighted-cov}.  Put
+$Y_i=q_i(v_iv_i^\top-I_d/d)$ and
+$E_i=\{\norm{v_i}_2\leq2\}$.  Apply matrix Bernstein to the centered,
+bounded matrices
+\[
+ \widehat Y_i=Y_i\1_{E_i}-\E[Y_i\1_{E_i}].
+\]
+On $E_i$, $\norm{\widehat Y_i}_{\op}\leq Cq_{\max}$.  Moreover,
+\[
+ \left\|\sum_i\E\widehat Y_i^2\right\|_{\op}
+ \leq C\sum_iq_i^2
+ \left\|\E(v_iv_i^\top-I_d/d)^2\right\|_{\op}
+ \leq Cq_{\max}/d.
+\]
+The truncation bias satisfies, by \eqref{eq:gaussian-trunc-tail},
+\[
+ \left\|\sum_i\E[Y_i\1_{E_i^c}]\right\|_{\op}
+ \leq Ce^{-cd}.
+\]
+Taking matrix-Bernstein deviation $1/(4d)$ gives exponent
+$c/(dq_{\max})\geq cdh^{12}$.  Together with
+$\Pp(\cup_iE_i^c)\leq e^{-cd}$, this proves
+\eqref{eq:weighted-cov} with failure much smaller than $d^{-30}$.
+
+For the fourth moment, work in the Hilbert space
+$\mathcal H$ of symmetric $d\times d$ matrices, of dimension at most
+$D$.  Put
+\[
+ Z_i=v_iv_i^\top-I_d/d,
+ \qquad
+ \mathcal A_i=Z_i\otimes Z_i,
+\]
+where $(Z\otimes Z)A=\ip{Z}{A}_{\F}Z$.  For symmetric $A$,
+Gaussian fourth moments give
+\begin{equation}
+ \E\ip{Z_i}{A}_{\F}^2=\frac2{d^2}\norm A_{\F}^2.
+ \label{eq:Z-cov}
+\end{equation}
+Furthermore,
+\begin{align*}
+ &\ip{A}{\E[\norm{Z_i}_{\F}^2(Z_i\otimes Z_i)]A}_{\F}\\
+ &\qquad=\E\bigl[\norm{Z_i}_{\F}^2\ip{Z_i}{A}_{\F}^2\bigr]\\
+ &\qquad\leq
+ (\E\norm{Z_i}_{\F}^4)^{1/2}
+ (\E\ip{Z_i}{A}_{\F}^4)^{1/2}
+ \leq\frac{C}{d^2}\norm A_{\F}^2.
+\end{align*}
+The last inequality uses the degree-two Gaussian hypercontractive
+bound together with \eqref{eq:Z-cov}.  Hence
+\begin{equation}
+ \left\|\E[\norm{Z_i}_{\F}^2(Z_i\otimes Z_i)]\right\|_{\op}
+ \leq C/d^2.
+ \label{eq:operator-fourth-variance}
+\end{equation}
+
+Truncate again on $E_i$.  On $E_i$,
+$\norm{\mathcal A_i}_{\op}=\norm{Z_i}_{\F}^2\leq C$.  By
+\eqref{eq:operator-fourth-variance}, the variance proxy for
+\[
+ q_i\bigl(\mathcal A_i\1_{E_i}-
+ \E[\mathcal A_i\1_{E_i}]\bigr)
+\]
+is at most $Cq_{\max}/d^2$, while the summand norm is at most
+$Cq_{\max}$.  Matrix Bernstein with deviation $d^{-2}$ has exponent
+$c/(Dq_{\max})\geq ch^{12}$.  The dimension factor is at most $2D$, and the truncation bias is
+$O(e^{-cd})$ by \eqref{eq:gaussian-trunc-tail}.  Moreover,
+\[
+ \Pp\!\left(\bigcup_iE_i^c\right)
+ \leq N\Pp(\norm{v_1}_2>2)\leq e^{-c'd},
+\]
+because $N=d^\beta+O(1)$.  On $\cap_iE_i$, the truncated and
+untruncated empirical operators coincide.  Combining the operator
+deviation, its mean, the truncation bias, and this last event shows
+that, with failure at most $d^{-30}$,
+\[
+ \sum_iq_i\ip{Z_i}{A}_{\F}^2
+ \leq\frac{C}{d^2}\norm A_{\F}^2
+ \qquad\text{for every symmetric }A.
+\]
+For $A\succeq0$,
+\[
+ v_i^\top Av_i=\frac{\tr A}{d}+\ip{Z_i}{A}_{\F},
+\]
+so $(a+b)^2\leq2a^2+2b^2$ and
+$\norm A_{\F}\leq\tr A$ prove \eqref{eq:weighted-fourth}.
+
+Finally, fix $W$ and set $r=\norm W_{\F}$.  If $r=0$, then
+\eqref{eq:weighted-coercivity} is immediate.  Assume $r>0$.  If an
+index $I$ is drawn with distribution $(q_i)$, then \eqref{eq:weighted-cov} and
+\eqref{eq:weighted-fourth}, applied to $A=W^\top W$, give
+\[
+ \E_q\norm{Wv_I}_2^2\geq\frac{r^2}{2d},
+ \qquad
+ \E_q\norm{Wv_I}_2^4\leq C\frac{r^4}{d^2}.
+\]
+Paley--Zygmund therefore gives a fixed $c_0>0$ such that a $q$-mass at
+least $c_0$ satisfies
+$\norm{Wv_i}_2^2\geq r^2/(4d)$.  On this set,
+\[
+ \psi\!\left(\frac{\norm{Wv_i}_2}{\sqrt d}\right)
+ \geq c\psi(r/d).
+\]
+Averaging proves \eqref{eq:weighted-coercivity}.
+\end{proof}
+
+\begin{corollary}[Diffuse-tail coercivity]
+\label{cor:tail-coercivity}
+Let $T\subseteq[N]$ be deterministic, $P_T\geq1/2$, and
+\[
+ \max_{i\in T}\frac{p_i}{P_T}\leq(Dh^{12})^{-1}.
+\]
+With probability at least $1-d^{-25}-e^{-cN}$,
+\begin{equation}
+ \sum_{i\in T}p_i\Phi(Wv_i)
+ \geq cP_T\psi\!\left(\frac{\norm W_{\F}}d\right)
+ \qquad\text{for every }W.
+ \label{eq:tail-coercivity}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:free-energy} to each vector $Wv_i$, then apply
+Lemma~\ref{lem:weighted-query} with weights $q_i=p_i/P_T$.  Both
+statements are uniform, so $W$ may depend arbitrarily on the data.
+\end{proof}
+
+\subsection{A reusable bilinear Gaussian bound}
+
+\begin{lemma}[Bilinear Gaussian matrix bound]
+\label{lem:bilinear}
+Let $U,V\in\R^{d\times N}$ be independent matrices with independent
+$\mathcal N(0,1/d)$ entries.  For each fixed deterministic
+$M\in\R^{N\times N}$,
+\begin{equation}
+ \norm{UMV^\top}_{\F}\leq2\norm M_{\F}
+ \label{eq:bilinear-bound}
+\end{equation}
+with probability at least $1-2e^{-cd}$.
+\end{lemma}
+
+\begin{proof}
+Write $U=X/\sqrt d$ with $X$ standard Gaussian.  Then
+\[
+ \norm{UM}_{\F}^2
+ =\frac1d\vecop(X)^\top(I_d\otimes MM^\top)\vecop(X).
+\]
+Equivalently, the quadratic-form matrix is
+$d^{-1}I_d\otimes MM^\top$.  It has trace $\norm M_{\F}^2$,
+Frobenius norm at most $\norm M_{\F}^2/\sqrt d$, and operator norm at
+most $\norm M_{\F}^2/d$.  Lemma~\ref{lem:standard-tools}(iv), with
+$x=c_0d$ and $c_0$ sufficiently small, yields
+$\norm{UM}_{\F}^2\leq2\norm M_{\F}^2$ outside an event $e^{-cd}$.
+Conditional on $UM$, the same argument applied to
+$UMV^\top=(UM)Y^\top/\sqrt d$ gives
+$\norm{UMV^\top}_{\F}^2\leq2\norm{UM}_{\F}^2$ outside another event
+$e^{-cd}$.  Combining the two inequalities proves
+\eqref{eq:bilinear-bound}.
+\end{proof}
+
+\begin{lemma}[Weighted centered gradient]
+\label{lem:gradient}
+For every deterministic vector $a=(a_1,\ldots,a_N)$,
+\begin{equation}
+ \norm{\sum_{i=1}^Na_ix_iv_i^\top}_{\F}
+ \leq2\norm a_2
+ \label{eq:gradient-bound}
+\end{equation}
+with probability at least $1-2e^{-cd}$.
+\end{lemma}
+
+\begin{proof}
+Let $U=[u_1,\ldots,u_N]$, $V=[v_1,\ldots,v_N]$, and
+\[
+ M=\diag(a)-\frac1N\1 a^\top.
+\]
+Then $\sum_i a_ix_iv_i^\top=UMV^\top$.  The $i$th column of $M$ is
+$a_i(e_i-N^{-1}\1)$, so
+\[
+ \norm M_{\F}^2=(1-N^{-1})\sum_i a_i^2\leq\norm a_2^2.
+\]
+Apply Lemma~\ref{lem:bilinear}.
+\end{proof}
+
+\subsection{The deterministic clipped comparison matrix}
+
+Retain $b_i,R,J$ from \eqref{eq:bRJ} and define
+\begin{equation}
+ S_b=\sum_{i=1}^Nb_i u_iv_i^\top.
+ \label{eq:Sb}
+\end{equation}
+
+\begin{lemma}[Clipped comparison]
+\label{lem:comparison}
+Fix $0\leq\alpha<1$ and $\beta>2$.  With probability at least
+$1-d^{-20}-e^{-cN}$,
+\begin{align}
+ \norm{S_b}_{\F}&\leq2R,
+ \label{eq:Sb-norm}\\
+ \ip{\sum_i p_ix_iv_i^\top}{S_b}_{\F}&\geq\frac12J,
+ \label{eq:Sb-linear}\\
+ \max_{i,j}|x_j^\top S_bv_i|&\leq C,
+ \label{eq:Sb-logits}\\
+ \sum_i p_i\norm{S_bv_i}_2^2
+ &\leq Ch\left(\sum_i p_ib_i^2+\frac{R^2}{d}\right).
+ \label{eq:Sb-action}
+\end{align}
+Consequently, for a sufficiently small absolute $c_0>0$,
+\begin{equation}
+ W_0=\frac{c_0}{h}S_b
+ \quad\Longrightarrow\quad
+ I(W_0)\geq c\frac{J}{h}
+ \geq c\frac{R^2}{Dh}.
+ \label{eq:comparator-gain}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The norm bound \eqref{eq:Sb-norm} follows from
+Lemma~\ref{lem:bilinear} with $M=\diag(b)$.
+
+We next prove \eqref{eq:Sb-linear}.  First remove centering and put
+$G_0=\sum_i p_i u_iv_i^\top$.  Expanding gives
+\begin{align*}
+ \ip{G_0}{S_b}_{\F}
+ &=\sum_i p_ib_i\norm{u_i}_2^2\norm{v_i}_2^2\\
+ &\quad+\sum_{i<k}(p_ib_k+p_kb_i)
+ (u_i^\top u_k)(v_i^\top v_k).
+\end{align*}
+For the diagonal term, let $a_i=p_ib_i$.  Since
+$\E[\norm{u_i}_2^2\norm{v_i}_2^2]=1$ and
+$\operatorname{Var}(\norm{u_i}_2^2\norm{v_i}_2^2)\leq C/d$,
+\[
+ \left\|\sum_i a_i
+ (\norm{u_i}_2^2\norm{v_i}_2^2-1)\right\|_{L^2}
+ \leq C J/\sqrt d,
+\]
+because $\sum_i a_i^2\leq(\sum_i a_i)^2=J^2$.  This is a centered
+Gaussian polynomial of degree four, so Lemma~\ref{lem:standard-tools}(i),
+with moment order $q=\lceil80\log d\rceil$, shows that it is at most
+$J/8$ with failure at most $d^{-40}$.
+
+The off-diagonal term is another centered degree-four Gaussian
+polynomial.  Distinct unordered pairs are orthogonal in $L^2$, and
+\[
+ \E(u_i^\top u_k)^2\E(v_i^\top v_k)^2=d^{-2}.
+\]
+Therefore its $L^2$ norm is at most
+\[
+ \frac C d
+ \left(\sum_{i<k}(p_ib_k+p_kb_i)^2\right)^{1/2}
+ \leq C\frac{\norm p_2R}{d}.
+\]
+Hypercontractivity and \eqref{eq:cross-small} imply that its magnitude
+is at most $J/8$ with failure at most $d^{-40}$.
+
+Finally,
+\[
+ \sum_i p_ix_iv_i^\top
+ =G_0-\bar u\left(\sum_i p_iv_i\right)^\top.
+\]
+With failure $e^{-cd}$,
+\[
+ \norm{\bar u}_2\leq2/\sqrt N,
+ \qquad
+ \norm{\sum_i p_iv_i}_2\leq2\norm p_2,
+ \qquad
+ \norm{S_b}_{\F}\leq2R.
+\]
+Hence the centering correction is at most
+$8\norm p_2R/\sqrt N=o(J)$ by \eqref{eq:cross-small} and
+$N\gg D$.  This proves \eqref{eq:Sb-linear}.
+
+For \eqref{eq:Sb-logits}, let $\mathcal E_0$ denote the event
+\begin{equation}
+ \max_i\{\norm{u_i}_2,\norm{v_i}_2\}\leq2,
+ \qquad
+ \max_{i\neq j}\{|u_i^\top u_j|,|v_i^\top v_j|\}
+ \leq C\sqrt{h/d}.
+ \label{eq:uniform-norm-inner}
+\end{equation}
+Standard chi-square bounds and conditional Gaussian inner-product
+tails, followed by a union bound, give
+\[
+ \Pp(\mathcal E_0^c)\leq d^{-40}+e^{-cd}
+\]
+after choosing $C$ sufficiently large.
+
+For fixed $i,j$, define
+\[
+ Z_{ij}:=
+ \sum_{k\notin\{i,j\}}b_k(u_j^\top u_k)(v_k^\top v_i),
+ \qquad
+ \mathcal A_{ij}:=
+ \{\norm{u_j}_2\leq2,\ \norm{v_i}_2\leq2\}.
+\]
+Condition only on $(u_j,v_i)$, not on $\mathcal E_0$.  The summands in
+$Z_{ij}$ are conditionally independent and centered.  Since
+\[
+ \norm{u_j^\top u_k}_{\psiTwo\mid u_j}
+ \leq C\frac{\norm{u_j}_2}{\sqrt d},
+ \qquad
+ \norm{v_k^\top v_i}_{\psiTwo\mid v_i}
+ \leq C\frac{\norm{v_i}_2}{\sqrt d},
+\]
+and the two factors are conditionally independent,
+\eqref{eq:orlicz-product} shows that, on the
+$\sigma(u_j,v_i)$-measurable event $\mathcal A_{ij}$,
+\[
+ \norm{b_k(u_j^\top u_k)(v_k^\top v_i)}
+       _{\psiOne\mid u_j,v_i}
+ \leq\frac{Cb_k}{d}.
+\]
+Consequently,
+\[
+ \sum_{k\notin\{i,j\}}
+ \norm{b_k(u_j^\top u_k)(v_k^\top v_i)}
+       _{\psiOne\mid u_j,v_i}^2
+ \leq\frac{CR^2}{d^2},
+ \qquad
+ \max_{k\notin\{i,j\}}
+ \norm{b_k(u_j^\top u_k)(v_k^\top v_i)}
+       _{\psiOne\mid u_j,v_i}
+ \leq\frac Cd.
+\]
+Conditional Bernstein with $t=50h$, followed by integration over
+$(u_j,v_i)$, gives
+\[
+ \Pp\!\left(
+ \mathcal A_{ij}\cap
+ \left\{|Z_{ij}|>
+ C\left(\frac{R\sqrt h}{d}+\frac hd\right)\right\}
+ \right)
+ \leq2e^{-50h}.
+\]
+Because $\mathcal E_0\subseteq\bigcap_{i,j}\mathcal A_{ij}$, a union
+bound over $N^2$ pairs yields
+\[
+ \Pp\!\left(
+ \mathcal E_0\cap
+ \left\{\max_{i,j}|Z_{ij}|>
+ C\left(\frac{R\sqrt h}{d}+\frac hd\right)\right\}
+ \right)
+ \leq2N^2e^{-50h}
+ =2N^{-48}\leq d^{-40}.
+\]
+Moreover,
+\begin{equation}
+ C\left(\frac{R\sqrt h}{d}+\frac hd\right)=o(1)
+ \label{eq:Sb-remainder}
+\end{equation}
+by \eqref{eq:R-polylog-small} and $h/d=o(1)$.  On the intersection
+of $\mathcal E_0$ and the preceding remainder event, the omitted
+collision terms are $O(1)$ when $i=j$ and $O(\sqrt{h/d})$ otherwise.
+Thus $\max_{i,j}|u_j^\top S_bv_i|\leq C$.
+
+Finally, on the previously established events
+$\norm{\bar u}_2\leq2/\sqrt N$, $\norm{S_b}_{\F}\leq2R$, and
+$\mathcal E_0$,
+\[
+ |\bar u^\top S_bv_i|
+ \leq\norm{\bar u}_2\norm{S_b}_{\F}\norm{v_i}_2
+ \leq\frac{CR}{\sqrt N}
+ =C\frac Rd\frac d{\sqrt N}=o(1),
+\]
+where \eqref{eq:R-small} and $N\gg D$ were used.  Since
+$x_j=u_j-\bar u$, this proves \eqref{eq:Sb-logits}.
+
+To prove \eqref{eq:Sb-action}, condition on
+$V=[v_1,\ldots,v_N]$ and set
+\[
+ B=\diag(b),
+ \qquad
+ P=\diag(p),
+ \qquad
+ K=B V^\top V P V^\top V B\succeq0.
+\]
+Then
+\[
+ \sum_i p_i\norm{S_bv_i}_2^2=\tr(UKU^\top),
+ \qquad U=[u_1,\ldots,u_N].
+\]
+Write $U=X/\sqrt d$ and let $g\in\R^{dN}$ be the concatenation of
+the $d$ rows of the standard Gaussian matrix $X$.  Then
+\[
+ \tr(UKU^\top)
+ =g^\top B_Kg,
+ \qquad
+ B_K=\frac1d(I_d\otimes K)\succeq0.
+\]
+Since $K\succeq0$,
+\[
+ \tr B_K=\tr K,\qquad
+ \norm{B_K}_{\F}
+ =\frac{\norm K_{\F}}{\sqrt d}
+ \leq\frac{\tr K}{\sqrt d},\qquad
+ \norm{B_K}_{\op}
+ =\frac{\norm K_{\op}}d
+ \leq\frac{\tr K}d.
+\]
+Lemma~\ref{lem:standard-tools}(iv), with $x=c_0d$ and $c_0>0$
+sufficiently small, therefore gives
+\[
+ \tr(UKU^\top)\leq2\tr K
+\]
+with conditional failure $e^{-c_0d}$.  Moreover,
+\[
+ \tr K=\sum_{i,k}p_ib_k^2(v_i^\top v_k)^2.
+\]
+On the norm event, the diagonal part is at most
+$C\sum_i p_ib_i^2$.  For the off-diagonal part, Minkowski's inequality
+and \eqref{eq:inner-product-moment} give, for
+$q=\lceil40\log d\rceil$,
+\[
+ \left\|\sum_{i\neq k}p_ib_k^2(v_i^\top v_k)^2\right\|_{L^q}
+ \leq\sum_{i\neq k}p_ib_k^2
+ \norm{(v_i^\top v_k)^2}_{L^q}
+ \leq Cq\frac{R^2}{d}.
+\]
+Markov's inequality proves \eqref{eq:Sb-action} with failure
+$d^{-30}$.
+
+It remains to prove the objective gain.  The centered empirical
+covariance satisfies
+\[
+ \frac1N\sum_jx_jx_j^\top
+ \preceq\frac1N\sum_ju_ju_j^\top
+ \preceq\frac C d I_d
+\]
+with failure $e^{-cN}$ by Lemma~\ref{lem:standard-tools}(vi), taking $t=\sqrt N/4$.
+Let $\eta=c_0/h$ and $W_0=\eta S_b$.  By
+\eqref{eq:Sb-logits}, $|x_j^\top W_0v_i|\leq1/4$ when $c_0$ is small.
+Since $N^{-1}\sum_jx_j^\top W_0v_i=0$ and
+$e^z\leq1+z+Cz^2$ for $|z|\leq1/4$,
+\[
+ \Phi(W_0v_i)
+ \leq C\eta^2\frac1N\sum_j(x_j^\top S_bv_i)^2
+ \leq C\frac{\eta^2}{d}\norm{S_bv_i}_2^2.
+\]
+Therefore, by \eqref{eq:Sb-action},
+\begin{align*}
+ \sum_i p_i\Phi(W_0v_i)
+ &\leq C\eta^2h
+ \left(\frac1d\sum_i p_ib_i^2+\frac{R^2}{D}\right)\\
+ &\leq C\eta^2hJ,
+\end{align*}
+where $b_i^2\leq b_i$ and \eqref{eq:J-R} were used.  On the other hand,
+\eqref{eq:Sb-linear} gives
+\[
+ \sum_i p_ix_i^\top W_0v_i
+ =\eta\ip{\sum_i p_ix_iv_i^\top}{S_b}_{\F}
+ \geq\eta J/2.
+\]
+Since $\eta=c_0/h$, choosing $c_0$ sufficiently small makes the
+free-energy term at most $\eta J/4$.  This proves
+\eqref{eq:comparator-gain}.
+\end{proof}
+
+\subsection{A head frame bound and a capped-support inequality}
+
+\begin{lemma}[Upper frame bound on the natural head]
+\label{lem:head-frame}
+With probability at least $1-d^{-25}$,
+\begin{equation}
+ \sum_{i=1}^m(x_i^\top Wv_i)^2\leq Ch\norm W_{\F}^2
+ \qquad\text{for every }W\in\R^{d\times d}.
+ \label{eq:head-frame}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+First replace $x_i$ by $u_i$.  Let
+$y_i=\vecop(u_iv_i^\top)\in\R^D$.  Then
+$\E[y_iy_i^\top]=I_D/D$.  Also,
+\[
+ \left\|\E[(y_iy_i^\top-I_D/D)^2]\right\|_{\op}\leq C/D.
+\]
+Indeed,
+$\E[\norm{u_i}_2^2u_iu_i^\top]=((d+2)/d^2)I_d$, and similarly for
+$v_i$, so
+$\norm{\E[\norm{y_i}_2^2y_iy_i^\top]}_{\op}\leq C/D$.
+
+Truncate on $\{\norm{u_i}_2,\norm{v_i}_2\leq2\}$.  The truncated
+summand norm is $O(1)$, the variance proxy for the first $m\leq D$
+terms is $O(m/D)\leq O(1)$, and the total truncation bias is
+$O(me^{-cd})=e^{-\Omega(d)}$.  Matrix Bernstein with deviation $C_0h$
+and $C_0$ sufficiently large gives
+\[
+ \left\|\sum_{i=1}^m y_iy_i^\top\right\|_{\op}\leq Ch
+\]
+with failure at most $d^{-30}$.  Hence
+\[
+ \sum_{i=1}^m(u_i^\top Wv_i)^2\leq Ch\norm W_{\F}^2.
+\]
+For the centering part,
+\[
+ \sum_{i=1}^m(\bar u^\top Wv_i)^2
+ \leq\norm{\bar u}_2^2
+ \left\|\sum_{i=1}^m v_iv_i^\top\right\|_{\op}
+ \norm W_{\F}^2.
+\]
+Using $\norm{\bar u}_2^2\leq C/N$ and the crude bound
+$\norm{\sum_{i\leq m}v_iv_i^\top}_{\op}\leq4m\leq4D$, the coefficient
+is $O(D/N)=o(1)$.  Finally,
+$(a-b)^2\leq2a^2+2b^2$ proves \eqref{eq:head-frame}.
+\end{proof}
+
+\begin{lemma}[Weighted capped support]
+\label{lem:capped-support}
+Fix $0\leq\alpha<1$.  For every $M>0$, there exists
+$K=K(\alpha,M)$ such that, for every $m\geq1$ and all sufficiently
+large $h$, the following holds.  If $a_1,\ldots,a_m\in\R$ satisfy
+\[
+ \sum_{i=1}^m a_i^2\leq B^2,
+ \qquad
+ B\leq\sqrt m\,h^{-K},
+\]
+then
+\begin{equation}
+ \sum_{i=1}^mp_i\min\{h,(a_i)_+\}
+ \leq h^{-M}\sum_{i=1}^mp_i.
+ \label{eq:capped-support}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The normalization $H_{N,\alpha}^{-1}$ cancels in every ratio below.
+Choose
+\[
+ K_0>\frac{M+3}{1-\alpha}.
+\]
+First suppose $m\geq2h^{K_0}$ and put
+$q=\lfloor mh^{-K_0}\rfloor$, so $1\leq q<m$.  Cauchy--Schwarz gives
+\begin{equation}
+ \sum_{i=1}^mp_i\min\{h,(a_i)_+\}
+ \leq h\sum_{i\leq q}p_i
+ +B\left(\sum_{q<i\leq m}p_i^2\right)^{1/2}.
+ \label{eq:cap-split}
+\end{equation}
+Integral comparison gives
+\[
+ \frac{\sum_{i\leq q}p_i}{\sum_{i\leq m}p_i}
+ \leq C(q/m)^{1-\alpha}
+ \leq Ch^{-K_0(1-\alpha)},
+\]
+so the first term in \eqref{eq:cap-split} is at most
+$h^{-M-2}\sum_{i\leq m}p_i$.  Also,
+\[
+ \frac{(\sum_{q<i\leq m}p_i^2)^{1/2}}
+ {\sum_{i\leq m}p_i}
+ \leq\frac C{\sqrt m}
+ \begin{cases}
+ 1,&0\leq\alpha<1/2,\\
+ \sqrt{\log(m/q)},&\alpha=1/2,\\
+ (q/m)^{1/2-\alpha},&1/2<\alpha<1.
+ \end{cases}
+\]
+Thus the second term, divided by $\sum_{i\leq m}p_i$, is at most
+\[
+ Ch^{-K}\times
+ \begin{cases}
+ 1,&\alpha<1/2,\\
+ \sqrt{K_0\log h},&\alpha=1/2,\\
+ h^{K_0(\alpha-1/2)},&\alpha>1/2.
+ \end{cases}
+\]
+Choosing
+$K>M+3+K_0(\alpha-1/2)_+$ proves \eqref{eq:capped-support} in this
+case.
+
+Now suppose $m<2h^{K_0}$.  Direct Cauchy--Schwarz gives
+\[
+ \sum_{i=1}^mp_i\min\{h,(a_i)_+\}
+ \leq B\left(\sum_{i=1}^mp_i^2\right)^{1/2}.
+\]
+Integral comparison gives the explicit bound
+\[
+ \frac{\sqrt m(\sum_{i\leq m}p_i^2)^{1/2}}
+ {\sum_{i\leq m}p_i}
+ \leq C
+ \begin{cases}
+ 1,&0\leq\alpha<1/2,\\
+ \sqrt{\log(m+1)},&\alpha=1/2,\\
+ m^{\alpha-1/2},&1/2<\alpha<1.
+ \end{cases}
+\]
+Since $m<2h^{K_0}$, the right-hand side is at most a fixed power of
+$h$.  Increasing $K$ once more proves \eqref{eq:capped-support} for the
+remaining values of $m$.
+\end{proof}
+
+\section{Proof for $0\leq\alpha<1$}
+
+\begin{proposition}[Upper bound for $\alpha<1$]
+\label{prop:alpha-less-upper}
+For fixed $0\leq\alpha<1$ and $\beta>2$, with probability at least
+$1-d^{-c}-e^{-cN}$,
+\[
+ \norm{W_\star}_{\F}\leq h^C R.
+\]
+\end{proposition}
+
+\begin{proof}
+Work on $\mathcal E_{\rm ex}$ and on the concentration events invoked
+below.  Use the deterministic diffuse tail $T$ from
+Lemma~\ref{lem:strong-tail}.  Since $P_T\geq1/2$ and
+$p_i/P_T\leq2/(Dh^{24})\leq(Dh^{12})^{-1}$, Corollary
+\ref{cor:tail-coercivity} applies.  Put
+$r=\norm{W_\star}_{\F}$ and $a=\norm{G_T}_{\F}$.  Since
+$L(W_\star)\leq L(0)=h$, \eqref{eq:subset-lower} and
+\eqref{eq:tail-coercivity} give
+\begin{equation}
+ cP_T\psi(r/d)\leq P_Hh+ar.
+ \label{eq:upper-master}
+\end{equation}
+Lemma~\ref{lem:gradient} gives $a\leq2\sqrt{S_T}$, so
+$ad\leq2h^{-A/2}$.  If $r\geq d$, then
+$\psi(r/d)=r/d$, and the term $ar=(ad)(r/d)$ can be absorbed into the
+left-hand side.  Hence
+\[
+ r/d\leq CP_Hh=o(1),
+\]
+contradicting $r/d\geq1$.  Therefore $r<d$ and
+$\psi(r/d)=r^2/d^2$.  Solving the quadratic inequality
+\[
+ cr^2/d^2\leq P_Hh+ar
+\]
+gives
+\[
+ r\leq C\bigl(Da+d\sqrt{P_Hh}\bigr)
+ \leq C\bigl(D\sqrt{S_T}+d\sqrt{P_Hh}\bigr).
+\]
+Lemma~\ref{lem:strong-tail} now yields $r\leq h^CR$.
+\end{proof}
+
+\begin{proposition}[Lower bound for $\alpha<1$]
+\label{prop:alpha-less-lower}
+For fixed $0\leq\alpha<1$ and $\beta>2$, with probability at least
+$1-d^{-c}-e^{-cN}$,
+\[
+ \norm{W_\star}_{\F}\geq h^{-C}R.
+\]
+\end{proposition}
+
+\begin{proof}
+Work on $\mathcal E_{\rm ex}$ and on the concentration events invoked
+below.  By optimality, $I(W_\star)\geq I(W_0)$ for the
+deterministic-coefficient comparison matrix in
+Lemma~\ref{lem:comparison}.  Hence
+\begin{equation}
+ I(W_\star)\geq c\frac{R^2}{Dh}.
+ \label{eq:lower-gain}
+\end{equation}
+Let $r=\norm{W_\star}_{\F}$ and
+$s_i=x_i^\top W_\star v_i$.  By \eqref{eq:deterministic-cap},
+\begin{align}
+ I(W_\star)
+ &\leq\sum_{i\leq m}p_i\min\{h,(s_i)_+\}
+ +\left|\ip{G_{\{m+1,\ldots,N\}}}{W_\star}_{\F}\right|\\
+ &\leq\sum_{i\leq m}p_i\min\{h,(s_i)_+\}
+ +2\sqrt{\sum_{i>m}p_i^2}\,r,
+ \label{eq:lower-decomp}
+\end{align}
+where Lemma~\ref{lem:gradient} was used.  Since
+$D^2\sum_{i>m}p_i^2\leq R^2$, the last term is at most $2Rr/D$.
+
+Let $K_{\rm cap}=K(\alpha,3)$ be the exponent supplied by
+Lemma~\ref{lem:capped-support} with $M=3$.  Fix any $K_0>2$, and then
+fix
+\[
+ K\geq\max\{2,K_0+K_{\rm cap}+2\}.
+\]
+Assume for contradiction that
+\begin{equation}
+ r\leq c_\star R h^{-K},
+ \label{eq:small-r-assumption}
+\end{equation}
+where $c_\star>0$ will be chosen sufficiently small.  The tail term in
+\eqref{eq:lower-decomp} is at most
+$2c_\star R^2/(Dh^K)$, which is at most one quarter of
+\eqref{eq:lower-gain} for all sufficiently large $h$ after choosing
+$c_\star$ small.
+
+If $m=0$, this already contradicts \eqref{eq:lower-gain}.  Suppose
+$m\geq1$.  Lemma~\ref{lem:head-frame} gives
+\begin{equation}
+ \left(\sum_{i\leq m}s_i^2\right)^{1/2}\leq C\sqrt h\,r.
+ \label{eq:head-l2}
+\end{equation}
+If $R>\sqrt m\,h^{K_0}$, then
+\eqref{eq:head-mass} and the trivial cap give
+\[
+ \sum_{i\leq m}p_i\min\{h,(s_i)_+\}
+ \leq h\sum_{i\leq m}p_i
+ \leq C\frac{hm}{D}
+ \leq C\frac{R^2}{Dh^{2K_0-1}},
+\]
+which is at most one quarter of \eqref{eq:lower-gain} for all
+sufficiently large $h$, because $K_0>2$.
+
+If $R\leq\sqrt m\,h^{K_0}$, then \eqref{eq:head-l2} and
+\eqref{eq:small-r-assumption} imply
+\[
+ \left(\sum_{i\leq m}s_i^2\right)^{1/2}
+ \leq Cc_\star\sqrt m\,h^{K_0+1/2-K}.
+\]
+Our choice of $K$ implies, for all sufficiently large $h$,
+\[
+ Cc_\star h^{K_0+1/2-K}\leq h^{-K_{\rm cap}}.
+\]
+Lemma~\ref{lem:capped-support}, with $M=3$, therefore applies and yields
+\[
+ \sum_{i\leq m}p_i\min\{h,(s_i)_+\}
+ \leq h^{-3}\sum_{i\leq m}p_i
+ \leq C\frac{m}{Dh^3}
+ \leq C\frac{R^2}{Dh^3},
+\]
+again at most one quarter of \eqref{eq:lower-gain}.  Thus the head and
+tail in \eqref{eq:lower-decomp} are together strictly smaller than the
+right-hand side of \eqref{eq:lower-gain}, a contradiction.  Therefore
+$r\geq cRh^{-K}$.
+\end{proof}
+
+Propositions~\ref{prop:alpha-less-upper} and
+\ref{prop:alpha-less-lower} prove Theorem~\ref{thm:main} for every
+fixed $0\leq\alpha<1$.
+
+\section{The endpoint $\alpha=1$}
+
+At the endpoint,
+\[
+ p_i=\frac1{iH_N},
+ \qquad
+ H_N=\sum_{k=1}^N\frac1k
+ =h+\gamma+O(N^{-1})\asymp h.
+\]
+Put
+\[
+ m_1=\left\lfloor\frac{D}{H_N}\right\rfloor.
+\]
+Since $D/H_N\to\infty$ and $D/(NH_N)\to0$, one has
+$1\leq m_1<N$ for all sufficiently large $d$.  Moreover,
+$Dp_i\geq1$ exactly when $i\leq m_1$.  Therefore
+\begin{equation}
+ R_F^2
+ =m_1+\frac{D^2}{H_N^2}\sum_{i=m_1+1}^N\frac1{i^2}.
+ \label{eq:endpoint-RF-exact}
+\end{equation}
+The integral bounds
+\[
+ \frac1{m_1+1}-\frac1{N+1}
+ \leq\sum_{i=m_1+1}^N\frac1{i^2}
+ \leq\frac1{m_1}
+\]
+and $m_1/N\to0$ imply
+\[
+ \sum_{i=m_1+1}^N i^{-2}\asymp m_1^{-1}.
+\]
+Since $m_1\asymp D/h$, \eqref{eq:endpoint-RF-exact} gives
+\begin{equation}
+ R_F^2\asymp\frac Dh,
+ \qquad
+ R_F\asymp\frac d{\sqrt h}.
+ \label{eq:endpoint-scale}
+\end{equation}
+
+\subsection{A head-memory comparison}
+
+For $K\leq N$, define
+\[
+ S_K=\sum_{k=1}^K u_kv_k^\top.
+\]
+
+\begin{lemma}[Head-memory event]
+\label{lem:head-memory}
+Let $\delta=d^{-40}$ and
+$\Lambda=\log(64N^2/\delta)$.  There are absolute constants
+$c,c_0,C>0$ such that, whenever
+\[
+ K\leq cD/h^3,
+\]
+then, with probability at least $1-\delta$,
+\begin{align}
+ (u_i-u_j)^\top S_Kv_i&\geq c_0,
+ &&i\leq K,\ j\neq i,
+ \label{eq:head-margin}\\
+ |(u_j-u_i)^\top S_Kv_i|&\leq C/h,
+ &&i>K,\ j\neq i.
+ \label{eq:tail-logit}
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Let $\mathcal E_0$ denote the event
+\begin{equation}
+ \max_i\bigl|\norm{u_i}_2^2-1\bigr|
+ \vee\max_i\bigl|\norm{v_i}_2^2-1\bigr|\leq\frac14,
+ \qquad
+ \max_{i\neq j}\{|u_i^\top u_j|,|v_i^\top v_j|\}
+ \leq C_0\sqrt{\Lambda/d}.
+ \label{eq:endpoint-basic-event}
+\end{equation}
+The norm bounds follow from chi-square tails.  For a cross inner
+product, condition on one vector and use the conditional Gaussian tail
+bound on its norm event.  A union bound over at most $2N^2$
+quantities, with $C_0$ sufficiently large, gives
+\[
+ \Pp(\mathcal E_0^c)\leq\delta/4.
+\]
+
+Fix $i\neq j$, let
+$\mathcal F_{ij}=\sigma(u_i,u_j,v_i)$, and, for
+$k\notin\{i,j\}$, define
+\[
+ Z_k^{(i,j)}
+ =((u_i-u_j)^\top u_k)(v_k^\top v_i).
+\]
+Conditional on $\mathcal F_{ij}$, the variables
+$\{Z_k^{(i,j)}:k\leq K,\ k\notin\{i,j\}\}$ are independent and
+centered.  Their two factors are conditionally independent centered
+Gaussian variables.  Hence \eqref{eq:orlicz-product} gives
+\[
+ \norm{Z_k^{(i,j)}}_{\psiOne\mid\mathcal F_{ij}}
+ \leq C\frac{\norm{u_i-u_j}_2\norm{v_i}_2}{d}.
+\]
+On the $\mathcal F_{ij}$-measurable event
+\[
+ \mathcal A_{ij}
+ :=\{\norm{u_i}_2\leq2,\ \norm{u_j}_2\leq2,\
+       \norm{v_i}_2\leq2\},
+\]
+we consequently have
+\[
+ \max_{\substack{k\leq K\\k\notin\{i,j\}}}
+ \norm{Z_k^{(i,j)}}_{\psiOne\mid\mathcal F_{ij}}
+ \leq\frac Cd,
+ \qquad
+ \sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+ \norm{Z_k^{(i,j)}}_{\psiOne\mid\mathcal F_{ij}}^2
+ \leq\frac{CK}{d^2}.
+\]
+Conditional Bernstein, Lemma~\ref{lem:standard-tools}(ii), with
+$t=\Lambda$, implies
+\begin{align*}
+ &\Pp\left(
+ \mathcal A_{ij}\cap
+ \left\{
+ \left|
+ \sum_{\substack{k\leq K\\k\notin\{i,j\}}}Z_k^{(i,j)}
+ \right|
+ >
+ C\left(\frac{\sqrt{K\Lambda}}d+\frac{\Lambda}{d}\right)
+ \right\}\right)\\
+ &\hspace{45mm}\leq2e^{-\Lambda}.
+\end{align*}
+Indeed, this follows by taking conditional probabilities given
+$\mathcal F_{ij}$ and then integrating over the
+$\mathcal F_{ij}$-measurable event $\mathcal A_{ij}$.  In particular,
+we have not conditioned on the global event $\mathcal E_0$.
+
+Since $\mathcal E_0\subseteq\mathcal A_{ij}$ for every pair and
+$\Lambda=\log(64N^2/\delta)$, a union bound over at most $N^2$ pairs
+shows that, outside an event of probability at most $\delta/32$,
+simultaneously for all $i\neq j$ on $\mathcal E_0$,
+\begin{equation}
+ \left|
+ \sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+ ((u_i-u_j)^\top u_k)(v_k^\top v_i)
+ \right|
+ \leq C\left(\frac{\sqrt{K\Lambda}}d+\frac{\Lambda}{d}\right).
+ \label{eq:endpoint-remainder}
+\end{equation}
+Because $\delta=d^{-40}$, $N=\lceil d^\beta\rceil$, and $\beta>2$
+is fixed, $\Lambda\asymp h$.  The hypothesis $K\leq cD/h^3$ gives
+\[
+ \frac{\sqrt{K\Lambda}}d+\frac{\Lambda}{d}
+ \leq\frac{C\sqrt c}{h}+\frac{Ch}{d}
+ \leq\frac Ch
+\]
+for all sufficiently large $d$.
+
+Work now on the intersection of $\mathcal E_0$ and the remainder
+event.  If $i\leq K$, the self term $k=i$ satisfies
+\[
+ (\norm{u_i}_2^2-u_j^\top u_i)\norm{v_i}_2^2
+ \geq
+ \left(\frac34-C_0\sqrt{\frac{\Lambda}{d}}\right)\frac34
+ \geq\frac12
+\]
+for all sufficiently large $d$.  If $j\leq K$, the only other removed
+term is
+\[
+ (u_i^\top u_j-\norm{u_j}_2^2)(v_j^\top v_i),
+\]
+whose absolute value is at most
+$C\sqrt{\Lambda/d}=o(1)$.  Together with
+\eqref{eq:endpoint-remainder}, this proves \eqref{eq:head-margin}, for
+example with $c_0=1/4$ for all sufficiently large $d$.
+
+If $i>K$, the self term is absent.  The only possible removed term is
+the $k=j$ term when $j\leq K$, and its absolute value is at most
+\[
+ C\sqrt{\Lambda/d}\leq C/h,
+\]
+where the last inequality follows from $h^3=o(d)$.  Combining this
+with \eqref{eq:endpoint-remainder} proves \eqref{eq:tail-logit}.  The
+total failure probability is at most
+$\delta/4+\delta/32<\delta$.
+\end{proof}
+
+Choose
+\begin{equation}
+ K_0=\left\lfloor cD/h^3\right\rfloor,
+ \qquad
+ W_{\mathrm{head}}=ThS_{K_0},
+ \label{eq:head-comparator}
+\end{equation}
+where $T>0$ is a sufficiently large absolute constant.  On the event
+of Lemma~\ref{lem:head-memory},
+\begin{equation}
+ L(W_{\mathrm{head}})
+ \leq P_{\{K_0+1,\ldots,N\}}(h+C)+N^{-10}.
+ \label{eq:head-comparator-loss}
+\end{equation}
+Indeed, choose $T$ so that $Tc_0\geq12$.  For $i\leq K_0$, every
+wrong logit is at most $-Tc_0h$, and hence
+\[
+ \ell_i(W_{\mathrm{head}})
+ \leq\sum_{j\neq i}e^{-Tc_0h}
+ \leq N^{1-Tc_0}\leq N^{-10}.
+\]
+For $i>K_0$, \eqref{eq:tail-logit} gives
+$\ell_i(W_{\mathrm{head}})\leq h+C$.
+
+\subsection{Endpoint lower bound}
+
+\begin{proposition}[Lower bound at $\alpha=1$]
+\label{prop:endpoint-lower}
+With probability at least $1-d^{-20}$,
+\[
+ \norm{W_\star}_{\F}\geq c\frac d{\sqrt h}.
+\]
+\end{proposition}
+
+\begin{proof}
+Work on $\mathcal E_{\rm ex}$ and on the head-memory and gradient
+events specified below.  Let $C_{\rm cmp}$ be a fixed constant for
+which \eqref{eq:head-comparator-loss} holds.  Choose a fixed
+$s_0>C_{\rm cmp}+3$ and set
+\[
+ K_1=\lfloor e^{-s_0}K_0\rfloor,
+ \qquad
+ T_1=\{K_1+1,\ldots,N\}.
+\]
+Since $K_0\to\infty$, also $K_1\to\infty$.  The harmonic-number
+expansion $H_n=\log n+\gamma+O(n^{-1})$ and
+$K_1=e^{-s_0}K_0+O(1)$ give
+\[
+ H_{K_0}-H_{K_1}
+ =\log(K_0/K_1)+O(K_1^{-1})
+ =s_0+o(1).
+\]
+Moreover, $h/H_N=1+O(h^{-1})$.  Hence
+\begin{equation}
+ \frac h{H_N}(H_{K_0}-H_{K_1})=s_0+o(1).
+ \label{eq:endpoint-harmonic-gap}
+\end{equation}
+Write $P_0=P_{\{K_0+1,\ldots,N\}}$.  From
+\eqref{eq:head-comparator-loss} and
+\eqref{eq:endpoint-harmonic-gap},
+\begin{align*}
+ P_{T_1}h-L(W_{\mathrm{head}})
+ &\geq (P_{T_1}-P_0)h-C_{\rm cmp}P_0-N^{-10}\\
+ &=\frac h{H_N}(H_{K_0}-H_{K_1})
+   -C_{\rm cmp}P_0-N^{-10}\\
+ &\geq s_0-C_{\rm cmp}+o(1)\geq1
+\end{align*}
+for all sufficiently large $d$, where $P_0\leq1$ was used.  By
+optimality on $\mathcal E_{\rm ex}$,
+\begin{equation}
+ P_{T_1}h-L(W_\star)\geq1.
+ \label{eq:endpoint-gap}
+\end{equation}
+
+The set $T_1$ is deterministic, so Lemma~\ref{lem:gradient} applies to
+the deterministic coefficients $a_i=p_i\1_{\{i\in T_1\}}$.  On its
+event,
+\[
+ \norm{G_{T_1}}_{\F}\leq2\sqrt{S_{T_1}},
+ \qquad
+ S_{T_1}
+ =\frac1{H_N^2}\sum_{i=K_1+1}^N\frac1{i^2}
+ \leq\frac C{K_1h^2}.
+\]
+On the other hand, \eqref{eq:subset-lower} and $\Phi\geq0$ imply
+\[
+ L(W_\star)
+ \geq P_{T_1}h-\norm{G_{T_1}}_{\F}\norm{W_\star}_{\F}.
+\]
+Combining this with \eqref{eq:endpoint-gap} gives
+\[
+ 1\leq\norm{G_{T_1}}_{\F}\norm{W_\star}_{\F}
+ \leq2\sqrt{S_{T_1}}\norm{W_\star}_{\F}.
+\]
+Therefore
+\[
+ \norm{W_\star}_{\F}
+ \geq\frac1{2\sqrt{S_{T_1}}}
+ \geq ch\sqrt{K_1}
+ \asymp\frac d{\sqrt h}.
+\]
+The head-memory event fails with probability at most $d^{-40}$, the
+single deterministic gradient event fails with probability at most
+$2e^{-cd}$, and the existence event satisfies
+$\Pp(\mathcal E_{\rm ex}^c)\leq e^{-c_{\rm ex}N}$.  Their sum is at
+most $d^{-20}$ for all sufficiently large $d$.
+\end{proof}
+
+\subsection{Blockwise coercivity}
+
+\begin{lemma}[Three uniform Gaussian block estimates]
+\label{lem:block-estimates}
+Let
+\[
+ k=\lceil AD/h\rceil,
+ \qquad
+ B=\{k+1,\ldots,2k\},
+\]
+where $A=A(\beta)>0$ is a fixed sufficiently large constant.  For large $d$,
+$2k\leq N$.  With probability at least $1-e^{-cd}$, all of the
+following hold:
+\begin{align}
+ \inf_{\norm a_2=1}\max_{1\leq j\leq N}u_j^\top a
+ &\geq c\sqrt{h/d},
+ \label{eq:cloud-inradius}\\
+ \inf_{\norm b_2=1}\frac1k\sum_{i\in B}|b^\top v_i|
+ &\geq c/\sqrt d,
+ \label{eq:block-l1}\\
+ \norm{\sum_{i\in B}u_iv_i^\top}_{\F}
+ &\leq C\sqrt k.
+ \label{eq:block-bilinear}
+\end{align}
+\end{lemma}
+
+\begin{proof}
+We first prove \eqref{eq:cloud-inradius}.  Choose a sufficiently small
+constant $\gamma=\gamma(\beta)>0$ such that
+$\beta(1-2\gamma^2)>1$, and put
+$r=\gamma\sqrt{h/d}$.  Let $\mathcal N$ be an $(r/8)$-net of the unit
+sphere.  Then
+\[
+ \log|\mathcal N|\leq Cd\log d.
+\]
+For fixed $a\in\mathcal N$, the variables
+$\sqrt d\,u_j^\top a$ are standard normal.  Mills' lower bound gives
+\[
+ q:=\Pp(u_j^\top a\geq2r)
+ \geq c h^{-1/2}e^{-2\gamma^2h}
+ =c h^{-1/2}N^{-2\gamma^2}.
+\]
+Therefore
+\[
+ \Pp\left(\max_{j\leq N}u_j^\top a<2r\right)
+ \leq e^{-Nq}
+ \leq\exp\!\left(-cN^{1-2\gamma^2}/\sqrt h\right).
+\]
+This dominates the net cardinality because
+$\beta(1-2\gamma^2)>1$.  On the additional event
+$\max_j\norm{u_j}_2\leq2$, every unit vector is within $r/8$ of a net
+point, and the corresponding support value decreases by at most $r/4$.
+Thus \eqref{eq:cloud-inradius} holds with failure $e^{-cd}$.
+
+For \eqref{eq:block-l1}, put
+$\mu_d=\E|b^\top v_i|=\sqrt{2/(\pi d)}$, which is independent of the
+unit vector $b$, and define
+\[
+ \Delta=\sup_{\norm b_2=1}
+ \left|\frac1k\sum_{i\in B}|b^\top v_i|-\mu_d\right|.
+\]
+Symmetrization and the contraction principle give
+\[
+ \E\Delta
+ \leq\frac Ck\E\sup_{\norm b=1}
+ \left|\sum_{i\in B}\varepsilon_i b^\top v_i\right|
+ =\frac Ck\E\norm{\sum_{i\in B}\varepsilon_i v_i}_2
+ \leq\frac C{\sqrt k}.
+\]
+Since $k\asymp d^2/h$, this is at most $\mu_d/4$ for large $d$.  As a
+function of the standard Gaussian vectors $g_i=\sqrt d\,v_i$, the
+quantity $\Delta$ is $(kd)^{-1/2}$-Lipschitz.  Gaussian concentration,
+with $t=\mu_d/4$, yields
+\[
+ \Pp(\Delta>\mu_d/2)\leq e^{-ck}.
+\]
+This proves \eqref{eq:block-l1}.
+
+Finally, \eqref{eq:block-bilinear} follows from
+Lemma~\ref{lem:bilinear} with the diagonal coefficient matrix equal to
+one on $B$ and zero elsewhere; its Frobenius norm is $\sqrt k$.
+\end{proof}
+
+\begin{lemma}[One-block coercivity]
+\label{lem:block-coercivity}
+For $k,B$ as in Lemma~\ref{lem:block-estimates}, with $A=A(\beta)$ sufficiently
+large, with probability at least $1-e^{-cd}$,
+\begin{equation}
+ \frac1k\sum_{i\in B}\ell_i(W)
+ \geq c\frac{\sqrt h}{d}\norm W_{\F}
+ \qquad\text{for every }W\in\R^{d\times d}.
+ \label{eq:block-coercivity}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Work on the event of Lemma~\ref{lem:block-estimates}.  The claim is
+immediate for $W=0$, since its right-hand side is zero.  Assume
+$W\neq0$ and write a compact singular value decomposition
+\[
+ W=\sum_{a=1}^r\sigma_ax_ay_a^\top,
+ \qquad \sigma_a>0.
+\]
+For every $i\in B$, Cauchy--Schwarz gives
+\[
+ \sum_{a=1}^r\sigma_a^2|y_a^\top v_i|
+ \leq
+ \left(\sum_{a=1}^r\sigma_a^2\right)^{1/2}
+ \left(\sum_{a=1}^r\sigma_a^2(y_a^\top v_i)^2\right)^{1/2}
+ =\norm W_{\F}\norm{Wv_i}_2.
+\]
+Sum over $i\in B$ and apply \eqref{eq:block-l1} separately to each
+unit vector $y_a$.  This gives
+\[
+ \norm W_{\F}\frac1k\sum_{i\in B}\norm{Wv_i}_2
+ \geq
+ \sum_{a=1}^r\sigma_a^2
+ \left(\frac1k\sum_{i\in B}|y_a^\top v_i|\right)
+ \geq\frac c{\sqrt d}\norm W_{\F}^2.
+\]
+Division by $\norm W_{\F}>0$ yields
+\begin{equation}
+ \frac1k\sum_{i\in B}\norm{Wv_i}_2
+ \geq c\frac{\norm W_{\F}}{\sqrt d}.
+ \label{eq:average-query-norm}
+\end{equation}
+
+The cloud estimate implies, for every $y\in\R^d$,
+\[
+ \max_{1\leq j\leq N}u_j^\top y
+ \geq c\sqrt{h/d}\,\norm y_2.
+\]
+For $y\neq0$, this follows by applying \eqref{eq:cloud-inradius} to
+$y/\norm y_2$; for $y=0$, both sides vanish.  Consequently,
+\[
+ \ell_i(W)
+ =\log\sum_{j=1}^N e^{(u_j-u_i)^\top Wv_i}
+ \geq c\sqrt{h/d}\,\norm{Wv_i}_2-u_i^\top Wv_i.
+\]
+Average this inequality over $i\in B$, then use
+\eqref{eq:average-query-norm}, \eqref{eq:block-bilinear}, and
+Cauchy--Schwarz in Frobenius inner product:
+\begin{align*}
+ \frac1k\sum_{i\in B}\ell_i(W)
+ &\geq c\sqrt{h/d}\,\frac1k\sum_{i\in B}\norm{Wv_i}_2
+ -\frac1k\left|\ip{W}{\sum_{i\in B}u_iv_i^\top}_{\F}\right|\\
+ &\geq\left(c\frac{\sqrt h}{d}-\frac C{\sqrt k}\right)\norm W_{\F}.
+\end{align*}
+Since $k=\lceil AD/h\rceil\geq AD/h$,
+\[
+ \frac C{\sqrt k}\leq\frac{C\sqrt h}{\sqrt A\,d}.
+\]
+Choose the fixed constant $A=A(\beta)$ sufficiently large that the
+last coefficient is at most $c\sqrt h/(2d)$.  This proves
+\eqref{eq:block-coercivity} simultaneously for every $W$.
+\end{proof}
+
+\begin{proposition}[Upper bound at $\alpha=1$]
+\label{prop:endpoint-upper}
+With probability at least $1-e^{-cd}$,
+\[
+ \norm{W_\star}_{\F}\leq Cdh^{3/2}.
+\]
+\end{proposition}
+
+\begin{proof}
+Work on $\mathcal E_{\rm ex}$ and on the block-coercivity event.  For
+$i\in B$, monotonicity gives
+$p_i\geq p_{2k}\asymp(kh)^{-1}$.  Lemma
+\ref{lem:block-coercivity} therefore implies, for every $W$,
+\[
+ L(W)
+ \geq p_{2k}\sum_{i\in B}\ell_i(W)
+ \geq c\frac{\norm W_{\F}}{d\sqrt h}.
+\]
+At the minimizer, $L(W_\star)\leq L(0)=h$, and hence
+$\norm{W_\star}_{\F}\leq Cdh^{3/2}$.
+\end{proof}
+
+Together with \eqref{eq:endpoint-scale}, Propositions
+\ref{prop:endpoint-lower} and \ref{prop:endpoint-upper} prove
+Theorem~\ref{thm:main} for $\alpha=1$.
+
+\section{Evaluation of the clipped scale}
+
+For $0\leq\alpha<1$, recall
+$p_i\asymp N^{\alpha-1}i^{-\alpha}$.
+
+If $0\leq\alpha<1/2$, then $\sum_i p_i^2\asymp N^{-1}$.  If clipping
+occurs, its head size satisfies $m=o(D^2/N)$, so it does not change the
+leading order.  Thus
+\[
+ R_F\asymp D/\sqrt N=d^{2-\beta/2}.
+\]
+At $\alpha=1/2$,
+$\sum_i p_i^2\asymp(\log N)/N$; in the clipped case
+$m\asymp D^2/N$ while the tail still contributes
+$D^2(\log N)/N$.  Therefore
+\[
+ R_F\asymp d^{2-\beta/2}\sqrt{\log N}.
+\]
+
+Let $1/2<\alpha<1$.  The sharper integral asymptotic
+\[
+ H_{N,\alpha}=\frac{N^{1-\alpha}}{1-\alpha}(1+o(1))
+\]
+gives
+\[
+ Dp_1=(1-\alpha)d^{\,2-\beta(1-\alpha)}(1+o(1)).
+\]
+If $\beta(1-\alpha)>2$, then $Dp_1\to0$; if
+$\beta(1-\alpha)=2$, then $Dp_1\to1-\alpha<1$.  Thus in both cases
+$m=0$ for all sufficiently large $d$, and
+\[
+ R_F=D\norm p_2\asymp DN^{-(1-\alpha)}
+ =d^{2-\beta(1-\alpha)}.
+\]
+If $\beta(1-\alpha)<2$, then $Dp_1\to\infty$, and the clipping
+index satisfies
+\[
+ m\asymp(DN^{\alpha-1})^{1/\alpha}
+ =d^{[2-\beta(1-\alpha)]/\alpha}.
+\]
+Both the head and tail in \eqref{eq:R-decomp} are of order $m$, so
+\[
+ R_F\asymp\sqrt m
+ =d^{[2-\beta(1-\alpha)]/(2\alpha)}.
+\]
+The endpoint $\alpha=1$ was evaluated in
+\eqref{eq:endpoint-scale}.  This proves the phase diagram in
+Theorem~\ref{thm:main}.
+
+\section{Probability ledger and logical closure}
+
+The proof uses the following events.  They are intersected
+casewise: the clipped-comparison rows are used only for $\alpha<1$,
+whereas the head-memory and block rows are used only for $\alpha=1$.
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Event & Content & Failure probability\\
+\hline
+Existence & unique finite minimizer & $e^{-c_{\rm ex}N}$\\
+Key free energy & \eqref{eq:free-energy-lower}, uniformly in $y$ & $e^{-cN}+e^{-cd}$\\
+Weighted query moments & \eqref{eq:weighted-cov}--\eqref{eq:weighted-fourth} & $d^{-30}$\\
+Bilinear/gradient bounds & Lemmas \ref{lem:bilinear}--\ref{lem:gradient} & $e^{-cd}$\\
+Clipped comparison & Lemma \ref{lem:comparison} & $d^{-20}+e^{-cN}$\\
+Head frame & \eqref{eq:head-frame} & $d^{-25}$\\
+Endpoint head memory & \eqref{eq:head-margin}--\eqref{eq:tail-logit} & $d^{-40}$\\
+Endpoint block & \eqref{eq:block-coercivity} & $e^{-cd}$\\
+\hline
+\end{tabular}
+\end{center}
+For $\alpha<1$, take the intersection of
+$\mathcal E_{\rm ex}$, the key free-energy event, the weighted-query
+event for the single deterministic tail $T$, the finitely many
+bilinear/gradient events used above, the clipped-comparison event, and
+the head-frame event.  For $\alpha=1$, take the intersection of
+$\mathcal E_{\rm ex}$, the head-memory event, the gradient event for
+the deterministic set $T_1$, and the endpoint block event.  A union
+bound, together with $e^{-cd}\leq d^{-c_0}$ for a suitable fixed
+$c_0>0$ and all sufficiently large $d$, gives
+\[
+ \Pp\!\left(
+ \mathcal E_{\rm ex}\cap
+ \{h^{-C}R_F\leq\norm{W_\star}_{\F}\leq h^CR_F\}
+ \right)
+ \geq1-d^{-c_0}-e^{-cN}.
+\]
+Every estimate applied to $W_\star$ is deterministic or uniform over
+all $W$.  The comparison matrix $W_0$ uses deterministic coefficients
+$b_i$.  In the two conditional Bernstein arguments, conditioning is
+only on the explicitly listed Gaussian vectors; the global norm and
+inner-product events are intersected afterward.  Hence no residual
+involving the adaptive minimizer is treated as independent, and the
+argument does not assume the clipping behavior it proves at the
+norm-scale level.
+
+\begin{thebibliography}{9}
+\bibitem{existence}
+Companion note, \emph{Finite Existence and Uniqueness of the Gaussian
+Softmax Associative-Memory Minimizer}, existence-and-uniqueness theorem.
+
+\bibitem{tropp}
+J.~A. Tropp,
+\emph{User-Friendly Tail Bounds for Sums of Random Matrices},
+Foundations of Computational Mathematics, 2012.
+
+\bibitem{vershynin}
+R.~Vershynin,
+\emph{High-Dimensional Probability},
+Cambridge University Press, 2018.
+
+\bibitem{janson}
+S.~Janson,
+\emph{Gaussian Hilbert Spaces},
+Cambridge University Press, 1997.
+\end{thebibliography}
+
+\end{document}
