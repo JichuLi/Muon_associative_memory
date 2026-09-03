@@ -1,0 +1,10 @@
+{
+  "case_id": "sampled_onehot",
+  "method": "lbfgs",
+  "step": 40,
+  "loss": 0.7442765187798236,
+  "gradient_fro": 0.0004394485520699281,
+  "best_loss": 0.7442765187798236,
+  "best_step": 38,
+  "updated": 1788363068.1860187
+}

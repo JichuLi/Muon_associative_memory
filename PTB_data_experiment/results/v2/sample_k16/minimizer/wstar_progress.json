@@ -1,0 +1,10 @@
+{
+  "case_id": "sample_k16",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 4.6787792709267615,
+  "gradient_fro": 0.002665173120828189,
+  "best_loss": 4.6787792709267615,
+  "best_step": 60,
+  "updated": 1788343099.4835067
+}

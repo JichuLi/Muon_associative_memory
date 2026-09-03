@@ -1,0 +1,26 @@
+{
+  "n": 5000,
+  "conditional_entropy": 1.096989566458141,
+  "weighted_top1": 0.7426468288582448,
+  "target_entropy": 3.1329832997351037,
+  "mutual_information": 2.0359937332769626,
+  "context_top1000_mass": 0.8378658072178213,
+  "min_probability": 8.068090551205387e-07,
+  "max_column_sum_error": 4.882195980826509e-08,
+  "P_sha256": "6addfba7ce9269e42fcda9c1c741e2be42a3d13ab5302a23920c7b9929e79564",
+  "pi_sha256": "01ae30e1e8d3568e58d73871819710306c3f92449380d912426ebbf45e6d476d",
+  "corpus": "ptb",
+  "source_sha256": "f25c0206f08c4373d2f8df2943a492e7ccf284e1f8b51885209b673c49e5e29d",
+  "target_recipe": {
+    "kind": "class_block_soft",
+    "blocks": 32,
+    "background": 0.05
+  },
+  "target_seed": 0,
+  "block_labels_sha256": "036391de22e2f6e1b65b586df97aaf395dd72d112f56cfb83e20a2b02809a75e",
+  "argmax_labels_sha256": "b3bc366445d6458cec0600794242f42d1d19a3315ae790d896562609a357c71b",
+  "blocks": 32,
+  "background": 0.05,
+  "target_marginal_tv_from_source": 0.4562951036137145,
+  "context_marginal_tv_from_source": 0.0
+}

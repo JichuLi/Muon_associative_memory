@@ -1,0 +1,10 @@
+{
+  "case_id": "association_0.5",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 7.4784458282184385,
+  "gradient_fro": 0.00040582484949945743,
+  "best_loss": 7.4784458282184385,
+  "best_step": 60,
+  "updated": 1788343938.926794
+}

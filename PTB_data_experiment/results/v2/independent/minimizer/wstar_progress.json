@@ -1,0 +1,10 @@
+{
+  "case_id": "independent",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 7.732634821493412,
+  "gradient_fro": 0.0003259864943836913,
+  "best_loss": 7.732634821493412,
+  "best_step": 53,
+  "updated": 1788363280.493006
+}

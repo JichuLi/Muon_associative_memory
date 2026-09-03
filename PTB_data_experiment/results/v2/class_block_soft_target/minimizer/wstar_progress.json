@@ -1,0 +1,10 @@
+{
+  "case_id": "class_block_soft_target",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 3.0444249812329014,
+  "gradient_fro": 0.00044165319211111095,
+  "best_loss": 3.0444249812329014,
+  "best_step": 54,
+  "updated": 1788362887.833254
+}

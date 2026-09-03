@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+
+# Local runtime controls/logs.
+PAUSE
+STOP_AFTER_RUN
+results/telemetry.jsonl
+results/resource_pause.json
+results/*.tmp

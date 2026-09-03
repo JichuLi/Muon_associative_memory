@@ -1,0 +1,10 @@
+{
+  "case_id": "tail_background_soft_target",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 7.568824424085116,
+  "gradient_fro": 0.00048764657697535025,
+  "best_loss": 7.568824424085116,
+  "best_step": 60,
+  "updated": 1788361145.9945111
+}

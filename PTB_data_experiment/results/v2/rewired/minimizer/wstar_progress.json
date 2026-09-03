@@ -1,0 +1,10 @@
+{
+  "case_id": "rewired",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 7.703647047949754,
+  "gradient_fro": 0.00038993619172733357,
+  "best_loss": 7.703647047949754,
+  "best_step": 55,
+  "updated": 1788363218.2486942
+}

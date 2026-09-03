@@ -1,0 +1,10 @@
+{
+  "case_id": "prototype_32",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 7.241104012345248,
+  "gradient_fro": 0.0005427577303055009,
+  "best_loss": 7.241104012345248,
+  "best_step": 60,
+  "updated": 1788346379.6496756
+}

@@ -1,0 +1,40 @@
+{
+  "case": {
+    "id": "class_block_soft_target",
+    "family": "shared_structure_new",
+    "stage": 1,
+    "target": {
+      "kind": "class_block_soft",
+      "blocks": 32,
+      "background": 0.05
+    },
+    "bias": {
+      "kind": "zero"
+    },
+    "geometry": {
+      "kind": "original"
+    },
+    "target_seeds": [
+      0
+    ],
+    "rep_seeds": [
+      0
+    ],
+    "methods": [
+      "gd_ls",
+      "muon_ls",
+      "h0_ls",
+      "signgd_ls",
+      "gd_const",
+      "ngd_const",
+      "muon_const",
+      "h0_const",
+      "signgd_const"
+    ],
+    "role": "ptb_v2",
+    "required": true,
+    "estimated_seconds": 900,
+    "diagnostics_preconditioners": true
+  },
+  "zero_bias": true
+}

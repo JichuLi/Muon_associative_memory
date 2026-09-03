@@ -1,0 +1,10 @@
+{
+  "case_id": "frequency_matched_random_onehot",
+  "method": "lbfgs",
+  "step": 20,
+  "loss": 0.18058174770477384,
+  "gradient_fro": 0.0007261451975582304,
+  "best_loss": 0.18058174770477384,
+  "best_step": 20,
+  "updated": 1788352912.2544906
+}

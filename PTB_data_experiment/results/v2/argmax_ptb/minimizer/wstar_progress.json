@@ -1,0 +1,10 @@
+{
+  "case_id": "argmax_ptb",
+  "method": "lbfgs",
+  "step": 40,
+  "loss": 1.4601284422256002,
+  "gradient_fro": 0.00041530253691496647,
+  "best_loss": 1.4601284422256002,
+  "best_step": 40,
+  "updated": 1788348011.0613005
+}

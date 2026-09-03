@@ -1,0 +1,40 @@
+{
+  "case": {
+    "id": "prototype_32",
+    "family": "shared_structure",
+    "stage": 1,
+    "target": {
+      "kind": "prototype",
+      "k": 32,
+      "residual": 0
+    },
+    "bias": {
+      "kind": "zero"
+    },
+    "geometry": {
+      "kind": "original"
+    },
+    "target_seeds": [
+      0
+    ],
+    "rep_seeds": [
+      0
+    ],
+    "methods": [
+      "gd_ls",
+      "muon_ls",
+      "h0_ls",
+      "signgd_ls",
+      "gd_const",
+      "ngd_const",
+      "muon_const",
+      "h0_const",
+      "signgd_const"
+    ],
+    "role": "ptb_v2",
+    "required": true,
+    "estimated_seconds": 450,
+    "diagnostics_preconditioners": false
+  },
+  "zero_bias": true
+}

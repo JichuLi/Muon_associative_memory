@@ -1,0 +1,131 @@
+{
+  "case_id": "context_gamma0.5",
+  "planned_figures": [
+    {
+      "path": "figures/v2/context_gamma0.5/loss/loss_vs_step_auc_selected.png",
+      "criterion": "auc",
+      "metric": "raw training cross-entropy loss versus optimizer update step",
+      "how_plotted": "Curves use the LR selected by the named criterion. A dotted L(W*) reference line is drawn whenever an independent W* reference loss is available; the legend records whether it is `solved` or approximate.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/optimizer_dynamics_auc_selected.png",
+      "criterion": "auc",
+      "metric": "eta, Frobenius update length, gradient norm, prediction entropy, prediction marginal TV, and top-32 gradient spectral energy",
+      "how_plotted": "The first three panels come from the full trace; the last three come from selected-run diagnostic snapshots.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/frequency_ce_auc_selected.png",
+      "criterion": "auc",
+      "metric": "within-bucket CE for head, middle, and tail context-frequency buckets",
+      "how_plotted": "Contexts are sorted by target pi; head is the first 20 percent, middle the next 40 percent, and tail the last 40 percent.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/geometry_auc_selected.png",
+      "criterion": "auc",
+      "metric": "directional curvature, current-to-initial curvature ratio, gradient nuclear effective rank, and marginal-gradient ratio",
+      "how_plotted": "Curvature is measured along the actual update direction at each step; nuclear effective rank is computed from gradient singular values.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/gradient_spectra_auc_selected.png",
+      "criterion": "auc",
+      "metric": "gradient singular values normalized by the largest singular value at diagnostic steps",
+      "how_plotted": "The dotted line is the polar cutoff rtol=1e-7 used by Muon.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/heldout_auc_selected.png",
+      "criterion": "auc",
+      "metric": "held-out CE dynamics when a held-out count probe is attached",
+      "how_plotted": "This file is optional and appears only for cases that attach held-out evaluation counts.",
+      "optional": true
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/selection/lr_sweeps_auc.png",
+      "criterion": "auc",
+      "metric": "constant-LR sweep score for each constant optimizer",
+      "how_plotted": "The y-axis is the named selection score; the star marks the selected constant LR for that optimizer and criterion. For `auc`, this is exactly the legacy mean(log CE) score.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/loss/loss_vs_step_late_selected.png",
+      "criterion": "late",
+      "metric": "raw training cross-entropy loss versus optimizer update step",
+      "how_plotted": "Curves use the LR selected by the named criterion. A dotted L(W*) reference line is drawn whenever an independent W* reference loss is available; the legend records whether it is `solved` or approximate.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/optimizer_dynamics_late_selected.png",
+      "criterion": "late",
+      "metric": "eta, Frobenius update length, gradient norm, prediction entropy, prediction marginal TV, and top-32 gradient spectral energy",
+      "how_plotted": "The first three panels come from the full trace; the last three come from selected-run diagnostic snapshots.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/frequency_ce_late_selected.png",
+      "criterion": "late",
+      "metric": "within-bucket CE for head, middle, and tail context-frequency buckets",
+      "how_plotted": "Contexts are sorted by target pi; head is the first 20 percent, middle the next 40 percent, and tail the last 40 percent.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/geometry_late_selected.png",
+      "criterion": "late",
+      "metric": "directional curvature, current-to-initial curvature ratio, gradient nuclear effective rank, and marginal-gradient ratio",
+      "how_plotted": "Curvature is measured along the actual update direction at each step; nuclear effective rank is computed from gradient singular values.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/gradient_spectra_late_selected.png",
+      "criterion": "late",
+      "metric": "gradient singular values normalized by the largest singular value at diagnostic steps",
+      "how_plotted": "The dotted line is the polar cutoff rtol=1e-7 used by Muon.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/dynamics/heldout_late_selected.png",
+      "criterion": "late",
+      "metric": "held-out CE dynamics when a held-out count probe is attached",
+      "how_plotted": "This file is optional and appears only for cases that attach held-out evaluation counts.",
+      "optional": true
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/selection/lr_sweeps_late.png",
+      "criterion": "late",
+      "metric": "constant-LR sweep score for each constant optimizer",
+      "how_plotted": "The y-axis is the named selection score; the star marks the selected constant LR for that optimizer and criterion. For `auc`, this is exactly the legacy mean(log CE) score.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/minimizer/wstar_scalar_properties.png",
+      "criterion": null,
+      "metric": "scalar properties of the reference W*",
+      "how_plotted": "Shows reference loss, gradient norm, matrix norms, stable rank, nuclear effective rank, threshold ranks, alignments, prediction entropy, prediction marginal TV, and bucket CE summaries.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/minimizer/wstar_singular_values.png",
+      "criterion": null,
+      "metric": "singular values of the reference W*",
+      "how_plotted": "Two panels show raw singular values and values normalized by the largest singular value; the vertical dotted line marks stable rank ||W||_F^2/||W||_op^2.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/minimizer/wstar_bucket_ce.png",
+      "criterion": null,
+      "metric": "head/middle/tail context-bucket CE at W*",
+      "how_plotted": "Uses the same context-frequency buckets as the frequency dynamics plot.",
+      "optional": false
+    },
+    {
+      "path": "figures/v2/context_gamma0.5/minimizer/wstar_solver_traces.png",
+      "criterion": null,
+      "metric": "reference solver loss and gradient norm versus reference descent step",
+      "how_plotted": "Shows the configured L-BFGS reference attempt used for the reported W* candidate.",
+      "optional": false
+    }
+  ]
+}

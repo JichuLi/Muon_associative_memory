@@ -1,0 +1,31 @@
+case_id,family,signature,current_run_rows,legacy_reusable_run_rows,missing_methods,estimated_seconds_remaining,estimated_minutes_remaining
+ptb,natural_conditional,f5f34bf8fc63dce23cf8,87,83,,180.0,3.0
+sampled_onehot,finite_support,d57f2eee77f102b8b2f8,87,65,,180.0,3.0
+hard_copy,copy_am,91af12627b6e305f0ce1,86,67,signgd_const,25.4,0.42
+soft_copy_05,copy_am,bf24800bc823502b21b2,87,65,,180.0,3.0
+rewired,null_no_association,3d9be2de67256ce4179c,87,65,,180.0,3.0
+independent,null_no_association,49e5a0958ac1f18e9164,87,65,,180.0,3.0
+flat_context,context_frequency,c7bc28f8ec238daafed3,95,65,,180.0,3.0
+permuted_entries,matrix_geometry,75ab5236ed5c42ca6358,84,65,,180.0,3.0
+onehot_mix_0.5,finite_support,0bccff85bc8d35a80215,84,47,h0_const,199.7,3.33
+association_0.1,association_strength,16682c5a900f4cbd67de,87,47,h0_const,199.7,3.33
+rewire_mix_0.5,null_no_association,653a0aa961180688202d,90,47,h0_const,199.7,3.33
+context_gamma0.5,context_frequency,f8a6f9257ef90525fa63,92,47,h0_const,199.7,3.33
+onehot_mix_0.25,finite_support,a922b51beca5c7e9757e,84,47,h0_const signgd_const,219.1,3.65
+onehot_mix_0.75,finite_support,01b04f8d78624c2dbfb3,84,47,h0_const,199.7,3.33
+sample_k4,finite_support,7e1fa4cf03d50dcb88d0,84,47,h0_const signgd_const,219.1,3.65
+sample_k16,finite_support,a04cce5c16652871f186,89,47,h0_const,199.7,3.33
+association_0.5,association_strength,1d2d15e11ab513b4a021,90,47,h0_const,199.7,3.33
+context_gamma2,context_frequency,291862838e2fd714f7a2,84,47,h0_const signgd_const,219.1,3.65
+copy_assoc_0.1,copy_am,bb6e353373d21ecbdf7f,84,47,h0_const signgd_const,219.1,3.65
+prototype_32,shared_structure,c5a3567afd3dc40f5bb0,90,47,h0_const,199.7,3.33
+argmax_ptb,finite_support_new,72c73b93afbfc378d838,99,0,gd_const,199.4,3.32
+top2_renormalized,finite_support_new,db8071087f296c16a212,87,0,gd_const ngd_const signgd_const,238.0,3.97
+top8_renormalized,finite_support_new,09469f357c6a320709c3,87,0,gd_const ngd_const h0_const,238.3,3.97
+frequency_matched_random_onehot,random_control_new,a2d31ece826198bd340a,88,0,gd_const ngd_const h0_const signgd_const,244.8,4.08
+frequency_matched_random_soft_k4,random_control_new,cb3ae200a008aec83227,81,0,gd_const ngd_const muon_const h0_const signgd_const,285.1,4.75
+random_context_column_permutation,alignment_new,4fbbb7029e0f40f5a094,90,0,ngd_const h0_const,218.9,3.65
+anti_frequency_entropy_alignment,alignment_new,06346e391ed7ef04eeba,97,0,gd_const,199.4,3.32
+head_background_soft_target,background_new,368be40f6fc264a994a3,87,0,gd_const ngd_const h0_const,238.3,3.97
+tail_background_soft_target,background_new,351d2b044677ef53ad78,92,0,gd_const h0_const,219.1,3.65
+class_block_soft_target,shared_structure_new,e795cd9215cb5f927902,86,0,gd_const ngd_const muon_const h0_const,265.8,4.43

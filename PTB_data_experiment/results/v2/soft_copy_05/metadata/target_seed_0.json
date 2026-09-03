@@ -1,0 +1,21 @@
+{
+  "n": 5000,
+  "conditional_entropy": 3.692742457029194,
+  "weighted_top1": 0.5094644621910269,
+  "target_entropy": 6.075050874762807,
+  "mutual_information": 2.382308417733613,
+  "context_top1000_mass": 0.8378658072178213,
+  "min_probability": 8.068090210144874e-06,
+  "max_column_sum_error": 7.231665222207084e-08,
+  "P_sha256": "2c6b9ad0b4bde738c362f9f1cc3743a1920bd46c9296df5647de371f5f798f85",
+  "pi_sha256": "01ae30e1e8d3568e58d73871819710306c3f92449380d912426ebbf45e6d476d",
+  "corpus": "ptb",
+  "source_sha256": "f25c0206f08c4373d2f8df2943a492e7ccf284e1f8b51885209b673c49e5e29d",
+  "target_recipe": {
+    "kind": "copy",
+    "association": 0.5
+  },
+  "target_seed": 0,
+  "target_marginal_tv_from_source": 1.082241949703261e-06,
+  "context_marginal_tv_from_source": 0.0
+}

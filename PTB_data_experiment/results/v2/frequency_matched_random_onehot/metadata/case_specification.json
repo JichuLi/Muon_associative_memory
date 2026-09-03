@@ -1,0 +1,38 @@
+{
+  "case": {
+    "id": "frequency_matched_random_onehot",
+    "family": "random_control_new",
+    "stage": 1,
+    "target": {
+      "kind": "frequency_matched_onehot"
+    },
+    "bias": {
+      "kind": "zero"
+    },
+    "geometry": {
+      "kind": "original"
+    },
+    "target_seeds": [
+      0
+    ],
+    "rep_seeds": [
+      0
+    ],
+    "methods": [
+      "gd_ls",
+      "muon_ls",
+      "h0_ls",
+      "signgd_ls",
+      "gd_const",
+      "ngd_const",
+      "muon_const",
+      "h0_const",
+      "signgd_const"
+    ],
+    "role": "ptb_v2",
+    "required": true,
+    "estimated_seconds": 900,
+    "diagnostics_preconditioners": true
+  },
+  "zero_bias": true
+}

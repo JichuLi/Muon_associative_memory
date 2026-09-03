@@ -1,0 +1,10 @@
+{
+  "case_id": "ptb",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 6.856622551012292,
+  "gradient_fro": 0.0009047690650234012,
+  "best_loss": 6.856622551012292,
+  "best_step": 60,
+  "updated": 1788363006.8704135
+}

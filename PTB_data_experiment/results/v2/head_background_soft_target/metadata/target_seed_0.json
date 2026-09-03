@@ -1,0 +1,26 @@
+{
+  "n": 5000,
+  "conditional_entropy": 4.762561066960066,
+  "weighted_top1": 0.1671384175056939,
+  "target_entropy": 5.840513559741841,
+  "mutual_information": 1.0779524927817752,
+  "context_top1000_mass": 0.8378658072178213,
+  "min_probability": 1.1295324675586471e-08,
+  "max_column_sum_error": 7.404938440203068e-08,
+  "P_sha256": "743b54b17e6dcca25d7028fdcac1d73b06ea8d04ea17818688aa34cc32ca4ec6",
+  "pi_sha256": "01ae30e1e8d3568e58d73871819710306c3f92449380d912426ebbf45e6d476d",
+  "corpus": "ptb",
+  "source_sha256": "f25c0206f08c4373d2f8df2943a492e7ccf284e1f8b51885209b673c49e5e29d",
+  "target_recipe": {
+    "kind": "background_mix",
+    "bucket": "head",
+    "count": 1000,
+    "background": 0.3
+  },
+  "target_seed": 0,
+  "background_bucket": "head",
+  "background_ids": 1000,
+  "background_mass_in_source": 0.8378658072178212,
+  "target_marginal_tv_from_source": 0.04864025948130849,
+  "context_marginal_tv_from_source": 0.0
+}
