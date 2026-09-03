@@ -1,0 +1,10 @@
+{
+  "case_id": "onehot_mix_0.75",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 6.069067881467821,
+  "gradient_fro": 0.002004183709980192,
+  "best_loss": 6.069067881467821,
+  "best_step": 60,
+  "updated": 1788341554.122936
+}

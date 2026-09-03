@@ -1,0 +1,21 @@
+{
+  "n": 5000,
+  "conditional_entropy": 5.1274453639648385,
+  "weighted_top1": 0.0971930499538016,
+  "target_entropy": 6.075051723351624,
+  "mutual_information": 0.9476063593867856,
+  "context_top1000_mass": 0.8378658072178213,
+  "min_probability": 1.61361786155112e-08,
+  "max_column_sum_error": 9.692252511683819e-08,
+  "P_sha256": "90432b07ef0456a0a7dee979c6b4564381e9c0fd2c3effa70ee0e9456865ad21",
+  "pi_sha256": "01ae30e1e8d3568e58d73871819710306c3f92449380d912426ebbf45e6d476d",
+  "corpus": "ptb",
+  "source_sha256": "f25c0206f08c4373d2f8df2943a492e7ccf284e1f8b51885209b673c49e5e29d",
+  "target_recipe": {
+    "kind": "rewire",
+    "mix": 1
+  },
+  "target_seed": 0,
+  "target_marginal_tv_from_source": 7.054125171585828e-09,
+  "context_marginal_tv_from_source": 0.0
+}

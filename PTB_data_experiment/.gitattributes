@@ -1,0 +1,4 @@
+*.png binary
+*.pt binary
+*.npz binary
+*.sqlite binary

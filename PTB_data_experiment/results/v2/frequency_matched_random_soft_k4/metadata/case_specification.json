@@ -1,0 +1,40 @@
+{
+  "case": {
+    "id": "frequency_matched_random_soft_k4",
+    "family": "random_control_new",
+    "stage": 1,
+    "target": {
+      "kind": "frequency_matched_soft_k",
+      "k": 4,
+      "bin_size": 8
+    },
+    "bias": {
+      "kind": "zero"
+    },
+    "geometry": {
+      "kind": "original"
+    },
+    "target_seeds": [
+      0
+    ],
+    "rep_seeds": [
+      0
+    ],
+    "methods": [
+      "gd_ls",
+      "muon_ls",
+      "h0_ls",
+      "signgd_ls",
+      "gd_const",
+      "ngd_const",
+      "muon_const",
+      "h0_const",
+      "signgd_const"
+    ],
+    "role": "ptb_v2",
+    "required": true,
+    "estimated_seconds": 900,
+    "diagnostics_preconditioners": false
+  },
+  "zero_bias": true
+}

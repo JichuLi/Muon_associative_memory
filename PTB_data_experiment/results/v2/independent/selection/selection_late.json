@@ -1,0 +1,103 @@
+{
+  "gd_ls": {
+    "lr": null,
+    "late": 7.782528500820876
+  },
+  "muon_ls": {
+    "lr": null,
+    "late": 7.831242150074692
+  },
+  "h0_ls": {
+    "lr": null,
+    "late": 7.731269772044188
+  },
+  "signgd_ls": {
+    "lr": null,
+    "late": 7.800669082025285
+  },
+  "gd_const": {
+    "lr": 421.6965034285823,
+    "late": 7.776052836187391,
+    "candidates": 15,
+    "grid_min": 10.0,
+    "grid_max": 100000.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "ngd_const": {
+    "lr": 4.216965034285822,
+    "late": 7.7777309245687105,
+    "candidates": 18,
+    "grid_min": 0.1,
+    "grid_max": 1000.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "muon_const": {
+    "lr": 1.778279410038923,
+    "late": 7.745685613067991,
+    "candidates": 15,
+    "grid_min": 0.01,
+    "grid_max": 100.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "h0_const": {
+    "lr": 0.1,
+    "late": 7.731269793006838,
+    "candidates": 17,
+    "grid_min": 0.001,
+    "grid_max": 100.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "signgd_const": {
+    "lr": 0.0133352143216,
+    "late": 7.805878044124404,
+    "candidates": 18,
+    "grid_min": 0.001,
+    "grid_max": 10.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  }
+}

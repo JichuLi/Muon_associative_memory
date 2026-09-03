@@ -1,0 +1,99 @@
+{
+  "gd_ls": {
+    "lr": null
+  },
+  "muon_ls": {
+    "lr": null
+  },
+  "h0_ls": {
+    "lr": null
+  },
+  "signgd_ls": {
+    "lr": null
+  },
+  "gd_const": {
+    "lr": 421.6965034285823,
+    "auc": 2.03346555238045,
+    "candidates": 15,
+    "grid_min": 10.0,
+    "grid_max": 100000.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "ngd_const": {
+    "lr": 7.498942093324558,
+    "auc": 2.0330659976269683,
+    "candidates": 18,
+    "grid_min": 0.1,
+    "grid_max": 1000.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "muon_const": {
+    "lr": 3.1622776601683795,
+    "auc": 2.0244268972359887,
+    "candidates": 18,
+    "grid_min": 0.01,
+    "grid_max": 100.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "h0_const": {
+    "lr": 0.0749894209333,
+    "auc": 2.0157849831190124,
+    "candidates": 17,
+    "grid_min": 0.001,
+    "grid_max": 100.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  },
+  "signgd_const": {
+    "lr": 0.0237137370566,
+    "auc": 2.038617148549551,
+    "candidates": 18,
+    "grid_min": 0.001,
+    "grid_max": 10.0,
+    "refinement_offsets": [
+      -0.375,
+      -0.25,
+      -0.125,
+      0.125,
+      0.25,
+      0.375
+    ],
+    "flat_objective": false,
+    "grid_boundary": false
+  }
+}

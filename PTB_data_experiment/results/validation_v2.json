@@ -1,0 +1,320 @@
+{
+  "ok": true,
+  "errors": [],
+  "planned_cases": 30,
+  "optimizer_count": 9,
+  "expected_methods": [
+    "gd_const",
+    "gd_ls",
+    "h0_const",
+    "h0_ls",
+    "muon_const",
+    "muon_ls",
+    "ngd_const",
+    "signgd_const",
+    "signgd_ls"
+  ],
+  "rows": [
+    {
+      "case_id": "ptb",
+      "family": "natural_conditional",
+      "target_kind": "ptb",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 8.911383467203395e-09
+    },
+    {
+      "case_id": "sampled_onehot",
+      "family": "finite_support",
+      "target_kind": "sample_k",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 0.47582800122204677
+    },
+    {
+      "case_id": "hard_copy",
+      "family": "copy_am",
+      "target_kind": "copy",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 1.0757453839729814e-06
+    },
+    {
+      "case_id": "soft_copy_05",
+      "family": "copy_am",
+      "target_kind": "copy",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 8.068090210144874e-06,
+      "max_column_sum_error": 7.231665222207084e-08,
+      "target_marginal_tv_from_source": 1.082241949701018e-06
+    },
+    {
+      "case_id": "rewired",
+      "family": "null_no_association",
+      "target_kind": "rewire",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 9.692252511683819e-08,
+      "target_marginal_tv_from_source": 7.054125171585828e-09
+    },
+    {
+      "case_id": "independent",
+      "family": "null_no_association",
+      "target_kind": "association",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.6136180420289747e-05,
+      "max_column_sum_error": 2.8703652787953615e-09,
+      "target_marginal_tv_from_source": 9.48134823534151e-09
+    },
+    {
+      "case_id": "flat_context",
+      "family": "context_frequency",
+      "target_kind": "context_frequency",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 0.21876401554481995
+    },
+    {
+      "case_id": "permuted_entries",
+      "family": "matrix_geometry",
+      "target_kind": "ptb",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 8.911383467203395e-09
+    },
+    {
+      "case_id": "onehot_mix_0.5",
+      "family": "finite_support",
+      "target_kind": "onehot_mix",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 7.729977369308472e-08,
+      "target_marginal_tv_from_source": 0.2379139983467622
+    },
+    {
+      "case_id": "association_0.1",
+      "family": "association_strength",
+      "target_kind": "association",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.4522563105856534e-05,
+      "max_column_sum_error": 1.578700903337449e-08,
+      "target_marginal_tv_from_source": 5.2524985866677574e-09
+    },
+    {
+      "case_id": "rewire_mix_0.5",
+      "family": "null_no_association",
+      "target_kind": "rewire",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 9.251269439403131e-08,
+      "target_marginal_tv_from_source": 7.420793270589401e-09
+    },
+    {
+      "case_id": "context_gamma0.5",
+      "family": "context_frequency",
+      "target_kind": "context_frequency",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 0.1630589326866522
+    },
+    {
+      "case_id": "onehot_mix_0.25",
+      "family": "finite_support",
+      "target_kind": "onehot_mix",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 5.2212271839380264e-08,
+      "target_marginal_tv_from_source": 0.35687100071481404
+    },
+    {
+      "case_id": "onehot_mix_0.75",
+      "family": "finite_support",
+      "target_kind": "onehot_mix",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 8.940696716308594e-08,
+      "target_marginal_tv_from_source": 0.11895699902914825
+    },
+    {
+      "case_id": "sample_k4",
+      "family": "finite_support",
+      "target_kind": "sample_k",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 0.36998326140182525
+    },
+    {
+      "case_id": "sample_k16",
+      "family": "finite_support",
+      "target_kind": "sample_k",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 0.2737353133861452
+    },
+    {
+      "case_id": "association_0.5",
+      "family": "association_strength",
+      "target_kind": "association",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 8.068090210144874e-06,
+      "max_column_sum_error": 6.955906428629532e-08,
+      "target_marginal_tv_from_source": 3.701426922000814e-09
+    },
+    {
+      "case_id": "context_gamma2",
+      "family": "context_frequency",
+      "target_kind": "context_frequency",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 0.13602147890801977
+    },
+    {
+      "case_id": "copy_assoc_0.1",
+      "family": "copy_am",
+      "target_kind": "copy",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.4522563105856534e-05,
+      "max_column_sum_error": 8.139977580867708e-09,
+      "target_marginal_tv_from_source": 1.082774730046772e-06
+    },
+    {
+      "case_id": "prototype_32",
+      "family": "shared_structure",
+      "target_kind": "prototype",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.6136180391868038e-08,
+      "max_column_sum_error": 3.056666209033665e-08,
+      "target_marginal_tv_from_source": 9.912514864309006e-09
+    },
+    {
+      "case_id": "argmax_ptb",
+      "family": "finite_support_new",
+      "target_kind": "argmax",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 0.5355006734166102
+    },
+    {
+      "case_id": "top2_renormalized",
+      "family": "finite_support_new",
+      "target_kind": "top_k",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 7.450580596923828e-08,
+      "target_marginal_tv_from_source": 0.4730272075410655
+    },
+    {
+      "case_id": "top8_renormalized",
+      "family": "finite_support_new",
+      "target_kind": "top_k",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 7.078051567077637e-08,
+      "target_marginal_tv_from_source": 0.35316305787668534
+    },
+    {
+      "case_id": "frequency_matched_random_onehot",
+      "family": "random_control_new",
+      "target_kind": "frequency_matched_onehot",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 0.0445713584943007
+    },
+    {
+      "case_id": "frequency_matched_random_soft_k4",
+      "family": "random_control_new",
+      "target_kind": "frequency_matched_soft_k",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 0.0,
+      "max_column_sum_error": 0.0,
+      "target_marginal_tv_from_source": 0.09691390164244805
+    },
+    {
+      "case_id": "random_context_column_permutation",
+      "family": "alignment_new",
+      "target_kind": "context_column_permutation",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 0.35213830442571764
+    },
+    {
+      "case_id": "anti_frequency_entropy_alignment",
+      "family": "alignment_new",
+      "target_kind": "entropy_context_alignment",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.61361786155112e-08,
+      "max_column_sum_error": 7.331722784442718e-08,
+      "target_marginal_tv_from_source": 0.4957400405965708
+    },
+    {
+      "case_id": "head_background_soft_target",
+      "family": "background_new",
+      "target_kind": "background_mix",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 1.1295324675586471e-08,
+      "max_column_sum_error": 7.404938440203068e-08,
+      "target_marginal_tv_from_source": 0.04864025948130849
+    },
+    {
+      "case_id": "tail_background_soft_target",
+      "family": "background_new",
+      "target_kind": "background_mix",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 2.1837628594312264e-08,
+      "max_column_sum_error": 7.299869331234277e-08,
+      "target_marginal_tv_from_source": 0.2866860369025892
+    },
+    {
+      "case_id": "class_block_soft_target",
+      "family": "shared_structure_new",
+      "target_kind": "class_block_soft",
+      "zero_bias": true,
+      "corpus": "ptb",
+      "min_probability": 8.068090551205387e-07,
+      "max_column_sum_error": 4.882195980826509e-08,
+      "target_marginal_tv_from_source": 0.4562951036137145
+    }
+  ],
+  "updated": 1788407686.1081288
+}

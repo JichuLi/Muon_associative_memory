@@ -1,0 +1,39 @@
+{
+  "case": {
+    "id": "anti_frequency_entropy_alignment",
+    "family": "alignment_new",
+    "stage": 1,
+    "target": {
+      "kind": "entropy_context_alignment",
+      "mode": "high_frequency_low_entropy"
+    },
+    "bias": {
+      "kind": "zero"
+    },
+    "geometry": {
+      "kind": "original"
+    },
+    "target_seeds": [
+      0
+    ],
+    "rep_seeds": [
+      0
+    ],
+    "methods": [
+      "gd_ls",
+      "muon_ls",
+      "h0_ls",
+      "signgd_ls",
+      "gd_const",
+      "ngd_const",
+      "muon_const",
+      "h0_const",
+      "signgd_const"
+    ],
+    "role": "ptb_v2",
+    "required": true,
+    "estimated_seconds": 900,
+    "diagnostics_preconditioners": false
+  },
+  "zero_bias": true
+}

@@ -1,0 +1,1237 @@
+{
+  "schema_version": 2,
+  "protocol_version": "mechanism-v1",
+  "study_version": "ptb-v2-signgd-h0-wstar",
+  "objective": "PTB-only mechanism map for which conditional distributions amplify Muon's benefit; reuse old compatible traces, add SignGD, complete H0, late-window selection, and W* references.",
+  "d": 256,
+  "steps": 200,
+  "vocab_size": 5000,
+  "normalize_features": true,
+  "dtype": "float32",
+  "loss_accumulation": "float64",
+  "tf32": false,
+  "polar_rtol": 1e-07,
+  "momentum": 0,
+  "weight_decay": 0,
+  "selection": {
+    "criteria": {
+      "auc": {
+        "kind": "mean_log_ce",
+        "start": 0,
+        "end": 200
+      },
+      "late": {
+        "kind": "mean_ce",
+        "start": 120,
+        "end": 150
+      }
+    },
+    "constant_lr_selected_independently_per_method_and_criterion": true,
+    "line_search_has_no_lr_selection": true
+  },
+  "lr_log10_grids": {
+    "gd_const": [
+      1,
+      5,
+      9
+    ],
+    "ngd_const": [
+      -1,
+      3,
+      9
+    ],
+    "muon_const": [
+      -2,
+      2,
+      9
+    ],
+    "h0_const": [
+      -3,
+      2,
+      11
+    ],
+    "signgd_const": [
+      -3,
+      1,
+      9
+    ]
+  },
+  "refinement_offsets": [
+    -0.375,
+    -0.25,
+    -0.125,
+    0.125,
+    0.25,
+    0.375
+  ],
+  "max_boundary_extensions": 8,
+  "boundary_log10_increment": 0.5,
+  "ray_bisections": 20,
+  "ray_max_expansions": 48,
+  "ray_max_fro": 1000000000000.0,
+  "diagnostic_steps": [
+    0,
+    20,
+    100,
+    120,
+    150,
+    200
+  ],
+  "same_state_steps": [
+    0,
+    20,
+    100,
+    120,
+    150
+  ],
+  "detailed_every": 20,
+  "wstar": {
+    "enabled": true,
+    "attempt_all_except_definitely_unbounded": true,
+    "skip_case_ids": [
+      "hard_copy"
+    ],
+    "skip_policy": "Only skip settings whose target is known to have no finite minimizer under the zero-bias softmax model. Other targets get a limited-budget reference attempt and are marked approximate if the solver cannot certify stationarity.",
+    "solver": "torch_lbfgs_strong_wolfe",
+    "reference_steps": 80,
+    "lbfgs_history_size": 20,
+    "lbfgs_max_eval_per_step": 8,
+    "lbfgs_line_search": "strong_wolfe",
+    "lbfgs_tolerance_change": 1e-09,
+    "lbfgs_stall_patience": 12,
+    "gradient_norm_goal": 1e-05
+  },
+  "outputs": {
+    "case_root": "results/v2/<case_id>",
+    "figure_root": "figures/v2/<case_id>",
+    "selection": "results/v2/<case_id>/selection",
+    "minimizer": "results/v2/<case_id>/minimizer",
+    "metadata": "results/v2/<case_id>/metadata",
+    "loss_figures": "figures/v2/<case_id>/loss",
+    "dynamics_figures": "figures/v2/<case_id>/dynamics",
+    "selection_figures": "figures/v2/<case_id>/selection",
+    "minimizer_figures": "figures/v2/<case_id>/minimizer"
+  },
+  "resources": {
+    "cpu_threads": 2,
+    "gpu_work_duty": 0.7,
+    "battery_work_duty": 0.4,
+    "monitor_interval_seconds": 30,
+    "guard_every_steps": 20,
+    "soft_temperature_c": 76,
+    "hard_temperature_c": 82,
+    "min_free_commit_gb": 1,
+    "min_free_disk_gb": 12,
+    "battery_pause_percent": 25,
+    "gpu_allocator_fraction": 0.32,
+    "deadline_unix": 1788932524
+  },
+  "storage": {
+    "database": "results/study_v2.sqlite",
+    "legacy_databases": [
+      "legacy/mechanism_v1_20260902/results/study.sqlite"
+    ],
+    "save_candidate_weights": false,
+    "save_dense_target_per_case": false,
+    "save_all_candidate_loss_curves": true,
+    "maximum_expected_output_gb": 4
+  },
+  "cases": [
+    {
+      "id": "ptb",
+      "family": "natural_conditional",
+      "stage": 1,
+      "target": {
+        "kind": "ptb",
+        "rho": 0.001
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": true
+    },
+    {
+      "id": "sampled_onehot",
+      "family": "finite_support",
+      "stage": 1,
+      "target": {
+        "kind": "sample_k",
+        "k": 1
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "hard_copy",
+      "family": "copy_am",
+      "stage": 1,
+      "target": {
+        "kind": "copy",
+        "association": 1
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": true
+    },
+    {
+      "id": "soft_copy_05",
+      "family": "copy_am",
+      "stage": 1,
+      "target": {
+        "kind": "copy",
+        "association": 0.5
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": true
+    },
+    {
+      "id": "rewired",
+      "family": "null_no_association",
+      "stage": 1,
+      "target": {
+        "kind": "rewire",
+        "mix": 1
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "independent",
+      "family": "null_no_association",
+      "stage": 1,
+      "target": {
+        "kind": "association",
+        "alpha": 0
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "flat_context",
+      "family": "context_frequency",
+      "stage": 1,
+      "target": {
+        "kind": "context_frequency",
+        "gamma": 0
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "permuted_entries",
+      "family": "matrix_geometry",
+      "stage": 1,
+      "target": {
+        "kind": "ptb",
+        "rho": 0.001
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "entry_permutation",
+        "fraction": 1
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": true
+    },
+    {
+      "id": "onehot_mix_0.5",
+      "family": "finite_support",
+      "stage": 1,
+      "target": {
+        "kind": "onehot_mix",
+        "alpha": 0.5
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "association_0.1",
+      "family": "association_strength",
+      "stage": 1,
+      "target": {
+        "kind": "association",
+        "alpha": 0.1
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "rewire_mix_0.5",
+      "family": "null_no_association",
+      "stage": 1,
+      "target": {
+        "kind": "rewire",
+        "mix": 0.5
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "context_gamma0.5",
+      "family": "context_frequency",
+      "stage": 1,
+      "target": {
+        "kind": "context_frequency",
+        "gamma": 0.5
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "onehot_mix_0.25",
+      "family": "finite_support",
+      "stage": 1,
+      "target": {
+        "kind": "onehot_mix",
+        "alpha": 0.25
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "onehot_mix_0.75",
+      "family": "finite_support",
+      "stage": 1,
+      "target": {
+        "kind": "onehot_mix",
+        "alpha": 0.75
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "sample_k4",
+      "family": "finite_support",
+      "stage": 1,
+      "target": {
+        "kind": "sample_k",
+        "k": 4
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "sample_k16",
+      "family": "finite_support",
+      "stage": 1,
+      "target": {
+        "kind": "sample_k",
+        "k": 16
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "association_0.5",
+      "family": "association_strength",
+      "stage": 1,
+      "target": {
+        "kind": "association",
+        "alpha": 0.5
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "context_gamma2",
+      "family": "context_frequency",
+      "stage": 1,
+      "target": {
+        "kind": "context_frequency",
+        "gamma": 2
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "copy_assoc_0.1",
+      "family": "copy_am",
+      "stage": 1,
+      "target": {
+        "kind": "copy",
+        "association": 0.1
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "prototype_32",
+      "family": "shared_structure",
+      "stage": 1,
+      "target": {
+        "kind": "prototype",
+        "k": 32,
+        "residual": 0
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 450,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "argmax_ptb",
+      "family": "finite_support_new",
+      "stage": 1,
+      "target": {
+        "kind": "argmax"
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "top2_renormalized",
+      "family": "finite_support_new",
+      "stage": 1,
+      "target": {
+        "kind": "top_k",
+        "k": 2,
+        "background": 0.0
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "top8_renormalized",
+      "family": "finite_support_new",
+      "stage": 1,
+      "target": {
+        "kind": "top_k",
+        "k": 8,
+        "background": 0.0
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "frequency_matched_random_onehot",
+      "family": "random_control_new",
+      "stage": 1,
+      "target": {
+        "kind": "frequency_matched_onehot"
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": true
+    },
+    {
+      "id": "frequency_matched_random_soft_k4",
+      "family": "random_control_new",
+      "stage": 1,
+      "target": {
+        "kind": "frequency_matched_soft_k",
+        "k": 4,
+        "bin_size": 8
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "random_context_column_permutation",
+      "family": "alignment_new",
+      "stage": 1,
+      "target": {
+        "kind": "context_column_permutation"
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "anti_frequency_entropy_alignment",
+      "family": "alignment_new",
+      "stage": 1,
+      "target": {
+        "kind": "entropy_context_alignment",
+        "mode": "high_frequency_low_entropy"
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "head_background_soft_target",
+      "family": "background_new",
+      "stage": 1,
+      "target": {
+        "kind": "background_mix",
+        "bucket": "head",
+        "count": 1000,
+        "background": 0.3
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "tail_background_soft_target",
+      "family": "background_new",
+      "stage": 1,
+      "target": {
+        "kind": "background_mix",
+        "bucket": "tail",
+        "count": 2000,
+        "background": 0.3
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": false
+    },
+    {
+      "id": "class_block_soft_target",
+      "family": "shared_structure_new",
+      "stage": 1,
+      "target": {
+        "kind": "class_block_soft",
+        "blocks": 32,
+        "background": 0.05
+      },
+      "bias": {
+        "kind": "zero"
+      },
+      "geometry": {
+        "kind": "original"
+      },
+      "target_seeds": [
+        0
+      ],
+      "rep_seeds": [
+        0
+      ],
+      "methods": [
+        "gd_ls",
+        "muon_ls",
+        "h0_ls",
+        "signgd_ls",
+        "gd_const",
+        "ngd_const",
+        "muon_const",
+        "h0_const",
+        "signgd_const"
+      ],
+      "role": "ptb_v2",
+      "required": true,
+      "estimated_seconds": 900,
+      "diagnostics_preconditioners": true
+    }
+  ],
+  "legacy": {
+    "path": "legacy/mechanism_v1_20260902",
+    "contains": [
+      "results",
+      "figures",
+      "REPORT.html"
+    ],
+    "reuse_policy": "copy compatible run rows and diagnostics by physics signature and run_id"
+  }
+}

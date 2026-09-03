@@ -1,0 +1,10 @@
+{
+  "case_id": "context_gamma2",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 6.522558327288471,
+  "gradient_fro": 0.0016724665740512766,
+  "best_loss": 6.522558327288471,
+  "best_step": 60,
+  "updated": 1788344745.0371885
+}

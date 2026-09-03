@@ -1,0 +1,10 @@
+{
+  "case_id": "anti_frequency_entropy_alignment",
+  "method": "lbfgs",
+  "step": 20,
+  "loss": 2.53585342861037,
+  "gradient_fro": 0.0009614446256110325,
+  "best_loss": 2.53585342861037,
+  "best_step": 20,
+  "updated": 1788357750.9832344
+}

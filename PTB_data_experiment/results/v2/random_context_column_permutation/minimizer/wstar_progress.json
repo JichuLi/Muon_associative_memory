@@ -1,0 +1,10 @@
+{
+  "case_id": "random_context_column_permutation",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 4.9251618199757194,
+  "gradient_fro": 0.005046236484502643,
+  "best_loss": 4.9251618199757194,
+  "best_step": 60,
+  "updated": 1788356082.2586043
+}

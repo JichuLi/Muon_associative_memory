@@ -1,0 +1,10 @@
+{
+  "case_id": "soft_copy_05",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 5.219718992532097,
+  "gradient_fro": 0.002394225008772497,
+  "best_loss": 5.219718992532097,
+  "best_step": 60,
+  "updated": 1788363143.8695114
+}

@@ -1,0 +1,15 @@
+{
+  "case_id": "hard_copy",
+  "protocol_signature": "91af12627b6e305f0ce1",
+  "target_seed": 0,
+  "rep_seed": 0,
+  "target_min_probability": 0.0,
+  "target_has_zero_support": true,
+  "target_sha256": "bf0db1b9484827f3163a8ebcd253c83ed4a4a5bc83def43d15e25c2599b1020d",
+  "pi_sha256": "01ae30e1e8d3568e58d73871819710306c3f92449380d912426ebbf45e6d476d",
+  "wstar_policy": "Only skip settings whose target is known to have no finite minimizer under the zero-bias softmax model. Zero-support targets are still attempted and marked approximate if the solver cannot certify stationarity.",
+  "updated": 1788331410.1103294,
+  "status": "skipped_definitely_no_finite_optimum",
+  "reference_loss": null,
+  "explanation": "This setting is treated as having no finite softmax minimizer under the zero-bias protocol, so no W* reference line is drawn."
+}

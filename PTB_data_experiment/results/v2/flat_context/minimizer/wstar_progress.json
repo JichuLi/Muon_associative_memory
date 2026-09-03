@@ -1,0 +1,10 @@
+{
+  "case_id": "flat_context",
+  "method": "lbfgs",
+  "step": 0,
+  "loss": 8.517193196289815,
+  "gradient_fro": 0.005516265402202459,
+  "best_loss": 8.517193196289815,
+  "best_step": 0,
+  "updated": 1788363303.1834295
+}

@@ -1,0 +1,10 @@
+{
+  "case_id": "top2_renormalized",
+  "method": "lbfgs",
+  "step": 60,
+  "loss": 2.595673479383213,
+  "gradient_fro": 0.005071292361830783,
+  "best_loss": 2.595673479383213,
+  "best_step": 60,
+  "updated": 1788349589.0241137
+}
