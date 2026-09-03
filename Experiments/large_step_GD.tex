@@ -1,0 +1,293 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    citecolor=blue!60!black,
+    urlcolor=blue!60!black
+]{hyperref}
+
+\newcommand{\loss}{\mathcal{L}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\img}[2][]{\includegraphics[#1]{\detokenize{#2}}}
+\newcommand{\panelcaption}[1]{\par\vspace{0.35em}{\small #1}}
+
+\title{Empirical Study of Large-Learning-Rate GD, Normalized GD, and Muon}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Experimental Setup}
+
+\paragraph{Goal of the experiments.}
+The experiments are designed to test whether the apparent advantage of Muon
+could be explained away by an insufficiently tuned GD baseline.  The first
+section gives GD favorable learning-rate schedules: constant steps scaled by
+the initial Hessian stability threshold, polynomial decay, and line search.
+The step-size trajectory of line-search GD is then used to motivate an
+explicit warm-up-stable GD schedule.  The second section removes the Hessian
+scaling altogether and sweeps very large absolute step sizes for GD and
+normalized GD, so that the comparison is not tied to a particular stability
+normalization.
+
+\paragraph{Problem instance and objective.}
+Each run uses $N=20000$ examples, dimensions $d\in\{64,128\}$, Zipf exponent
+$\alpha=1.5$, initialization $W_0=0$, and $120$ optimization steps.  For
+rank $i$,
+\[
+    u_i,v_i \overset{\mathrm{i.i.d.}}{\sim} \mathcal{N}(0,I_d/d),
+    \qquad
+    p_i=\frac{i^{-\alpha}}{\sum_{k=1}^N k^{-\alpha}}.
+\]
+For $W\in\R^{d\times d}$, define the score
+$s_{ji}(W)=u_j^\top Wv_i$.  The loss is the full-softmax weighted
+cross-entropy
+\[
+    \loss(W)
+    =
+    \sum_{i=1}^N p_i
+    \left[
+        \log\left(\sum_{j=1}^N \exp(s_{ji}(W))\right)
+        -
+        s_{ii}(W)
+    \right].
+\]
+Thus every query is compared against all $N$ classes.  The plotted losses are
+exact full-batch losses; no minibatching or negative sampling is used.
+
+\paragraph{Optimizers.}
+Let $g_t=-\nabla\loss(W_t)$.  All methods update
+\[
+    W_{t+1}=W_t+\eta_tD_t,
+\]
+but use different directions:
+\[
+    D_t^{\mathrm{GD}}=g_t,
+    \qquad
+    D_t^{\mathrm{NGD}}=\frac{g_t}{\|g_t\|_F},
+    \qquad
+    D_t^{\mathrm{Muon}}=\operatorname{Polar}(g_t).
+\]
+Here $\operatorname{Polar}(g_t)=UV^\top$ when
+$g_t=U\Sigma V^\top$ is the compact SVD.  In other words, GD uses the raw
+gradient magnitude, normalized GD keeps only the Frobenius-normalized gradient
+direction, and Muon replaces the gradient by its spectral polar factor.
+
+\paragraph{Learning-rate schedules in the first section.}
+The first section asks whether a strong schedule for raw GD can match Muon.
+To avoid handicapping GD with only small stable steps, define
+\[
+    \eta_{\mathrm{stab},0}
+    =
+    \frac{2}{\lambda_{\max}(H_0)},
+    \qquad
+    H_0=\nabla^2\loss(W_0).
+\]
+Constant GD uses $\eta_t=\rho\,\eta_{\mathrm{stab},0}$ with
+\[
+    \rho\in\{0.25,0.5,1,2,4,8,16\}.
+\]
+Decayed GD starts from a large Hessian-scaled step and then decreases it:
+\[
+    \eta_t
+    =
+    \frac{\rho\,\eta_{\mathrm{stab},0}}{(1+t/T)^p},
+    \qquad
+    \rho\in\{2,4,8,16\},\quad
+    T\in\{20,80\},\quad
+    p\in\{0.5,1,2\}.
+\]
+Exact line-search GD chooses $\eta_t$ along $D_t=g_t$ by approximately
+minimizing $\loss(W_t+\eta D_t)$ over $\eta\ge0$, using geometric bracketing
+with growth factor $2$ followed by $8$ bisection refinements.  The maximum
+GD line-search step in this comparison is $64\,\eta_{\mathrm{stab},0}$.
+The Muon baselines are constant-step Muon with
+\[
+    \eta\in\{0.25,0.5,1,1.5,2,3,4,5,6\}
+\]
+and line-search Muon along $D_t=\operatorname{Polar}(g_t)$ with maximum step
+$32$.
+
+\paragraph{Why add warm-up-stable GD.}
+The line-search GD step-size plots are not only a baseline; they also reveal a
+possible hand-designed schedule for GD.  Empirically, the selected line-search
+steps rise quickly from the initialization scale and then stay large for much
+of the trajectory.  To test whether this behavior, rather than the online line
+search itself, is enough to improve GD, we add the parametric schedule
+\[
+    \eta_t
+    =
+    \eta_{\mathrm{start}}
+    \left(
+        \frac{\eta_{\mathrm{hold}}}{\eta_{\mathrm{start}}}
+    \right)^{\min(t/W,1)^q},
+    \qquad
+    \eta_{\mathrm{start}}=\rho_{\mathrm{start}}\eta_{\mathrm{stab},0},
+    \qquad
+    \eta_{\mathrm{hold}}=\rho_{\mathrm{hold}}\eta_{\mathrm{stab},0}.
+\]
+Here the sweep uses
+\[
+    \rho_{\mathrm{start}}=1,\qquad
+    \rho_{\mathrm{hold}}\in\{8,16,32,64,96,128\},\qquad
+    W\in\{3,5,10\},\qquad
+    q\in\{1,2\}.
+\]
+This schedule is intentionally favorable to GD: it imitates the warm-up and
+large-hold pattern suggested by exact line search, but it does not use Muon or
+any spectral update direction.
+
+\paragraph{Large absolute-step sweep in the second section.}
+The second section addresses a different objection: perhaps scaling GD by
+$2/\lambda_{\max}(H_0)$ is itself too restrictive.  We therefore sweep
+absolute learning rates directly.  Constant GD uses
+\[
+\begin{aligned}
+    \eta\in\{&
+    0.25,0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,12,16,24,\\
+    &32,48,64,96,128,192,256,384,512,768,1024,1536,\\
+    &2048,3072,4096,6144,8192,12288\}.
+\end{aligned}
+\]
+Normalized GD uses
+\[
+    \eta\in\{1,2,4,8,12,16,24,32,48,64,96\}.
+\]
+The same constant-step Muon grid is used as the baseline.  The main
+large-step comparison also includes Muon line search and a small-step GD
+line-search baseline capped at $\eta\le2.99$, which separates the small-step
+regime from the aggressive large-step sweeps.
+
+\paragraph{Selection rule and plotted quantities.}
+The figures focus on two quantities: training loss and the selected step size
+$\eta_t$.  Local sharpness diagnostics are also recorded along each
+trajectory:
+\[
+    \widehat\lambda_{\max}(H(W_t)),
+    \qquad
+    \frac{2}{\widehat\lambda_{\max}(H(W_t))},
+\]
+estimated every $10$ steps by $3$ power iterations on a stratified subsample
+of $2048$ queries.  For each method family and dimension, the displayed best
+hyperparameter is selected by trajectory speed, not by final loss alone:
+\[
+    \operatorname{Score}(h)
+    =
+    \frac{1}{|\mathcal{S}|}
+    \sum_{s\in\mathcal{S}}
+    \frac{1}{121}
+    \sum_{t=0}^{120}
+    \log\bigl(\max\{\loss(W_t^{h,s}),10^{-30}\}\bigr).
+\]
+Unstable or missing trajectories receive a large penalty.  After this
+selection step, plotted curves show the mean over available seeds with a
+one-standard-deviation band.
+
+\section{GD-Friendly Learning-Rate Schedules}
+
+This section gives raw GD several increasingly favorable choices of step
+size.  The first figure compares the best constant, decayed, and line-search
+GD trajectories against constant and line-search Muon.  The next figure plots
+the corresponding step sizes, which is used to diagnose what schedule the
+line-search GD baseline is implicitly choosing.
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.9\linewidth]{figures/report_figures/schedule_loss_d64.png}
+    \par
+    \img[width=0.9\linewidth]{figures/report_figures/schedule_loss_d128.png}
+    \caption{Loss comparison among constant Muon, exact-line Muon, constant GD, decayed GD, and exact-line GD. Top: $d=64$. Bottom: $d=128$.}
+    \label{fig:schedule-loss}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\linewidth}
+        \centering
+        \img[width=\linewidth]{figures/report_figures/schedule_stepsize_d64.png}
+        \panelcaption{(a) $d=64$. Selected or prescribed step size $\eta_t$ for each displayed method family.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.49\linewidth}
+        \centering
+        \img[width=\linewidth]{figures/report_figures/schedule_stepsize_d128.png}
+        \panelcaption{(b) $d=128$. Selected or prescribed step size $\eta_t$ for each displayed method family.}
+    \end{minipage}
+    \caption{Step-size trajectories for the selected schedules.}
+    \label{fig:schedule-stepsize}
+\end{figure}
+
+The step-size curves motivate the warm-up-stable GD schedule in the setup:
+line-search GD rapidly increases the step size from the initialization scale
+and then keeps using a large step.  The following figure tests this
+line-search-inspired schedule as an explicit GD baseline.
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/warmup_stable_loss_d64.png}
+    \par\vspace{0.8em}
+    \img[width=0.88\linewidth]{figures/report_figures/warmup_stable_loss_d128.png}
+    \caption{Loss comparison after adding warm-up-stable GD. Top: $d=64$. Bottom: $d=128$.}
+    \label{fig:warmup-loss}
+\end{figure}
+
+\section{Large Learning-Rate Sweeps and Normalized GD}
+
+This section tests a more direct alternative: instead of parameterizing GD by
+the initial Hessian scale, it sweeps absolute learning rates over a wide range.
+The first two figures show the selected main comparisons.  The next two
+figures expose the full constant-GD sweep against the selected Muon baseline,
+and the last two figures repeat the same type of sweep for normalized GD.
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/large_lr_main_loss_d64.png}
+    \caption{$d=64$. Main loss comparison including large constant-step GD, normalized GD, and Muon baselines.}
+    \label{fig:large-sweep-loss-d64}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/large_lr_main_loss_d128.png}
+    \caption{$d=128$. Main loss comparison under the same large-step sweep protocol.}
+    \label{fig:large-sweep-loss-d128}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/gd_eta_sweep_vs_muon_best_d64.png}
+    \caption{$d=64$. Constant-GD absolute learning-rate sweep compared with the selected constant Muon curve.}
+    \label{fig:gd-eta-sweep-d64}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/gd_eta_sweep_vs_muon_best_d128.png}
+    \caption{$d=128$. Constant-GD absolute learning-rate sweep compared with the selected constant Muon curve.}
+    \label{fig:gd-eta-sweep-d128}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/normalized_gd_eta_sweep_vs_muon_best_d64.png}
+    \caption{$d=64$. Constant-step normalized-GD sweep compared with the selected constant Muon curve.}
+    \label{fig:normalized-gd-sweep-d64}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \img[width=0.88\linewidth]{figures/report_figures/normalized_gd_eta_sweep_vs_muon_best_d128.png}
+    \caption{$d=128$. Constant-step normalized-GD sweep compared with the selected constant Muon curve.}
+    \label{fig:normalized-gd-sweep-d128}
+\end{figure}
+
+\end{document}
