@@ -1,0 +1,1220 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\Frob}{\mathrm F}
+\newcommand{\one}{\mathbf 1}
+\newcommand{\cI}{\mathcal I}
+\newcommand{\cE}{\mathcal E}
+
+\title{Sharp Orders of the Minimum Gaussian Softmax Loss\\
+and of Its Improvement over the Null Loss}
+\author{Technical note}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let \(N=\lceil d^\beta\rceil\), where \(\beta>2\) is fixed, put
+\(D=d^2\) and \(h=\log N\), and take Zipf frequencies
+\(p_i=i^{-\alpha}/H_{N,\alpha}\) with fixed \(\alpha\geq0\).
+For the Gaussian softmax associative-memory loss, \(L(0)=h\).
+This note determines the sharp order of the optimal improvement
+\(\cI^\star=h-L^\star\) for \(0\leq\alpha\leq1\), and the sharp
+order of the residual loss \(L^\star\) for \(\alpha>1\).
+
+Below the critical point, the correct loss scale is
+\[
+ \Gamma_\alpha
+ :=\sum_{i=1}^Np_i\min\{h,Dp_i\}
+ =h\sum_{p_i\geq h/D}p_i
+   +D\sum_{p_i<h/D}p_i^2.
+\]
+We prove
+\[
+ h-L^\star=\Theta_{\alpha,\beta}(\Gamma_\alpha),
+ \qquad 0\leq\alpha<1.
+\]
+The threshold \(h/D\), rather than the radius threshold \(D^{-1}\),
+is forced by the fact that one query can improve by at most \(h\).
+At \(\alpha=1\),
+\[
+ h-L^\star=\frac{2}{\beta}h+O_\beta(\log h).
+\]
+For every fixed \(\alpha>1\),
+\[
+ L^\star
+ =\Theta_{\alpha,\beta}\!\left(D^{1-\alpha}h^\alpha\right).
+\]
+All logarithmic factors are displayed explicitly.  A proof sketch is
+given before the detailed arguments.
+\end{abstract}
+
+\section{Model and main theorem}
+\label{sec:model}
+
+Fix \(\beta>2\) and \(\alpha\geq0\), and set
+\[
+ N=\lceil d^\beta\rceil,\qquad D=d^2,\qquad h=\log N,
+ \qquad
+ H_{N,\alpha}=\sum_{k=1}^Nk^{-\alpha},
+ \qquad
+ p_i=\frac{i^{-\alpha}}{H_{N,\alpha}}.
+\]
+Let
+\[
+ u_1,\ldots,u_N,v_1,\ldots,v_N
+ \overset{\mathrm{ind}}{\sim}\mathcal N(0,I_d/d).
+\]
+For \(W\in\R^{d\times d}\), define
+\begin{align}
+ \ell_i(W)
+ &=
+ \log\left(1+\sum_{j\neq i}
+ \exp\bigl((u_j-u_i)^\top Wv_i\bigr)\right),\\
+ L(W)&=\sum_{i=1}^Np_i\ell_i(W),\\
+ L^\star&=\inf_{W\in\R^{d\times d}}L(W),
+ \qquad
+ \cI^\star=L(0)-L^\star=h-L^\star.
+ \label{eq:model}
+\end{align}
+Here \(L(0)=h\), since \(\ell_i(0)=\log N\).
+
+For \(0\leq\alpha<1\), introduce the loss-adapted clipping set
+\[
+ H_h:=\{i:p_i\geq h/D\},\qquad T_h:=[N]\setminus H_h,
+\]
+and the deterministic scale
+\begin{equation}
+ \Gamma_\alpha
+ :=h\sum_{i\in H_h}p_i+D\sum_{i\in T_h}p_i^2
+ =\sum_{i=1}^Np_i\min\{h,Dp_i\}.
+ \label{eq:Gamma-def}
+\end{equation}
+
+\begin{theorem}[Sharp loss and improvement orders]
+\label{thm:main}
+For every fixed \(\alpha\geq0\) and \(\beta>2\), there exist
+positive constants \(c_0,c_1\), depending only on
+\((\alpha,\beta)\), such that the following statements hold with
+probability at least
+\[
+ 1-d^{-c_0}-e^{-c_1N}
+\]
+for all sufficiently large \(d\).
+
+\begin{enumerate}[label=(\roman*)]
+\item If \(0\leq\alpha<1\), then
+\begin{equation}
+ \boxed{\qquad
+ h-L^\star
+ =\Theta_{\alpha,\beta}(\Gamma_\alpha),
+ \qquad
+ L^\star=h-\Theta_{\alpha,\beta}(\Gamma_\alpha).
+ \qquad}
+ \label{eq:main-subcritical}
+\end{equation}
+Moreover,
+\begin{equation}
+ \Gamma_\alpha\asymp_{\alpha,\beta}
+ \begin{cases}
+ d^{\,2-\beta},
+   &0\leq\alpha<\frac12,\\[1mm]
+ d^{\,2-\beta}h,
+   &\alpha=\frac12,\\[1mm]
+ d^{\,2-2\beta(1-\alpha)},
+   &\frac12<\alpha<1,\quad\beta(1-\alpha)\geq2,\\[1mm]
+ d^{-\frac{(\beta-2)(1-\alpha)}{\alpha}}
+ h^{\,2-\frac1\alpha},
+   &\frac12<\alpha<1,\quad\beta(1-\alpha)<2.
+ \end{cases}
+ \label{eq:Gamma-phase}
+\end{equation}
+Consequently, the requested explicit \(h-\Theta(\cdot)\) statement is
+\begin{equation}
+ \boxed{
+ L^\star=
+ \begin{cases}
+ h-\Theta_{\alpha,\beta}(d^{\,2-\beta}),
+   &0\leq\alpha<\frac12,\\[1mm]
+ h-\Theta_{\beta}(d^{\,2-\beta}h),
+   &\alpha=\frac12,\\[1mm]
+ h-\Theta_{\alpha,\beta}
+   (d^{\,2-2\beta(1-\alpha)}),
+   &\frac12<\alpha<1,\quad\beta(1-\alpha)\geq2,\\[1mm]
+ h-\Theta_{\alpha,\beta}\!\left(
+   d^{-\frac{(\beta-2)(1-\alpha)}{\alpha}}
+   h^{\,2-\frac1\alpha}\right),
+   &\frac12<\alpha<1,\quad\beta(1-\alpha)<2.
+ \end{cases}}
+ \label{eq:subcritical-explicit}
+\end{equation}
+
+\item If \(\alpha=1\), then
+\begin{equation}
+ \boxed{\qquad
+ h-L^\star=\frac2\beta h+O_\beta(\log h),
+ \qquad
+ L^\star=\left(1-\frac2\beta\right)h+O_\beta(\log h).
+ \qquad}
+ \label{eq:main-critical}
+\end{equation}
+
+\item If \(\alpha>1\), then
+\begin{equation}
+ \boxed{\qquad
+ L^\star
+ =\Theta_{\alpha,\beta}\!\left(D^{1-\alpha}h^\alpha\right)
+ =\Theta_{\alpha,\beta}\!\left(
+ d^{-2(\alpha-1)}(\log N)^\alpha\right).
+ \qquad}
+ \label{eq:main-supercritical}
+\end{equation}
+Equivalently,
+\[
+ h-L^\star
+ =h-\Theta_{\alpha,\beta}\!\left(D^{1-\alpha}h^\alpha\right).
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}[Why the loss clipping level is \(h/D\)]
+\label{rem:two-clippings}
+The supplied radius note uses
+\(\min\{1,Dp_i\}\), hence the threshold \(p_i=D^{-1}\).
+That is the correct clipping for \(\norm{W_\star}_{\Frob}\), but not
+for the objective value.  In the loss, the linear gain \(Dp_i\) from
+query \(i\) saturates when it reaches the null loss \(h\); therefore
+the objective-value threshold is \(Dp_i=h\).
+In the last line of \eqref{eq:Gamma-phase}, this distinction produces
+the genuine factor
+\[
+ h^{\,2-1/\alpha}.
+\]
+Thus a bare \(\Theta\) statement in terms of the radius scale would be
+false in that regime.
+\end{remark}
+
+\begin{remark}[The exact clipping boundary]
+If \(1/2<\alpha<1\) and \(\beta(1-\alpha)=2\), then
+\[
+ Dp_1\longrightarrow1-\alpha<1<h.
+\]
+Hence \(H_h=\varnothing\) eventually.  Equality belongs to the
+non-clipped branch and gives \(\Gamma_\alpha\asymp d^{-2}\), with no
+extra logarithm.
+\end{remark}
+
+\section{Proof sketch}
+\label{sec:sketch}
+
+\paragraph{Step 1: turn minimization into gain maximization.}
+Put
+\[
+ \bar u=\frac1N\sum_{j=1}^Nu_j,\qquad x_j=u_j-\bar u,\qquad
+ \Phi(y)=\log\left(\frac1N\sum_{j=1}^Ne^{x_j^\top y}\right).
+\]
+Then \(\Phi\geq0\), and the centered identity from the supplied note is
+\[
+ \ell_i(W)=h+\Phi(Wv_i)-x_i^\top Wv_i.
+\]
+Therefore
+\begin{equation}
+ \cI(W):=h-L(W)
+ =\sum_{i=1}^Np_i
+ \bigl(x_i^\top Wv_i-\Phi(Wv_i)\bigr),
+ \qquad
+ \cI^\star=\sup_W\cI(W).
+ \label{eq:gain-representation}
+\end{equation}
+
+\paragraph{Step 2: sharp upper bound below one.}
+On \(H_h=\{p_i\geq h/D\}\), the deterministic cap gives at most
+\[
+ h\sum_{i\in H_h}p_i.
+\]
+On \(T_h\), the centered-gradient bound controls the linear part by
+\[
+ 2\left(\sum_{i\in T_h}p_i^2\right)^{1/2}
+ \norm W_{\Frob}.
+\]
+Retain the free energy only on a still farther deterministic Zipf tail
+whose mass tends to one.  The imported diffuse-tail coercivity theorem
+then gives, uniformly in \(W\),
+\[
+ \cI(W)
+ \leq
+ h\sum_{i\in H_h}p_i+
+2\sqrt{S_h}\,\norm W_{\Frob}
+-c\psi\!\left(\frac{\norm W_{\Frob}}d\right),
+\quad
+ S_h=\sum_{i\in T_h}p_i^2,
+\]
+where \(\psi(t)=\min\{t^2,t\}\).  Optimizing the last two terms gives
+\(O(DS_h)\), proving \(\cI^\star\lesssim\Gamma_\alpha\).
+
+\paragraph{Step 3: matching comparison matrix below one.}
+Define
+\[
+ a_i=\min\{h,Dp_i\},\qquad
+ S_a=\sum_{i=1}^Na_i u_iv_i^\top.
+\]
+A fixed-comparator Gaussian-chaos calculation proves
+\[
+ \ip{\sum_i p_ix_iv_i^\top}{S_a}
+ \geq\frac12\Gamma_\alpha,
+ \qquad
+ \frac1d\sum_i p_i\norm{S_av_i}_2^2
+ \leq C\Gamma_\alpha.
+\]
+All off-target logits \(x_j^\top S_av_i\), \(j\neq i\), are \(o(1)\),
+whereas the self logit is \(a_i+o(1)\leq h+o(1)\).
+For a sufficiently small fixed \(\eta>0\),
+\[
+ \sum_i p_i\Phi(\eta S_av_i)
+ \leq C\eta^2\Gamma_\alpha+o(\Gamma_\alpha),
+\]
+while the linear gain is at least
+\(\eta\Gamma_\alpha/2\).  Hence
+\(\cI^\star\geq\cI(\eta S_a)\gtrsim\Gamma_\alpha\).
+
+\paragraph{Step 4: the endpoint.}
+At \(\alpha=1\), the imported head comparator memorizes
+\(K_0\asymp D/h^3\) queries and gives
+\[
+ L^\star
+ \leq\left(1-\frac2\beta\right)h+O_\beta(\log h).
+\]
+For the reverse bound, a deterministic diffuse tail beginning at a
+polylogarithmic multiple of \(D/h\) has weighted null loss
+\[
+ \left(1-\frac2\beta\right)h-O_\beta(\log h).
+\]
+Uniform free-energy coercivity absorbs its centered linear term, so no
+\(W\) can lower the loss below this scale.
+
+\paragraph{Step 5: above one, estimate the residual loss.}
+The high-margin capacity is \(K_c\asymp D/h\).  A capacity-scale
+head-memory matrix makes the first \(K_c\) losses negligible and pays
+only \(O(h)\) on the remaining Zipf mass:
+\[
+ L^\star\lesssim h\sum_{i>K_c}p_i
+ \asymp D^{1-\alpha}h^\alpha.
+\]
+For the lower bound, the imported one-block coercivity at
+\(k\asymp D/h\), combined with the centered-gradient bound, yields
+\[
+ \sum_{i=k+1}^{2k}\ell_i(W)\gtrsim kh
+\]
+uniformly in \(W\).  Since \(p_i\gtrsim k^{-\alpha}\) on that block,
+\[
+ L(W)\gtrsim hk^{1-\alpha}
+ \asymp D^{1-\alpha}h^\alpha.
+\]
+
+\section{Inputs imported from the supplied note}
+\label{sec:imports}
+
+The source is the companion radius note \cite{radius-note}.  Its scope
+is \(0\leq\alpha\leq1\).  The following table records every imported
+nonstandard input.
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Input used here & Location in the source note\\
+\midrule
+Existence and uniqueness & Theorem 1.1\\
+Centered identity and deterministic cap & equations (2)--(4)\\
+Uniform free-energy lower bound & Lemma 4.2\\
+Weighted query coercivity & Lemma 4.3 and Corollary 4.4\\
+Centered-gradient bound & Lemma 4.6\\
+Centered key covariance upper bound & proof of Lemma 4.7, equation (35)\\
+Endpoint head comparator & Lemma 6.1 and equation (54)\\
+Capacity-block coercivity & Lemma 6.4, equation (60)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+We restate the exact forms needed below.  With \(\bar u,x_j,\Phi\)
+as in Section~\ref{sec:sketch},
+\begin{align}
+ \ell_i(W)&=h+\Phi(Wv_i)-x_i^\top Wv_i,
+ \qquad \Phi(y)\geq0,
+ \label{eq:centered}\\
+ p_i\bigl(x_i^\top Wv_i-\Phi(Wv_i)\bigr)
+ &\leq p_i\min\{h,(x_i^\top Wv_i)_+\}.
+ \label{eq:cap}
+\end{align}
+Let \(\psi(t)=\min\{t^2,t\}\).  With failure probability at most
+\(e^{-cN}+e^{-cd}\),
+\begin{equation}
+ \Phi(y)\geq c\psi\!\left(\frac{\norm y_2}{\sqrt d}\right)
+ \qquad\text{for every }y\in\R^d.
+ \label{eq:pointwise-free}
+\end{equation}
+If \(q\) is a fixed deterministic probability vector satisfying
+\[
+ q_{\max}\leq(Dh^{12})^{-1},
+\]
+then, with additional failure probability at most \(d^{-30}\),
+\begin{equation}
+ \sum_iq_i\Phi(Wv_i)
+ \geq c\psi\!\left(\frac{\norm W_{\Frob}}d\right)
+ \qquad\text{for every }W.
+ \label{eq:query-coercivity}
+\end{equation}
+For every fixed deterministic vector \(b=(b_i)\), with failure at
+most \(2e^{-cd}\),
+\begin{equation}
+ \left\|\sum_i b_ix_iv_i^\top\right\|_{\Frob}
+ \leq2\norm b_2.
+ \label{eq:centered-gradient}
+\end{equation}
+Finally, with failure at most \(e^{-cN}\),
+\begin{equation}
+ \frac1N\sum_{j=1}^Nx_jx_j^\top\preceq\frac{C}{d}I_d.
+ \label{eq:key-covariance}
+\end{equation}
+
+At \(\alpha=1\), for
+\[
+ K_0=\lfloor cD/h^3\rfloor,
+\]
+the source constructs \(W_{\rm head}\) such that
+\begin{equation}
+ L(W_{\rm head})
+ \leq P_{\{K_0+1,\ldots,N\}}(h+C)+N^{-10}
+ \label{eq:endpoint-comparator}
+\end{equation}
+outside an event of probability \(d^{-40}\).
+It also proves that, for a sufficiently large fixed \(A=A(\beta)\),
+\[
+ k=\left\lceil\frac{AD}{h}\right\rceil,\qquad
+ B=\{k+1,\ldots,2k\},
+ \label{eq:block-def}
+\]
+satisfy \(2k\leq N\) and, outside an event of probability \(e^{-cd}\),
+\begin{equation}
+ \frac1k\sum_{i\in B}\ell_i(W)
+ \geq c_b\frac{\sqrt h}{d}\norm W_{\Frob}
+ \qquad\text{for every }W.
+ \label{eq:block-coercivity}
+\end{equation}
+
+\section{Zipf evaluation of the subcritical scale}
+\label{sec:zipf}
+
+Throughout this section \(0\leq\alpha<1\).  Integral comparison gives
+\begin{equation}
+ H_{N,\alpha}\asymp_\alpha N^{1-\alpha},
+ \qquad
+ p_i\asymp_\alpha N^{\alpha-1}i^{-\alpha}.
+ \label{eq:zipf-subcritical}
+\end{equation}
+Let
+\[
+ m_h:=\max\{i:p_i\geq h/D\},
+\]
+with \(m_h=0\) if the set is empty.  Then
+\begin{equation}
+ \Gamma_\alpha
+ =h\sum_{i\leq m_h}p_i+D\sum_{i>m_h}p_i^2.
+ \label{eq:Gamma-split}
+\end{equation}
+
+\begin{lemma}[Evaluation of \(\Gamma_\alpha\)]
+\label{lem:Gamma-evaluation}
+The four alternatives in \eqref{eq:Gamma-phase} hold.  In every fixed
+subcritical regime,
+\[
+ \Gamma_\alpha=d^{-\rho_{\alpha,\beta}}h^{s_\alpha}
+\text{ up to fixed multiplicative constants}
+\]
+for some \(0<\rho_{\alpha,\beta}<\beta\) and fixed \(s_\alpha\).
+In particular, \(\Gamma_\alpha\to0\) polynomially and
+\[
+ N^{-1+\eta}=o(\Gamma_\alpha)
+\]
+for every sufficiently small fixed
+\(\eta=\eta(\alpha,\beta)>0\).
+\end{lemma}
+
+\begin{proof}
+If \(0\leq\alpha<1/2\), then
+\[
+ \sum_{i=1}^Np_i^2\asymp_\alpha N^{-1}.
+\]
+If \(m_h>0\), then
+\[
+ \frac{m_h}{N}
+ \asymp_{\alpha,\beta}
+ \left(\frac{D}{Nh}\right)^{1/\alpha}
+ \quad(\alpha>0),
+\]
+and
+\[
+ h\sum_{i\leq m_h}p_i
+ \asymp h\left(\frac{m_h}{N}\right)^{1-\alpha}.
+\]
+Dividing this expression by \(D/N\) gives
+\[
+ \left(\frac{D}{Nh}\right)^{(1-2\alpha)/\alpha}=o(1).
+\]
+The square-sum after \(m_h=o(N)\) is still of order \(N^{-1}\).
+Thus \(\Gamma_\alpha\asymp D/N=d^{2-\beta}\).
+For \(\alpha=0\), \(p_i=N^{-1}<h/D\) eventually, and the same
+conclusion is immediate.
+
+If \(\alpha=1/2\), then
+\[
+ \sum_{i=1}^Np_i^2\asymp\frac{h}{N}.
+\]
+When \(m_h>0\), the head contribution in
+\eqref{eq:Gamma-split} is only \(O(D/N)\), while
+\[
+ D\sum_{i>m_h}p_i^2
+ \asymp\frac{D}{N}\log\frac{N}{m_h}
+ \asymp\frac{Dh}{N}.
+\]
+Hence \(\Gamma_{1/2}\asymp d^{2-\beta}h\).
+
+Now suppose \(1/2<\alpha<1\).  Since
+\[
+ Dp_1=(1-\alpha)d^{\,2-\beta(1-\alpha)}(1+o(1)),
+\]
+the set \(H_h\) is empty eventually when
+\(\beta(1-\alpha)\geq2\).  At equality the displayed expression tends
+to \(1-\alpha<h\).  Therefore
+\[
+ \Gamma_\alpha
+ =D\sum_i p_i^2
+ \asymp DN^{-2(1-\alpha)}
+ =d^{\,2-2\beta(1-\alpha)}.
+\]
+
+If \(\beta(1-\alpha)<2\), then \(H_h\neq\varnothing\) eventually and
+\begin{equation}
+ m_h
+ \asymp_{\alpha,\beta}
+ \left(\frac{DN^{\alpha-1}}{h}\right)^{1/\alpha}.
+ \label{eq:mh}
+\end{equation}
+Because \(p_{m_h}\asymp h/D\), integral comparison gives
+\[
+ h\sum_{i\leq m_h}p_i
+ \asymp\frac{h^2m_h}{D},
+ \qquad
+ D\sum_{i>m_h}p_i^2
+ \asymp\frac{h^2m_h}{D}.
+\]
+Substitution of \eqref{eq:mh} yields
+\[
+ \Gamma_\alpha
+ \asymp
+ d^{-\frac{(\beta-2)(1-\alpha)}{\alpha}}
+ h^{\,2-\frac1\alpha}.
+\]
+This proves \eqref{eq:Gamma-phase}.  The assertion about
+\(\rho_{\alpha,\beta}\) follows by inspecting the four powers of
+\(d\); in each case \(0<\rho_{\alpha,\beta}<\beta\).
+\end{proof}
+
+For the comparison proof, define
+\begin{equation}
+ a_i:=\min\{h,Dp_i\},\qquad
+ A^2:=\sum_i a_i^2,\qquad
+ J:=\sum_i p_ia_i=\Gamma_\alpha,\qquad
+ B_a:=\sum_i p_i a_i^2.
+ \label{eq:a-def}
+\end{equation}
+The following elementary consequences will be used repeatedly:
+\begin{equation}
+ \frac{A^2}{D}\leq J,\qquad
+ B_a\leq hJ,\qquad
+ \frac{\norm p_2}{\sqrt J}
+ \leq d^{-c_{\alpha,\beta}}h^{C_{\alpha,\beta}}.
+ \label{eq:aux-arithmetic}
+\end{equation}
+The first inequality follows termwise from \(a_i\leq Dp_i\), and the
+second from \(a_i\leq h\).  The third follows directly by substituting
+\eqref{eq:zipf-subcritical} and the four cases of
+\eqref{eq:Gamma-phase}; its exponent is strictly negative in every
+fixed subcritical regime.
+
+\section{Sharp improvement for \(0\leq\alpha<1\)}
+\label{sec:subcritical}
+
+\subsection{Uniform upper bound}
+
+\begin{proposition}[Sharp upper bound on improvement]
+\label{prop:sub-upper}
+For every fixed \(0\leq\alpha<1\), with probability at least
+\(1-d^{-c}-e^{-cN}\),
+\[
+ \cI(W)\leq C_{\alpha,\beta}\Gamma_\alpha
+ \qquad\text{for every }W\in\R^{d\times d}.
+\]
+\end{proposition}
+
+\begin{proof}
+Let \(H_h,T_h\) be as in \eqref{eq:Gamma-def}, and put
+\[
+ S_h=\sum_{i\in T_h}p_i^2.
+\]
+Choose the deterministic far tail
+\[
+ U=\{i:p_i\leq(Dh^{24})^{-1}\},
+ \qquad P_U=\sum_{i\in U}p_i.
+\]
+Equation \eqref{eq:zipf-subcritical} shows that the left endpoint of
+\(U\) is \(o(N)\), and therefore \(P_U=1-o(1)\).  In particular,
+\(P_U\geq1/2\) for large \(d\).  For
+\[
+ q_i=\frac{p_i\one_{\{i\in U\}}}{P_U},
+\]
+we have
+\[
+ q_{\max}\leq\frac{2}{Dh^{24}}\leq\frac1{Dh^{12}}.
+\]
+Thus \eqref{eq:query-coercivity} gives
+\begin{equation}
+ \sum_{i\in U}p_i\Phi(Wv_i)
+ \geq c\psi\!\left(\frac{\norm W_{\Frob}}d\right)
+ \quad\text{uniformly in }W.
+ \label{eq:far-tail-coercivity}
+\end{equation}
+
+Use the cap \eqref{eq:cap} on \(H_h\), retain the full linear part on
+\(T_h\), and retain the negative free energy only on \(U\subset T_h\).
+With \(r=\norm W_{\Frob}\), equations
+\eqref{eq:centered-gradient} and \eqref{eq:far-tail-coercivity} give
+\begin{align}
+ \cI(W)
+ &\leq
+ h\sum_{i\in H_h}p_i+
+ \ip{\sum_{i\in T_h}p_ix_iv_i^\top}{W}
+ -\sum_{i\in U}p_i\Phi(Wv_i)\\
+ &\leq
+ h\sum_{i\in H_h}p_i+
+2\sqrt{S_h}\,r
+-c\psi(r/d).
+ \label{eq:sub-upper-master}
+\end{align}
+Set \(t=r/d\) and \(A_h=DS_h\).  Then the last two terms are
+\[
+ 2\sqrt{A_h}\,t-c\psi(t).
+\]
+For \(0\leq t\leq1\), their supremum is at most \(C A_h\).
+For \(t\geq1\), they are nonpositive for all sufficiently large \(d\),
+because \(A_h\leq\Gamma_\alpha\to0\).  Hence
+\[
+ \cI(W)
+ \leq h\sum_{i\in H_h}p_i+C DS_h
+ \leq C\Gamma_\alpha.
+\]
+Every event used here is uniform before \(W\) is selected.
+\end{proof}
+
+\subsection{The log-clipped comparison lemma}
+
+\begin{lemma}[Log-clipped comparison action]
+\label{lem:log-clipped}
+Fix \(0\leq\alpha<1\), define \(a_i,A,J,B_a\) by
+\eqref{eq:a-def}, and set
+\[
+ S_a=\sum_{i=1}^Na_i u_iv_i^\top.
+\]
+There is a deterministic \(\varepsilon_d=o(1)\) such that, outside an
+event of probability \(d^{-c}+e^{-cN}\),
+\begin{align}
+ \ip{\sum_i p_ix_iv_i^\top}{S_a}
+ &\geq\frac12J,
+ \label{eq:comparison-linear}\\
+ \frac1d\sum_i p_i\norm{S_av_i}_2^2
+ &\leq CJ,
+ \label{eq:comparison-action}\\
+ \max_i\left|x_i^\top S_av_i-a_i\right|
+ +\max_{i\neq j}\left|x_j^\top S_av_i\right|
+ &\leq\varepsilon_d.
+ \label{eq:comparison-logits}
+\end{align}
+One may take
+\begin{equation}
+ \varepsilon_d
+ \leq C\left(
+ \sqrt{Jh}
+ +\frac{h^2}{d}
+ +\frac{h^{3/2}}{\sqrt d}
+ +\frac{d\sqrt J}{\sqrt N}\right)=o(1).
+ \label{eq:epsilon}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+We give the concentration details because removing the extraneous
+polylogarithmic loss from the old radius comparator is essential.
+
+\emph{Linear action.}
+First remove centering and write
+\[
+ G_0=\sum_i p_i u_iv_i^\top.
+\]
+Expansion gives
+\[
+ \ip{G_0}{S_a}
+ =
+ \sum_i p_i a_i\norm{u_i}_2^2\norm{v_i}_2^2
+ +\sum_{i\neq k}p_i a_k
+ (u_i^\top u_k)(v_i^\top v_k).
+\]
+The first sum has mean \(J\), and its centered \(L^2\)-norm is at most
+\[
+ \frac{C}{\sqrt d}
+ \left(\sum_i(p_i a_i)^2\right)^{1/2}
+ \leq\frac{CJ}{\sqrt d}.
+\]
+Distinct unordered pairs in the second sum are orthogonal in
+\(L^2\), so its \(L^2\)-norm is at most
+\[
+ C\frac{\norm p_2 A}{d}.
+\]
+By \eqref{eq:aux-arithmetic}, the ratio of this bound to \(J\) is
+polynomially small.  Gaussian-chaos hypercontractivity at a sufficiently
+large fixed moment therefore shows
+\[
+ \ip{G_0}{S_a}\geq\frac34J
+\]
+outside an event \(d^{-c}\).
+Moreover,
+\[
+ \sum_i p_ix_iv_i^\top
+ =G_0-\bar u\left(\sum_i p_iv_i\right)^\top.
+\]
+The standard bounds
+\[
+ \norm{\bar u}_2\leq C N^{-1/2},\qquad
+ \left\|\sum_i p_iv_i\right\|_2\leq C\norm p_2,\qquad
+ \norm{S_a}_{\Frob}\leq CA
+\]
+and \(N\gg D\), together with \eqref{eq:aux-arithmetic}, make the
+centering correction \(o(J)\).  This proves
+\eqref{eq:comparison-linear}.
+
+\emph{Quadratic action.}
+Let \(U=[u_1,\ldots,u_N]\), \(V=[v_1,\ldots,v_N]\),
+\(A_0=\operatorname{diag}(a_i)\), and \(P=\operatorname{diag}(p_i)\).
+Conditioning on \(V\),
+\[
+ Q:=\sum_i p_i\norm{S_av_i}_2^2
+ =\operatorname{tr}(UKU^\top),
+ \qquad
+ K=A_0V^\top VPV^\top VA_0\succeq0.
+\]
+The same Gaussian quadratic-form estimate used in the source proof of
+its equation (34) gives
+\begin{equation}
+ Q\leq2\operatorname{tr}K
+ \label{eq:U-quadratic}
+\end{equation}
+with conditional failure probability at most \(e^{-cd}\).
+Now
+\[
+ \operatorname{tr}K
+ =\sum_{i,k}p_i a_k^2(v_i^\top v_k)^2.
+\]
+The diagonal part is at most \(CB_a\) on the standard norm event.
+For fixed \(k\), condition on \(v_k\).  Weighted Bernstein applied to
+\[
+ \sum_{i\neq k}p_i(v_i^\top v_k)^2
+\]
+gives an upper bound \(C/d\).  Indeed, the conditional mean is
+\(\norm{v_k}_2^2/d\), the variance proxy is at most
+\[
+ \frac{C\norm{v_k}_2^4}{d^2}\sum_i p_i^2,
+\]
+and the largest subexponential scale is at most
+\(Cp_1\norm{v_k}_2^2/d\).
+Since \(p_1^{-1}\asymp N^{1-\alpha}\) is polynomial in \(d\), the
+Bernstein exponent dominates \(\log N\).  A union bound makes
+\[
+ \max_k\sum_{i\neq k}p_i(v_i^\top v_k)^2\leq\frac Cd
+ \label{eq:leave-one-out}
+\]
+hold with failure \(d^{-c}\).  Consequently,
+\[
+ \operatorname{tr}K\leq C(B_a+A^2/d).
+\]
+Combining this with \eqref{eq:U-quadratic} and
+\eqref{eq:aux-arithmetic} yields
+\[
+ \frac Qd
+ \leq C\left(\frac{B_a}{d}+\frac{A^2}{D}\right)
+ \leq CJ,
+\]
+which is \eqref{eq:comparison-action}.
+
+\emph{Logits.}
+On the standard simultaneous norm and inner-product event, collision
+terms contribute at most \(Ca_{\max}\sqrt{h/d}\), where
+\(a_{\max}\leq h\).  Conditional Bernstein for the non-collision sum,
+followed by a union bound over all ordered pairs, gives
+\[
+ C\left(\frac{A\sqrt h}{d}+\frac{a_{\max}h}{d}\right).
+\]
+Finally,
+\[
+ |\bar u^\top S_av_i|
+ \leq C\frac{A}{\sqrt N}.
+\]
+For the self logit, the diagonal term differs from \(a_i\) by at most
+\(Ca_i\sqrt{h/d}\).  Using \(A/d\leq\sqrt J\) gives exactly
+\eqref{eq:epsilon}.  Lemma~\ref{lem:Gamma-evaluation} implies that
+every term in \eqref{eq:epsilon} tends to zero polynomially, up to
+powers of \(h\).  This proves \eqref{eq:comparison-logits}.
+\end{proof}
+
+\begin{proposition}[Sharp lower bound on improvement]
+\label{prop:sub-lower}
+For every fixed \(0\leq\alpha<1\), with probability at least
+\(1-d^{-c}-e^{-cN}\),
+\[
+ \cI^\star\geq c_{\alpha,\beta}\Gamma_\alpha.
+\]
+\end{proposition}
+
+\begin{proof}
+Work on the event of Lemma~\ref{lem:log-clipped} and
+\eqref{eq:key-covariance}.  Let
+\[
+ z_{ji}=x_j^\top S_av_i.
+\]
+Since \(\sum_jx_j=0\), one has \(\sum_jz_{ji}=0\).
+Choose a sufficiently small fixed
+\(\eta=\eta(\alpha,\beta)>0\).  By
+\eqref{eq:comparison-logits}, for large \(d\),
+\[
+ |\eta z_{ji}|\leq\frac14\quad(j\neq i),
+ \qquad
+ z_{ii}\leq h+o(1).
+\]
+Therefore
+\begin{align}
+ \frac1N\sum_{j=1}^Ne^{\eta z_{ji}}
+ &=
+ 1+\frac1N\sum_j
+ \bigl(e^{\eta z_{ji}}-1-\eta z_{ji}\bigr)\\
+ &\leq
+ 1+N^{-1+\eta+o(1)}
+ +\frac{C\eta^2}{N}\sum_{j\neq i}z_{ji}^2.
+\end{align}
+Using \(\log(1+x)\leq x\) and
+\eqref{eq:key-covariance},
+\begin{equation}
+ \Phi(\eta S_av_i)
+ \leq
+ N^{-1+\eta+o(1)}
+ +C\eta^2\frac{\norm{S_av_i}_2^2}{d}.
+ \label{eq:Phi-comparator}
+\end{equation}
+Lemma~\ref{lem:Gamma-evaluation} permits \(\eta>0\) to be chosen so
+small that \(N^{-1+\eta}=o(J)\).  Averaging
+\eqref{eq:Phi-comparator} with weights \(p_i\) and using
+\eqref{eq:comparison-action} gives
+\[
+ \sum_i p_i\Phi(\eta S_av_i)
+ \leq C\eta^2J+o(J).
+\]
+On the other hand, \eqref{eq:comparison-linear} gives
+\[
+ \sum_i p_i x_i^\top(\eta S_a)v_i
+ \geq\frac{\eta}{2}J.
+\]
+Choose \(\eta\) once more so that \(C\eta^2\leq\eta/4\).
+Then, for all sufficiently large \(d\),
+\[
+ \cI(\eta S_a)\geq\frac{\eta}{8}J
+ =c_{\alpha,\beta}\Gamma_\alpha.
+\]
+Taking the supremum over \(W\) proves the proposition.
+\end{proof}
+
+Propositions~\ref{prop:sub-upper} and \ref{prop:sub-lower}, together
+with Lemma~\ref{lem:Gamma-evaluation}, prove part (i) of
+Theorem~\ref{thm:main}.
+
+\section{The critical point \(\alpha=1\)}
+\label{sec:critical}
+
+At the endpoint,
+\[
+ p_i=\frac1{iH_N},
+ \qquad
+ H_N=h+\gamma+O(N^{-1}).
+\]
+
+\subsection{Upper bound on the residual loss}
+
+From \eqref{eq:endpoint-comparator},
+\[
+ L^\star
+ \leq\frac{H_N-H_{K_0}}{H_N}(h+C)+N^{-10}.
+\]
+Since
+\[
+ \log K_0
+ =\log D-3\log h+O(1)
+ =\frac2\beta h-3\log h+O(1),
+\]
+the harmonic-number expansion gives
+\begin{equation}
+ L^\star
+ \leq\left(1-\frac2\beta\right)h
+ +3\log h+O_\beta(1).
+ \label{eq:critical-upper}
+\end{equation}
+Equivalently,
+\[
+ \cI^\star
+ \geq\frac2\beta h-3\log h-O_\beta(1).
+\]
+
+\subsection{Lower bound on the residual loss}
+
+Set
+\[
+ r_d=\left\lceil\frac{Dh^{24}}{H_N}\right\rceil,
+ \qquad
+ T=\{r_d,\ldots,N\},
+ \qquad
+ P_T=\sum_{i\in T}p_i,
+ \qquad
+ S_T=\sum_{i\in T}p_i^2.
+\]
+Then \(r_d<N\) for large \(d\), and
+\[
+ \log r_d
+ =2\log d+23\log h+o(1)
+ =\frac2\beta h+23\log h+o(1).
+\]
+Consequently,
+\begin{equation}
+ P_Th
+ =\left(1-\frac2\beta\right)h
+ -23\log h+O_\beta(1).
+ \label{eq:critical-tail-mass}
+\end{equation}
+In particular, \(P_T\) is bounded below by a positive constant.
+Moreover,
+\[
+ \max_{i\in T}\frac{p_i}{P_T}
+ \leq(Dh^{12})^{-1},
+ \qquad
+ S_T\leq\frac{P_T}{Dh^{24}}
+\]
+for large \(d\).
+
+Apply \eqref{eq:query-coercivity} to
+\(q_i=p_i\one_{\{i\in T\}}/P_T\), and apply
+\eqref{eq:centered-gradient} to
+\(b_i=p_i\one_{\{i\in T\}}\).  Nonnegativity of losses outside \(T\)
+and \eqref{eq:centered} imply, for every \(W\),
+\begin{align}
+ L(W)
+ &\geq
+ P_Th+cP_T\psi(t)-\varepsilon t,
+ \qquad
+ t=\frac{\norm W_{\Frob}}d,\\
+ \varepsilon&=2d\sqrt{S_T}
+ \leq2\sqrt{P_T}\,h^{-12}.
+ \label{eq:critical-master}
+\end{align}
+For \(t\geq1\), the last two terms are nonnegative for large \(d\).
+For \(0\leq t\leq1\),
+\[
+ cP_Tt^2-\varepsilon t
+ \geq-\frac{\varepsilon^2}{4cP_T}
+ \geq-Ch^{-24}.
+\]
+Using \eqref{eq:critical-tail-mass},
+\begin{equation}
+ L^\star
+ \geq
+ \left(1-\frac2\beta\right)h
+ -23\log h-O_\beta(1).
+ \label{eq:critical-lower}
+\end{equation}
+Equations \eqref{eq:critical-upper} and
+\eqref{eq:critical-lower} prove part (ii) of
+Theorem~\ref{thm:main}.
+
+\section{The supercritical regime \(\alpha>1\)}
+\label{sec:supercritical}
+
+For fixed \(\alpha>1\),
+\[
+ H_{N,\alpha}\asymp_\alpha1.
+\]
+If \(K\to\infty\) and \(K=o(N)\), integral comparison gives
+\begin{equation}
+ \sum_{i>K}p_i\asymp_\alpha K^{1-\alpha},
+ \qquad
+ Kp_{2K}\asymp_\alpha K^{1-\alpha}.
+ \label{eq:super-tail}
+\end{equation}
+
+\subsection{Capacity-scale head memory}
+
+\begin{lemma}[Head memory at scale \(D/h\)]
+\label{lem:capacity-memory}
+There are constants \(c_{\rm mem},c_0,C_0>0\), depending at most on
+\(\beta\), such that, if
+\[
+ K=\left\lfloor c_{\rm mem}\frac{D}{h}\right\rfloor,
+ \qquad
+ S_K=\sum_{k=1}^Ku_kv_k^\top,
+\]
+then, with probability at least \(1-d^{-40}\), simultaneously for
+every \(i\neq j\),
+\begin{align}
+ (u_i-u_j)^\top S_Kv_i&\geq c_0,
+ &&i\leq K,
+ \label{eq:capacity-head}\\
+ |(u_j-u_i)^\top S_Kv_i|&\leq C_0,
+ &&i>K.
+ \label{eq:capacity-tail}
+\end{align}
+\end{lemma}
+
+\begin{proof}
+Let \(\delta=d^{-40}\) and
+\(\Lambda=\log(64N^2/\delta)\asymp_\beta h\).
+Standard chi-square and conditional Gaussian inner-product tails give
+\[
+ \max_i\left|
+ \norm{u_i}_2^2-1\right|
+ \vee
+ \max_i\left|\norm{v_i}_2^2-1\right|
+ \leq\frac14,
+\]
+and
+\[
+ \max_{i\neq j}
+ \{|u_i^\top u_j|,|v_i^\top v_j|\}
+ \leq C\sqrt{\Lambda/d}
+\]
+outside an event of probability at most \(\delta/4\).
+
+Fix \(i\neq j\), condition on
+\(\sigma(u_i,u_j,v_i)\), and for
+\(k\leq K\), \(k\notin\{i,j\}\), set
+\[
+ Z_k^{(i,j)}
+ =((u_i-u_j)^\top u_k)(v_k^\top v_i).
+\]
+These variables are conditionally independent and centered, with
+\[
+ \norm{Z_k^{(i,j)}}_{\psi_1}\leq C/d.
+\]
+Conditional Bernstein and a union bound over the \(N^2\) ordered
+pairs give
+\[
+ \max_{i\neq j}
+ \left|
+ \sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+ Z_k^{(i,j)}
+ \right|
+ \leq
+ C\left(\frac{\sqrt{K\Lambda}}d+\frac{\Lambda}{d}\right)
+ \leq C_\beta\sqrt{c_{\rm mem}}+o(1).
+\]
+Choose \(c_{\rm mem}\) so that this is at most \(1/16\).
+For \(i\leq K\), the self term is at least \(1/2\), while the possible
+\(k=j\) collision is \(o(1)\), proving
+\eqref{eq:capacity-head}.  If \(i>K\), there is no self term, and the
+same estimate proves \eqref{eq:capacity-tail}.
+\end{proof}
+
+\begin{proposition}[Supercritical upper bound]
+\label{prop:super-upper}
+For every fixed \(\alpha>1\), with probability at least \(1-d^{-40}\),
+\[
+ L^\star\leq
+ C_{\alpha,\beta}D^{1-\alpha}h^\alpha.
+\]
+\end{proposition}
+
+\begin{proof}
+Choose a fixed \(T_\alpha>0\) such that
+\[
+ \beta(T_\alpha c_0-1)>2(\alpha-1)+1,
+\]
+and set \(W_{\rm mem}=T_\alpha hS_K\).
+On the event of Lemma~\ref{lem:capacity-memory},
+\[
+ \ell_i(W_{\rm mem})\leq N^{1-T_\alpha c_0},
+ \quad i\leq K,
+\]
+whereas
+\[
+ \ell_i(W_{\rm mem})\leq
+ \log(1+Ne^{T_\alpha C_0h})
+ \leq C_{\alpha,\beta}h,
+ \quad i>K.
+\]
+Thus
+\[
+ L(W_{\rm mem})
+ \leq N^{1-T_\alpha c_0}
+ +C_{\alpha,\beta}h\sum_{i>K}p_i.
+\]
+By \eqref{eq:super-tail} and \(K\asymp D/h\),
+\[
+ h\sum_{i>K}p_i
+ \asymp D^{1-\alpha}h^\alpha.
+\]
+The choice of \(T_\alpha\) makes the first term negligible relative
+to this scale.
+\end{proof}
+
+\subsection{Matching block lower bound}
+
+\begin{proposition}[Supercritical lower bound]
+\label{prop:super-lower}
+For every fixed \(\alpha>1\), with probability at least \(1-e^{-cd}\),
+\[
+ L(W)\geq
+ c_{\alpha,\beta}D^{1-\alpha}h^\alpha
+ \qquad\text{for every }W.
+\]
+\end{proposition}
+
+\begin{proof}
+Take \(k,B\) from \eqref{eq:block-def}, and write
+\[
+ Q_B(W)=\sum_{i\in B}\ell_i(W),
+ \qquad r=\norm W_{\Frob}.
+\]
+The imported block coercivity gives
+\begin{equation}
+ Q_B(W)\geq ar,
+ \qquad
+ a=c_b\frac{k\sqrt h}{d}.
+ \label{eq:block-first}
+\end{equation}
+Apply \eqref{eq:centered-gradient} with
+\(b_i=\one_{\{i\in B\}}\):
+\[
+ \left\|\sum_{i\in B}x_iv_i^\top\right\|_{\Frob}
+ \leq2\sqrt k.
+\]
+The centered identity and \(\Phi\geq0\) imply
+\begin{equation}
+ Q_B(W)\geq kh-2\sqrt k\,r.
+ \label{eq:block-second}
+\end{equation}
+For \(a,b,H>0\),
+\[
+ \max\{ar,H-br\}\geq H\frac{a}{a+b}.
+\]
+Using \eqref{eq:block-first}--\eqref{eq:block-second} and \(kh\geq AD\),
+\[
+ Q_B(W)
+ \geq
+ kh\,
+ \frac{c_b\sqrt{kh}/d}{c_b\sqrt{kh}/d+2}
+ \geq c_Akh.
+\]
+Since \(p_i\geq p_{2k}\) on \(B\),
+\[
+ L(W)\geq p_{2k}Q_B(W)
+ \geq c_{\alpha,\beta}hk^{1-\alpha}
+ \asymp D^{1-\alpha}h^\alpha.
+\]
+\end{proof}
+
+Propositions~\ref{prop:super-upper} and
+\ref{prop:super-lower} prove part (iii) of
+Theorem~\ref{thm:main}.
+
+\section{Probability ledger and final phase diagram}
+\label{sec:probability}
+
+For \(0\leq\alpha<1\), intersect the far-tail coercivity event, the
+single deterministic gradient event for \(T_h\), the log-clipped
+comparison event, and the centered covariance event.  Their total
+failure probability is \(d^{-c}+e^{-cN}\).
+
+At \(\alpha=1\), intersect the endpoint-comparator event, the
+far-tail coercivity event, its deterministic gradient event, and the
+existence event if one wishes to identify the infimum with the unique
+finite minimizer.  The same failure form holds.
+
+For \(\alpha>1\), intersect the capacity-memory event, the imported
+block-coercivity event, and the deterministic block-gradient event.
+Again the total failure probability is \(d^{-c}+e^{-cN}\).
+
+No estimate treats an adaptive optimizer as independent of the data:
+every bound used at an optimizer is deterministic or uniform in \(W\),
+and every comparison matrix has deterministic coefficients.
+
+The complete answer is
+\[
+\boxed{
+\begin{array}{c|c|c}
+\text{regime}
+&h-L^\star
+&L^\star\\ \hline
+0\leq\alpha<1
+&\Theta_{\alpha,\beta}(\Gamma_\alpha)
+&h-\Theta_{\alpha,\beta}(\Gamma_\alpha)\\[1mm]
+\alpha=1
+&\dfrac2\beta h+O_\beta(\log h)
+&\left(1-\dfrac2\beta\right)h+O_\beta(\log h)\\[2mm]
+\alpha>1
+&h-\Theta_{\alpha,\beta}(D^{1-\alpha}h^\alpha)
+&\Theta_{\alpha,\beta}(D^{1-\alpha}h^\alpha)
+\end{array}}
+\]
+with \(\Gamma_\alpha\) evaluated explicitly in
+\eqref{eq:Gamma-phase}.  In particular, for fixed
+\(\alpha<1\), the improvement tends to zero at the displayed sharp
+rate; at \(\alpha=1\), it is a fixed fraction of \(h\); and for fixed
+\(\alpha>1\), the residual loss tends to zero at the displayed sharp
+rate.
+
+\begin{thebibliography}{9}
+\bibitem{radius-note}
+Technical note,
+\emph{Sharp Frobenius Radius of the Gaussian Softmax
+Associative-Memory Minimizer for Zipf Frequencies},
+July 2026.
+
+\bibitem{tropp}
+J.~A. Tropp,
+\emph{User-Friendly Tail Bounds for Sums of Random Matrices},
+Foundations of Computational Mathematics, 2012.
+
+\bibitem{vershynin}
+R.~Vershynin,
+\emph{High-Dimensional Probability},
+Cambridge University Press, 2018.
+\end{thebibliography}
+
+\end{document}

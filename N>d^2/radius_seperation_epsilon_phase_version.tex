@@ -1,0 +1,2143 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,tabularx,array,enumitem,microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\usepackage{cleveref}
+\usepackage{aliascnt}
+
+\newtheorem{theorem}{Theorem}[section]
+\newaliascnt{proposition}{theorem}
+\newtheorem{proposition}[proposition]{Proposition}
+\aliascntresetthe{proposition}
+\newaliascnt{lemma}{theorem}
+\newtheorem{lemma}[lemma]{Lemma}
+\aliascntresetthe{lemma}
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
+\newaliascnt{remark}{theorem}
+\newtheorem{remark}[remark]{Remark}
+\aliascntresetthe{remark}
+\theoremstyle{definition}
+\newaliascnt{definition}{theorem}
+\newtheorem{definition}[definition]{Definition}
+\aliascntresetthe{definition}
+
+\crefname{theorem}{theorem}{theorems}
+\Crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{proposition}{propositions}
+\Crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{lemma}{lemmas}
+\Crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{corollary}{corollaries}
+\Crefname{corollary}{Corollary}{Corollaries}
+\crefname{remark}{remark}{remarks}
+\Crefname{remark}{Remark}{Remarks}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\Ee}{\mathbb E}
+\newcommand{\cN}{\mathcal N}
+\newcommand{\Id}{I}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle_F}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert_2}
+\newcommand{\normF}[1]{\left\lVert #1\right\rVert_F}
+\newcommand{\normop}[1]{\left\lVert #1\right\rVert_{\mathrm{op}}}
+\newcommand{\normnuc}[1]{\left\lVert #1\right\rVert_*}
+\newcommand{\RF}{R_{\mathrm F}}
+\newcommand{\Rop}{R_{\mathrm{op}}}
+\newcommand{\eps}{\varepsilon}
+
+\title{Sharp Accuracy-Dependent Frobenius--Operator Radius Separation\\
+for Gaussian Associative Memory with Zipf Frequencies}
+\author{Technical note}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $N=\lceil d^\beta\rceil$ and let the memory frequencies satisfy
+$p_i\propto i^{-\alpha}$ for fixed $\alpha\geq0$.  In the
+superquadratic regime $\beta>2$, we identify explicit loss intervals on
+which the minimum Frobenius and operator radii have matching asymptotic
+separation.  In the subquadratic regime $0<\beta<2$, the loss has
+infimum zero, and throughout the sharp full-memory interpolation phase
+$0<\eps\lesssim Np_N\log N$ we prove the subquadratic separation is $\Theta(\sqrt{\min\{N,d\}})$.  For every fixed $q>0$, all positive
+accuracy-dependent conclusions hold simultaneously with probability at
+least $1-Cd^{-q}-Ce^{-cd}$.
+\end{abstract}
+
+% ============================================================
+\section{Model and main theorem}
+% ============================================================
+
+We first treat the superquadratic regime.  Until
+\Cref{sec:subquadratic}, assume
+\[
+ \alpha\geq0,\qquad \beta>2,\qquad
+ N:=\lceil d^\beta\rceil,\qquad h:=\log N.
+\]
+The complementary regime $0<\beta<2$ is treated separately in
+\Cref{sec:subquadratic}; the critical case $\beta=2$ is not claimed in
+this note.  Draw two mutually independent families
+\[
+ u_1,\ldots,u_N,\ v_1,\ldots,v_N
+ \overset{\mathrm{ind}}{\sim}\cN(0,\Id_d/d).
+\]
+Set
+\[
+ p_i:=\frac{i^{-\alpha}}{H_{N,\alpha}},
+ \qquad H_{N,\alpha}:=\sum_{k=1}^N k^{-\alpha}.
+\]
+For $W\in\R^{d\times d}$ define
+\[
+ \ell_i(W):=
+ \log\sum_{j=1}^N
+ \exp\!\bigl((u_j-u_i)^\top Wv_i\bigr),
+ \qquad
+ L(W):=\sum_{i=1}^N p_i\ell_i(W).
+\]
+Thus $L(0)=h$.  For $X\in\{\mathrm F,\mathrm{op}\}$ let
+\[
+ R_X(\eps):=\inf\{\|W\|_X:L(W)\leq\eps\},
+ \qquad \inf\varnothing:=+\infty,
+\]
+and write
+\[
+ L_\star:=\inf_W L(W),\qquad
+ \Delta:=h-\eps,\qquad
+ \mathcal R_X(\Delta):=R_X(h-\Delta).
+\]
+
+All limits are as $d\to\infty$ with $(\alpha,\beta)$ fixed.  After a
+failure exponent $q>0$ is fixed, every implicit constant may depend on
+$(\alpha,\beta,q)$ but not on $d,N,\eps,\Delta$, or an auxiliary head
+size $K$.  We write $a\lesssim b$ and $a\asymp b$ in this sense.  An
+interval statement
+\[
+ A_d\lesssim x\lesssim B_d
+\]
+means that there are fixed constants $C,c>0$ such that the conclusion
+holds for every $CA_d\leq x\leq cB_d$.  No relation between $C$ and $c$
+is intended; nonemptiness is verified separately whenever needed.
+
+\begin{lemma}[Feasible levels and the universal ratio]
+\label{lem:feasible}
+If $\eps<L_\star$, then $R_X(\eps)=+\infty$, while $R_X(h)=0$.  If
+$L_\star<\eps<h$, or if $\eps=L_\star<h$ and the infimum is attained by
+a finite matrix, then both radii are finite and strictly positive and
+\begin{equation}
+ 1\leq \frac{\RF(\eps)}{\Rop(\eps)}\leq\sqrt d.
+ \label{eq:universal-ratio}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Only positivity needs proof.  Since $L$ is continuous and $L(0)=h>\eps$,
+there is $r>0$ such that $\normF{W}<r$ implies $L(W)>\eps$.  Hence
+$\RF(\eps)\geq r$ and, because $\normF{W}\leq\sqrt d\normop{W}$,
+$\Rop(\eps)\geq r/\sqrt d$.  The norm inequalities
+$\normop{W}\leq\normF{W}\leq\sqrt d\normop{W}$ give
+\eqref{eq:universal-ratio} after taking infima over the common feasible
+set.  The remaining claims follow directly from the definitions and
+$L(0)=h$.
+\end{proof}
+
+\begin{theorem}[Unified accuracy-dependent separation]
+\label{thm:main}
+Fix $q>0$.  For all sufficiently large $d$, there is an event of
+probability at least
+\begin{equation}
+ 1-Cd^{-q}-Ce^{-cd}
+ \label{eq:main-prob}
+\end{equation}
+on which the following statements hold simultaneously for every loss
+level in the displayed interval.
+\begin{enumerate}[label=\textup{(\roman*)}]
+\item If $0\leq\alpha<1/2$, then
+\[
+ 0<\Delta\lesssim \frac{d^2}{N}
+ \quad\Longrightarrow\quad
+ \frac{\mathcal R_F(\Delta)}{\mathcal R_{\mathrm{op}}(\Delta)}
+ \asymp\sqrt d.
+\]
+\item If $\alpha=1/2$, then
+\[
+ 0<\Delta\lesssim \frac{d^2h}{N}
+ \quad\Longrightarrow\quad
+ \frac{\mathcal R_F(\Delta)}{\mathcal R_{\mathrm{op}}(\Delta)}
+ \asymp\sqrt d.
+\]
+\item If $1/2<\alpha<1$, then
+\[
+ 0<\Delta\lesssim N^{2\alpha-2}
+ \quad\Longrightarrow\quad
+ \frac{\mathcal R_F(\Delta)}{\mathcal R_{\mathrm{op}}(\Delta)}
+ \asymp d^{1-\alpha}.
+\]
+If additionally
+\begin{equation}
+ \beta<\frac{2-\alpha}{1-\alpha},
+ \label{eq:between-condition}
+\end{equation}
+then
+\begin{equation}
+ h\left(\frac dN\right)^{1-\alpha}
+ \lesssim\Delta\lesssim
+ h\left(\frac{d^2}{Nh}\right)^{(1-\alpha)/\alpha}
+ \quad\Longrightarrow\quad
+ \frac{\mathcal R_F(\Delta)}{\mathcal R_{\mathrm{op}}(\Delta)}
+ \asymp\sqrt d.
+ \label{eq:between-head-main}
+\end{equation}
+The interval in \eqref{eq:between-head-main} is nonempty for all large
+$d$.
+\item If $\alpha=1$, then
+\[
+ 0<\Delta\lesssim h^{-2}
+ \quad\Longrightarrow\quad
+ \frac{\mathcal R_F(\Delta)}{\mathcal R_{\mathrm{op}}(\Delta)}
+ \asymp h.
+\]
+Moreover, for a fixed $A=A(\beta,q)>0$,
+\begin{equation}
+ \log\!\left(\frac{Nh^2}{d^2}\right)+A
+ \leq\eps\leq
+ \log\!\left(\frac Nd\right)-A
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+ \label{eq:alpha-one-main}
+\end{equation}
+\item If $\alpha>1$, then
+\begin{equation}
+ \eps\gtrsim\frac{h^\alpha}{d^{2(\alpha-1)}},\qquad \eps<h
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \asymp
+ \min\left\{\sqrt d,
+ \left(\frac h\eps\right)^{1/(2(\alpha-1))}\right\}.
+ \label{eq:alpha-greater-main}
+\end{equation}
+In particular,
+\[
+ \frac{h^\alpha}{d^{2(\alpha-1)}}\lesssim\eps
+ \lesssim\frac h{d^{\alpha-1}}
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+\]
+This last interval has additive width $\asymp h/d^{\alpha-1}$ and
+multiplicative endpoint ratio $\asymp(d/h)^{\alpha-1}$.
+\end{enumerate}
+
+Finally, suppose $1/2<\alpha<1$ and $\beta(1-\alpha)>2$.  Let
+$\mathcal E_{\min}$ be the finite-minimizer event from the companion
+note.  On the intersection with the event above, simultaneously for all
+feasible $L_\star\leq\eps<h$,
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}\lesssim d^{1-\alpha}.
+ \label{eq:weak-main}
+\end{equation}
+The probability of this intersection is at least
+\begin{equation}
+ 1-Cd^{-q}-Ce^{-cd}
+ -2^{1-N}\sum_{r=0}^{d^2-1}\binom{N-1}{r}.
+ \label{eq:weak-main-prob}
+\end{equation}
+\end{theorem}
+
+\paragraph{Proof structure and probability bookkeeping.}
+The proof has four modules: deterministic convex geometry; a base
+Gaussian event controlling sample covariances and the initial gradient;
+a diffuse event for $\alpha\leq1/2$ or a head event for $\alpha>1/2$;
+and, only for \eqref{eq:weak-main}, the companion minimizer event.
+Every Gaussian lemma below is simultaneous over all indices used later.
+The diffuse and head arguments use union bounds over at most $N^3$
+choices, hence contribute $Cd^{-q}$; Gaussian norm and spectral events
+contribute $Ce^{-cd}$.  Once these events occur, all statements over a
+continuum of loss levels are deterministic consequences of convex
+scaling or interval coverage, so no union bound over $\eps$ is used.
+
+% ============================================================
+\section{Deterministic convex geometry}
+% ============================================================
+
+Set
+\[
+ \bar u:=\frac1N\sum_{j=1}^N u_j,
+ \qquad x_j:=u_j-\bar u,
+ \qquad G:=\sum_{i=1}^N p_i x_i v_i^\top.
+\]
+Then $\sum_jx_j=0$.
+
+\begin{lemma}[Centered representation]
+\label{lem:centered}
+For every $W$,
+\begin{equation}
+ L(W)=h+\Psi(W)-\ip{G}{W},
+ \qquad
+ \Psi(W):=\sum_{i=1}^N p_i
+ \log\left(\frac1N\sum_{j=1}^N e^{x_j^\top Wv_i}\right).
+ \label{eq:centered}
+\end{equation}
+Moreover,
+\[
+ \Psi(0)=0,\qquad \nabla\Psi(0)=0,\qquad \Psi(W)\geq0,
+\]
+and, for every direction $A$,
+\begin{equation}
+ D^2\Psi(W)[A,A]
+ =\sum_{i=1}^N p_i
+ \Var_{j\sim q_i(W)}(x_j^\top Av_i),
+ \label{eq:hessian-variance}
+\end{equation}
+where
+\[
+ q_{ji}(W):=\frac{e^{x_j^\top Wv_i}}
+ {\sum_{k=1}^N e^{x_k^\top Wv_i}}.
+\]
+\end{lemma}
+
+\begin{proof}
+Since $u_j-u_i=x_j-x_i$,
+\[
+ \ell_i(W)=h+
+ \log\left(\frac1N\sum_j e^{x_j^\top Wv_i}\right)
+ -x_i^\top Wv_i,
+\]
+which gives \eqref{eq:centered}.  Jensen's inequality and
+$N^{-1}\sum_jx_j=0$ give $\Psi(W)\geq0$, and differentiation at zero
+gives $\nabla\Psi(0)=0$.  A second differentiation of each
+log-partition function gives the variance formula
+\eqref{eq:hessian-variance}.
+\end{proof}
+
+\begin{proposition}[Tangent bounds, local response, and scaling]
+\label{prop:convex-geometry}
+Let $\Delta>0$.
+\begin{enumerate}[label=\textup{(\roman*)}]
+\item Every $W$ with $L(W)\leq h-\Delta$ satisfies
+\[
+ \ip{G}{W}\geq\Delta.
+\]
+If $G=0$, the positive-gain sublevel set is therefore empty.  If
+$G\neq0$, then
+\begin{equation}
+ \mathcal R_F(\Delta)\geq\frac{\Delta}{\normF{G}},
+ \qquad
+ \mathcal R_{\mathrm{op}}(\Delta)\geq
+ \frac{\Delta}{\normnuc{G}},
+ \label{eq:tangent}
+\end{equation}
+with the usual convention if the sublevel set is empty.
+\item Assume
+\begin{equation}
+ \max_j\norm{x_j}\leq3,
+ \qquad
+ \sum_i p_i\norm{v_i}^2\leq4.
+ \label{eq:deterministic-regularity}
+\end{equation}
+Then
+\begin{equation}
+ \Psi(A)\leq18\normop{A}^2
+ \label{eq:global-psi}
+\end{equation}
+for every $A$.  Hence, whenever
+$0<\Delta\leq\normF{G}^2/72$,
+\begin{equation}
+ \mathcal R_F(\Delta)\asymp\frac{\Delta}{\normF{G}},
+ \qquad
+ \mathcal R_{\mathrm{op}}(\Delta)
+ \asymp\frac{\Delta}{\normnuc{G}}.
+ \label{eq:local-radii}
+\end{equation}
+\item If $L(W_0)\leq h-\Delta_0$, then
+$(\Delta/\Delta_0)W_0$ is feasible at gain $\Delta$ for every
+$0\leq\Delta\leq\Delta_0$.
+\item If a finite minimizer $W_\star$ exists and
+$\Delta_\star:=h-L(W_\star)>0$, then, for every
+$0<\Delta\leq\Delta_\star$,
+\begin{equation}
+ \frac{\mathcal R_F(\Delta)}
+ {\mathcal R_{\mathrm{op}}(\Delta)}
+ \leq
+ \frac{\normF{W_\star}\normnuc{G}}{\Delta_\star}.
+ \label{eq:all-accuracy}
+\end{equation}
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Part (i) follows from \eqref{eq:centered} and $\Psi\geq0$, followed by
+Frobenius and nuclear--operator duality.
+
+For part (ii), \eqref{eq:hessian-variance} and
+\eqref{eq:deterministic-regularity} give, for every $W,A$,
+\[
+ D^2\Psi(W)[A,A]
+ \leq\sum_i p_i\max_j|x_j^\top Av_i|^2
+ \leq36\normop{A}^2.
+\]
+Taylor's formula at zero yields \eqref{eq:global-psi}.  For the
+Frobenius upper bound, take $A=G/\normF{G}$ and
+$t=2\Delta/\normF{G}$; then
+\[
+ L(tA)\leq h-2\Delta+72\frac{\Delta^2}{\normF{G}^2}
+ \leq h-\Delta.
+\]
+For the operator upper bound, write $G=U\Sigma V^\top$ and use
+$Q=UV^\top$, for which $\normop{Q}=1$ and
+$\ip{G}{Q}=\normnuc{G}$.  The same calculation applies because
+$\normnuc{G}\geq\normF{G}$.  Together with \eqref{eq:tangent}, this
+proves \eqref{eq:local-radii}.
+
+Part (iii) is convexity:
+\[
+ L\left(\frac\Delta{\Delta_0}W_0\right)
+ \leq\left(1-\frac\Delta{\Delta_0}\right)L(0)
+ +\frac\Delta{\Delta_0}L(W_0)
+ \leq h-\Delta.
+\]
+For part (iv), scale $W_\star$ as in part (iii) to upper-bound
+$\mathcal R_F(\Delta)$ and combine with the operator tangent bound in
+\eqref{eq:tangent}.
+\end{proof}
+
+% ============================================================
+\section{Zipf sums and Gaussian estimates}
+% ============================================================
+
+We repeatedly use the following standard estimates
+\cite{vershynin,janson}.  If $g_r$ are independent standard Gaussians
+and $b_r\geq0$ are deterministic, then
+\begin{equation}
+ \Pp\!\left(
+ \left|\sum_r b_r(g_r^2-1)\right|
+ >2\sqrt{t\sum_r b_r^2}+2t\max_r b_r
+ \right)\leq2e^{-t}.
+ \label{eq:weighted-chi-square}
+\end{equation}
+If $Y$ is an $m\times n$ standard Gaussian matrix with $n\geq m$, then
+\begin{equation}
+ \Pp\!\left(
+ s_{\max}(Y)>\sqrt n+\sqrt m+t
+ \ \text{or}\ 
+ s_{\min}(Y)<\sqrt n-\sqrt m-t
+ \right)\leq2e^{-t^2/2}.
+ \label{eq:gaussian-singular-values}
+\end{equation}
+If $f$ is $L$-Lipschitz and $g\sim\cN(0,\Id_d/d)$, then
+\begin{equation}
+ \Pp(|f(g)-\Ee f(g)|>t)\leq
+ 2\exp\!\left(-\frac{dt^2}{2L^2}\right).
+ \label{eq:gaussian-lipschitz}
+\end{equation}
+If $X_k$ are independent and centered, then
+\begin{equation}
+ \Pp\!\left(
+ \left|\sum_kX_k\right|>
+ C\left[
+ \sqrt{t\sum_k\|X_k\|_{\psi_1}^2}
+ +t\max_k\|X_k\|_{\psi_1}
+ \right]
+ \right)\leq2e^{-t}.
+ \label{eq:subexponential-bernstein}
+\end{equation}
+Finally, a Gaussian polynomial of degree at most four satisfies
+$\|Z\|_{L^r}\leq(r-1)^2\|Z\|_{L^2}$ for $r\geq2$.
+
+\begin{lemma}[Zipf estimates]
+\label{lem:zipf}
+Let
+\[
+ s_2:=\sum_{i=1}^N p_i^2,
+ \qquad
+ P_{>K}:=\sum_{i>K}p_i,
+ \qquad
+ s_{2,>K}:=\sum_{i>K}p_i^2.
+\]
+Then
+\begin{equation}
+ s_2\asymp
+ \begin{cases}
+ N^{-1},&0\leq\alpha<1/2,\\
+ h/N,&\alpha=1/2,\\
+ N^{2\alpha-2},&1/2<\alpha<1,\\
+ h^{-2},&\alpha=1,\\
+ 1,&\alpha>1.
+ \end{cases}
+ \label{eq:s2-orders}
+\end{equation}
+Moreover, uniformly for $1\leq K\leq N/2$,
+\begin{align}
+ 0\leq\alpha<1:
+ &\quad p_K\asymp N^{\alpha-1}K^{-\alpha},
+ \quad \sum_{i\leq K}p_i\asymp Kp_K
+ \asymp(K/N)^{1-\alpha};
+ \label{eq:zipf-below-one}\\
+ 1/2<\alpha<1:
+ &\quad s_{2,>K}\asymp N^{2\alpha-2}K^{1-2\alpha};
+ \label{eq:zipf-tail-between}\\
+ \alpha=1:
+ &\quad p_K\asymp(Kh)^{-1},
+ \quad P_{>K}h=\log(N/K)+O(1),
+ \quad s_{2,>K}\asymp(Kh^2)^{-1};
+ \label{eq:zipf-one}\\
+ \alpha>1:
+ &\quad p_K\asymp K^{-\alpha},
+ \quad P_{>K}\asymp K^{1-\alpha},
+ \quad s_{2,>K}\asymp K^{1-2\alpha}.
+ \label{eq:zipf-above-one}
+\end{align}
+At $\alpha=1/2$,
+$s_{2,>K}\asymp N^{-1}\log(N/K)$.
+\end{lemma}
+
+\begin{proof}
+All statements follow from the integral comparisons
+\[
+ \sum_{i=1}^M i^{-r}\asymp
+ \begin{cases}
+ M^{1-r},&r<1,\\
+ \log M,&r=1,\\
+ 1,&r>1,
+ \end{cases}
+\]
+and, for $r>1$ and $K\leq M/2$,
+$\sum_{i=K+1}^M i^{-r}\asymp K^{1-r}$, after dividing by
+$H_{N,\alpha}$ or $H_{N,\alpha}^2$ as appropriate.  For
+$\alpha=1$, use
+$H_{N,1}=h+O(1)$ and
+$H_{N,1}-H_{K,1}=\log(N/K)+O(K^{-1})$.
+\end{proof}
+
+\begin{lemma}[Gaussian bilinear sums]
+\label{lem:bilinear}
+Let $a_1,\ldots,a_m$ be deterministic, let
+$u_i,v_i\overset{\mathrm{ind}}\sim\cN(0,\Id_d/d)$, and put
+\[
+ Z:=\sum_{i=1}^m a_i u_i v_i^\top,
+ \quad A_2:=\left(\sum_i a_i^2\right)^{1/2},
+ \quad A_\infty:=\max_i|a_i|.
+\]
+Then, with probability at least $1-Ce^{-cd}$,
+\begin{equation}
+ \normF{Z}\asymp A_2,
+ \qquad
+ \normop{Z}\lesssim A_\infty+\frac{A_2}{\sqrt d}.
+ \label{eq:bilinear-matrix}
+\end{equation}
+The upper bounds hold simultaneously for any polynomial number of
+deterministic coefficient vectors.
+
+If $Q$ is deterministic and
+$X=\sum_i a_i u_i^\top Qv_i$, then for every $t\geq1$, with
+probability at least $1-2e^{-t}$,
+\begin{equation}
+ |X|\lesssim
+ \frac{\normF{Q}A_2\sqrt t}{d}
+ +\frac{\normop{Q}A_\infty t}{d}.
+ \label{eq:scalar-bilinear}
+\end{equation}
+The same statement holds conditionally if $Q$ is random but independent
+of the Gaussian pairs in the sum.
+\end{lemma}
+
+\begin{proof}
+Write $U=[u_1,\ldots,u_m]$, $V=[v_1,\ldots,v_m]$, and
+$D=\operatorname{diag}(a_1,\ldots,a_m)$.  Formula
+\eqref{eq:weighted-chi-square}, first for $UD$ and then conditionally on
+$U$ for the columns of $UDV^\top$, gives
+$\normF{UD}\asymp A_2$ and
+$\normF{UDV^\top}\asymp\normF{UD}$, each with failure $Ce^{-cd}$.
+A $1/4$-net and \eqref{eq:weighted-chi-square} give
+\[
+ \normop{UD}\lesssim A_\infty+A_2/\sqrt d.
+\]
+Conditionally on $U$,
+$UDV^\top$ has the same law as
+$(UD^2U^\top)^{1/2}Y/\sqrt d$, where $Y$ is a standard $d\times d$
+Gaussian matrix.  Since $\normop{Y}\lesssim\sqrt d$ with failure
+$Ce^{-cd}$, this proves \eqref{eq:bilinear-matrix}.
+
+For the scalar statement, singular-value decomposition and rotational
+invariance give, for
+$|\lambda|A_\infty\normop{Q}/d\leq1/2$,
+\[
+ \log\Ee e^{\lambda X}
+ \leq \lambda^2 A_2^2\normF{Q}^2/d^2.
+\]
+Chernoff's method, applied also to $-X$, yields
+\eqref{eq:scalar-bilinear}.
+\end{proof}
+
+\begin{proposition}[Base Gaussian event and initial gradient]
+\label{prop:base-event}
+Fix $q>0$.  With probability at least
+$1-Cd^{-q}-Ce^{-cd}$, the following estimates hold simultaneously:
+\begin{align}
+ &\max_i\bigl|\norm{u_i}^2-1\bigr|
+ +\max_i\bigl|\norm{v_i}^2-1\bigr|\leq\frac1{10},
+ \label{eq:base-norms}\\
+ &\max_{i\neq j}
+ \bigl(|u_i^\top u_j|+|v_i^\top v_j|\bigr)
+ \lesssim\sqrt{h/d},
+ \label{eq:base-inner}\\
+ &\norm{\bar u}\lesssim N^{-1/2},
+ \qquad
+ \frac c d\Id_d\preceq
+ \Sigma_x:=\frac1N\sum_{j=1}^N x_jx_j^\top
+ \preceq\frac C d\Id_d,
+ \label{eq:base-Sigma}\\
+ &\normF{G}\asymp\sqrt{s_2}.
+ \label{eq:base-GF}
+\end{align}
+If $\alpha\leq1/2$, then
+\begin{equation}
+ M_v:=\sum_i p_i v_iv_i^\top\preceq C\Id_d/d.
+ \label{eq:base-Mv-upper}
+\end{equation}
+If $1/2<\alpha<1$ and $\beta(1-\alpha)>2$, then
+\begin{equation}
+ c\Id_d/d\preceq M_v\preceq C\Id_d/d.
+ \label{eq:base-Mv-two-sided}
+\end{equation}
+Finally, for $\alpha>1/2$,
+\begin{equation}
+ \frac{\normnuc{G}}{\normF{G}}
+ \asymp
+ \begin{cases}
+ d^{1-\alpha},&1/2<\alpha<1,\\
+ h,&\alpha=1,\\
+ 1,&\alpha>1.
+ \end{cases}
+ \label{eq:base-nuclear}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The Gaussian norm and inner-product tails, followed by union bounds over
+$O(N^2)$ indices, give \eqref{eq:base-norms}--\eqref{eq:base-inner}.
+The singular-value bounds for the $d\times N$ matrix
+$[u_1,\ldots,u_N]$ give two-sided bounds of order $d^{-1}$ for its
+sample covariance.  Since
+\[
+ \Sigma_x=\frac1N\sum_j u_ju_j^\top-\bar u\bar u^\top,
+ \qquad \norm{\bar u}^2=O_{\Pp}(N^{-1})=o(d^{-1}),
+\]
+this proves \eqref{eq:base-Sigma}.
+
+For fixed $z\in\mathbb S^{d-1}$,
+\[
+ d z^\top M_vz-1=\sum_i p_i(g_i^2-1).
+\]
+By \eqref{eq:weighted-chi-square}, a fixed-direction deviation by a
+constant has exponent
+$\gtrsim\min\{s_2^{-1},p_1^{-1}\}$.  For $\alpha\leq1/2$ this exponent
+is $\gg d$ because $\beta>2$; in the weak regime it is $\gg d$ because
+$p_1^{-1}\asymp N^{1-\alpha}$ and $\beta(1-\alpha)>2$.  A $1/4$-net
+therefore gives \eqref{eq:base-Mv-upper} and
+\eqref{eq:base-Mv-two-sided}.
+
+Write
+\[
+ \widetilde G:=\sum_i p_i u_iv_i^\top,
+ \qquad z_p:=\sum_i p_i v_i,
+ \qquad G=\widetilde G-\bar u z_p^\top.
+\]
+By \Cref{lem:bilinear},
+$\normF{\widetilde G}\asymp\sqrt{s_2}$.  Also
+$\norm{\bar u}\lesssim N^{-1/2}$ and
+$\norm{z_p}\lesssim\sqrt{s_2}$, so the centering term is
+$o(\sqrt{s_2})$.  This proves \eqref{eq:base-GF}.
+
+It remains to prove \eqref{eq:base-nuclear}.  Let
+$m=\lfloor d/4\rfloor$, set
+$U_m=[u_1,\ldots,u_m]$, $V_m=[v_1,\ldots,v_m]$, and define
+\[
+ Q_0:=U_m(U_m^\top U_m)^{-1}(V_m^\top V_m)^{-1}V_m^\top.
+\]
+With failure $Ce^{-cd}$, the singular values of $U_m,V_m$ are bounded
+above and below by constants.  Hence, after multiplying $Q_0$ by a fixed
+constant, we obtain $\normop{Q}\leq1$ and
+$u_i^\top Qv_i\geq c$ for all $i\leq m$.  Conditional on the head data, apply the scalar part of
+\Cref{lem:bilinear} with $t=(q+2)h$ to obtain
+\[
+ \left|\sum_{i>m}p_i u_i^\top Qv_i\right|
+ \lesssim
+ \sqrt{\frac{s_{2,>m}h}{d}}+\frac{p_{m+1}h}{d}
+\]
+with failure at most $d^{-q}$.  If $1/2<\alpha<1$, the head signal and
+the two displayed errors have respective orders
+\[
+ N^{\alpha-1}d^{1-\alpha},\qquad
+ N^{\alpha-1}d^{-\alpha}\sqrt h,
+ \qquad N^{\alpha-1}d^{-\alpha-1}h,
+\]
+so both errors are $o(1)$ times the signal.  At $\alpha=1$, the signal
+is $\asymp1$, while the errors are
+$O((d\sqrt h)^{-1})$ and $O(d^{-2})$.  The centering correction
+$O(\sqrt{s_2/N})$ is also negligible in both cases.  Therefore
+\begin{equation}
+ \normnuc{G}\gtrsim
+ \begin{cases}
+ N^{\alpha-1}d^{1-\alpha},&1/2<\alpha<1,\\
+ 1,&\alpha=1.
+ \end{cases}
+ \label{eq:nuclear-lower-head}
+\end{equation}
+
+For the matching upper bound, split the uncentered gradient at $d$:
+\[
+ \normnuc{\widetilde G}
+ \leq \sum_{i\leq d}p_i\norm{u_i}\norm{v_i}
+ +\sqrt d\normF{\sum_{i>d}p_i u_iv_i^\top}.
+\]
+Using \Cref{lem:bilinear,lem:zipf} and adding the negligible centering
+term gives
+\[
+ \normnuc{G}\lesssim
+ \begin{cases}
+ N^{\alpha-1}d^{1-\alpha},&1/2<\alpha<1,\\
+ 1,&\alpha\geq1.
+ \end{cases}
+\]
+Together with \eqref{eq:nuclear-lower-head} and
+\eqref{eq:base-GF} this proves the first two cases of
+\eqref{eq:base-nuclear}.  If $\alpha>1$, the nuclear norm dominates the
+Frobenius norm, while the same split gives $\normnuc{G}\lesssim1$;
+thus the ratio is $\asymp1$.
+\end{proof}
+
+\begin{corollary}[Local phase for $\alpha>1/2$]
+\label{cor:local-phase}
+On the event of \Cref{prop:base-event}, simultaneously for
+$0<\Delta\lesssim s_2$,
+\[
+ \frac{\mathcal R_F(\Delta)}
+ {\mathcal R_{\mathrm{op}}(\Delta)}
+ \asymp
+ \begin{cases}
+ d^{1-\alpha},&1/2<\alpha<1,\\
+ h,&\alpha=1,\\
+ 1,&\alpha>1.
+ \end{cases}
+\]
+\end{corollary}
+
+\begin{proof}
+The base norm event implies \eqref{eq:deterministic-regularity}, while
+\eqref{eq:base-GF} gives $\normF{G}^2\asymp s_2$.  Apply
+\eqref{eq:local-radii} and then \eqref{eq:base-nuclear}.
+\end{proof}
+
+% ============================================================
+\section{Diffuse phase for \texorpdfstring{$\alpha\leq1/2$}{alpha <= 1/2}}
+% ============================================================
+
+Assume in this section that $0\leq\alpha\leq1/2$.  For all large $d$,
+$d^2<N/2$.  Define
+\begin{equation}
+ T:=\{d^2+1,\ldots,N\},
+ \qquad s_T:=\sum_{i\in T}p_i^2,
+ \qquad S:=d^2\sum_{i\in T}p_i x_iv_i^\top.
+ \label{eq:diffuse-def}
+\end{equation}
+
+\begin{proposition}[Diffuse comparator]
+\label{prop:diffuse-comparator}
+Fix $q>0$.  With probability at least
+$1-Cd^{-q}-Ce^{-cd}$,
+\begin{align}
+ &s_T\asymp s_2\asymp
+ \begin{cases}
+ N^{-1},&\alpha<1/2,\\
+ h/N,&\alpha=1/2,
+ \end{cases}
+ \label{eq:diffuse-mass}\\
+ &\normF{S}\lesssim d^2\sqrt{s_T},
+ \qquad
+ \normop{S}\lesssim d^{3/2}\sqrt{s_T},
+ \label{eq:diffuse-norms}\\
+ &\ip{G}{S}\gtrsim d^2s_T,
+ \label{eq:diffuse-alignment}\\
+ &\max_{i,j}|x_j^\top Sv_i|
+ \lesssim
+ d\sqrt{s_Th}+d^2p_{d^2+1}
+ +d^2\sqrt{s_T/N}=o(1).
+ \label{eq:diffuse-logits}
+\end{align}
+On the same event,
+\begin{equation}
+ \frac{\normnuc{G}}{\normF{G}}\asymp\sqrt d.
+ \label{eq:diffuse-nuclear}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+For $\alpha<1/2$, integral comparison gives
+\[
+ \sum_{i>d^2}i^{-2\alpha}
+ \asymp N^{1-2\alpha},
+\]
+because $d^2/N\to0$.  At $\alpha=1/2$ the same tail equals
+$\log(N/d^2)+O(1)\asymp h$.  Division by
+$H_{N,\alpha}^2$ proves \eqref{eq:diffuse-mass}.
+
+For the uncentered matrix
+\[
+ \widetilde S:=d^2\sum_{i\in T}p_i u_iv_i^\top,
+\]
+the coefficient norms are
+\[
+ A_2=d^2\sqrt{s_T},
+ \qquad A_\infty=d^2p_{d^2+1}.
+\]
+A direct use of \Cref{lem:zipf} gives
+\begin{equation}
+ A_\infty\lesssim A_2/\sqrt d,
+ \qquad A_\infty=o(1).
+ \label{eq:diffuse-coefficients}
+\end{equation}
+For example, when $\alpha<1/2$,
+$dA_\infty^2/A_2^2\lesssim d^{-1}(d^2/N)^{1-2\alpha}$, and at
+$\alpha=1/2$ this ratio is $O((dh)^{-1})$.
+Thus \Cref{lem:bilinear} gives the bounds in
+\eqref{eq:diffuse-norms} for $\widetilde S$.  Since
+\[
+ S=\widetilde S-d^2\bar u
+ \left(\sum_{i\in T}p_iv_i\right)^\top,
+\]
+the centering term has both Frobenius and operator norm at most
+$d^2O(N^{-1/2})O(\sqrt{s_T})$, which is negligible relative to the two
+scales in \eqref{eq:diffuse-norms}.
+
+We next prove alignment.  Put
+$\widetilde G=\sum_i p_i u_iv_i^\top$.  Expanding gives
+\[
+ \ip{\widetilde G}{\widetilde S}=D+Z,
+\]
+where
+\[
+ D=d^2\sum_{i\in T}p_i^2\norm{u_i}^2\norm{v_i}^2
+\]
+and
+\[
+ Z=d^2\sum_{k\in T}\sum_{i\neq k}
+ p_ip_k(u_i^\top u_k)(v_i^\top v_k).
+\]
+On \eqref{eq:base-norms}, $D\geq c d^2s_T$.  In the expansion of
+$\Ee Z^2$, a Gaussian expectation vanishes unless the second ordered
+pair equals $(i,k)$ or $(k,i)$; in either nonzero case the product of
+the $u$- and $v$-expectations is $d^{-2}$.  Therefore
+\begin{align*}
+ \Ee Z^2
+ &\leq\frac1{d^2}
+ \left(s_2\,d^4s_T+(d^2s_T)^2\right),
+\end{align*}
+so, using $s_T\asymp s_2$,
+\[
+ \frac{\|Z\|_{L^2}}{d^2s_T}\lesssim d^{-1}.
+\]
+The random variable $Z$ belongs to Gaussian chaos of degree four.
+Choose an even $r>q+2$ and use hypercontractivity and Markov's
+inequality to obtain
+\[
+ \Pp\bigl(|Z|>d^2s_T/8\bigr)\leq d^{-q}
+\]
+for all large $d$.  Restoring the two centering terms changes the inner
+product by at most
+\[
+ O\!\left(d^2\sqrt{s_2s_T/N}\right)=o(d^2s_T).
+\]
+This proves \eqref{eq:diffuse-alignment}.
+
+It remains to prove the uniform logit bound.  Fix $(i,j)$ and condition
+only on the anchor vectors $(u_j,v_i)$.  For
+$k\in T\setminus\{i,j\}$, set
+\[
+ X_k:=d^2p_k(u_j^\top u_k)(v_k^\top v_i).
+\]
+The $X_k$ are conditionally independent and centered.  On the anchor
+norm event,
+\[
+ \sum_k\|X_k\|_{\psi_1\mid u_j,v_i}^2\lesssim d^2s_T,
+ \qquad
+ \max_k\|X_k\|_{\psi_1\mid u_j,v_i}
+ \lesssim dp_{d^2+1}.
+\]  Bernstein's
+inequality with $t=(q+3)h$ therefore gives
+\[
+ \left|\sum_{k\in T\setminus\{i,j\}}
+ d^2p_k(u_j^\top u_k)(v_k^\top v_i)\right|
+ \lesssim d\sqrt{s_Th}+d p_{d^2+1}h.
+\]
+By \eqref{eq:diffuse-coefficients} and $h/d=o(1)$, the second term is
+bounded by a constant multiple of $d^2p_{d^2+1}$.  The at most two
+removed anchor terms obey the same bound on
+\eqref{eq:base-norms}--\eqref{eq:base-inner}.  A union bound over
+$N^2$ pairs leaves failure at most $d^{-q}$.  Finally, replacing both
+$u_j$ and $\widetilde S$ by their centered versions adds at most
+\[
+ O\!\left(d^2\sqrt{s_T/N}\right).
+\]
+This proves \eqref{eq:diffuse-logits}.  Its right-hand side tends to zero:
+for $\alpha<1/2$ it is bounded by
+\[
+ C\left(d\sqrt{h/N}+(d^2/N)^{1-\alpha}+d^2/N\right),
+\]
+and at $\alpha=1/2$ by
+\[
+ C\left(dh/\sqrt N+d/\sqrt N+d^2\sqrt h/N\right).
+\]
+All terms vanish because $\beta>2$.
+
+Nuclear--operator duality, \eqref{eq:diffuse-alignment}, and
+\eqref{eq:diffuse-norms} give
+\[
+ \normnuc{G}\geq
+ \frac{\ip{G}{S}}{\normop{S}}
+ \gtrsim\sqrt d\sqrt{s_T}.
+\]
+Since $\normnuc{G}\leq\sqrt d\normF{G}$ and
+$\normF{G}\asymp\sqrt{s_2}\asymp\sqrt{s_T}$, this proves
+\eqref{eq:diffuse-nuclear}.
+\end{proof}
+
+\begin{theorem}[Diffuse accuracy interval]
+\label{thm:diffuse}
+Under $0\leq\alpha\leq1/2$, on the event of
+\Cref{prop:base-event,prop:diffuse-comparator}, simultaneously for
+\begin{equation}
+ 0<\Delta\lesssim d^2s_T,
+ \label{eq:diffuse-gain}
+\end{equation}
+one has
+\begin{equation}
+ \mathcal R_{\mathrm{op}}(\Delta)
+ \lesssim\frac{\Delta}{\sqrt d\sqrt{s_T}},
+ \qquad
+ \mathcal R_F(\Delta)\gtrsim\frac{\Delta}{\sqrt{s_2}},
+ \label{eq:diffuse-radii}
+\end{equation}
+and hence
+\[
+ \frac{\mathcal R_F(\Delta)}
+ {\mathcal R_{\mathrm{op}}(\Delta)}\asymp\sqrt d.
+\]
+\end{theorem}
+
+\begin{proof}
+By \eqref{eq:diffuse-logits}, the whole segment $tS$, $0\leq t\leq1$,
+lies in a fixed small-logit ball for large $d$.  There every softmax
+weight is within a fixed factor of $1/N$.  Using
+\eqref{eq:hessian-variance} and the pairwise-difference representation
+of covariance,
+\[
+ D^2\Psi(tS)[S,S]
+ \lesssim \tr(S^\top\Sigma_x S M_v)
+ \lesssim d^{-2}\normF{S}^2
+ \lesssim d^2s_T.
+\]
+Together with \eqref{eq:diffuse-alignment}, Taylor's formula gives
+\[
+ L(tS)\leq h-c t d^2s_T+C t^2d^2s_T.
+\]
+A sufficiently small fixed $t_0>0$ therefore achieves gain
+$\gtrsim d^2s_T$.  Convex scaling and \eqref{eq:diffuse-norms} give the
+operator upper bound in \eqref{eq:diffuse-radii}.  The Frobenius lower
+bound is \eqref{eq:tangent} and \eqref{eq:base-GF}.  Finally use
+$s_T\asymp s_2$ and \eqref{eq:universal-ratio}.
+\end{proof}
+
+% ============================================================
+\section{Head phase for \texorpdfstring{$\alpha>1/2$}{alpha > 1/2}}
+% ============================================================
+
+Assume throughout this section that $\alpha>1/2$.  For $K<N$ set
+\[
+ P_K:=\sum_{i>K}p_i,
+ \qquad s_K:=\sum_{i>K}p_i^2,
+ \qquad S_K:=\sum_{i=1}^K u_iv_i^\top,
+\]
+and define
+\begin{equation}
+ B_K:=\sum_{i=1}^N
+ \min\left\{1,\frac{p_i}{p_K}\right\}x_iv_i^\top.
+ \label{eq:BK-def}
+\end{equation}
+Fix once and for all $c_0:=1/8$.
+
+\begin{lemma}[Pooled Jensen lower bound]
+\label{lem:pooled}
+For every $W$ and every $i$,
+\begin{equation}
+ \ip{W}{x_iv_i^\top}\geq h-\ell_i(W).
+ \label{eq:single-pooled}
+\end{equation}
+Consequently, if
+\begin{equation}
+ L(W)\leq P_Kh+c_0Kp_Kh,
+ \label{eq:pooled-threshold}
+\end{equation}
+then
+\begin{equation}
+ \ip{W}{B_K}\geq(1-c_0)Kh.
+ \label{eq:BK-alignment}
+\end{equation}
+Moreover, with probability at least $1-Ce^{-cd}$, simultaneously for
+all $K\leq N/2$,
+\begin{equation}
+ \normF{B_K}\lesssim\sqrt K.
+ \label{eq:BK-norm}
+\end{equation}
+Thus every $W$ satisfying \eqref{eq:pooled-threshold} obeys
+\begin{equation}
+ \normF{W}\gtrsim h\sqrt K.
+ \label{eq:head-F-lower}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Jensen's inequality applied to all $N$ distractors gives
+\[
+ \ell_i(W)\geq h+\frac1N\sum_j(u_j-u_i)^\top Wv_i
+ =h-x_i^\top Wv_i,
+\]
+which is \eqref{eq:single-pooled}.  Since
+\[
+ p_K\min\left\{1,\frac{p_i}{p_K}\right\}
+ =\begin{cases}p_K,&i\leq K,\\ p_i,&i>K,\end{cases}
+\]
+multiplying \eqref{eq:single-pooled} by these coefficients and summing
+gives
+\[
+ p_K\ip{W}{B_K}
+ \geq(Kp_K+P_K)h-L(W).
+\]
+Use \eqref{eq:pooled-threshold} and divide by $p_K$.
+
+For the norm bound, the squared coefficient norm in \eqref{eq:BK-def}
+is
+\[
+ K+\sum_{i>K}(p_i/p_K)^2
+ =K+K^{2\alpha}\sum_{i>K}i^{-2\alpha}\asymp K,
+\]
+uniformly for $K\leq N/2$.  Apply \Cref{lem:bilinear} and note that
+the centering term has Frobenius norm $O(\sqrt{K/N})$.  A union bound
+over $K$ preserves failure $Ce^{-cd}$.  Finally combine
+\eqref{eq:BK-alignment} and \eqref{eq:BK-norm} by Cauchy--Schwarz.
+\end{proof}
+
+Define the deterministic error scale
+\begin{equation}
+ \mathsf e_K:=
+ P_K\left(\frac{h^2}{d}+\frac{Kh^2}{d^2}\right)
+ +h\left(1+\sqrt{K/d}\right)\sqrt{\frac{s_Kh}{d}}
+ +N^{-4\alpha-4}.
+ \label{eq:head-error}
+\end{equation}
+
+\begin{proposition}[Uniform head comparator]
+\label{prop:head-comparator}
+Fix $q>0$.  There exist fixed constants
+\[
+ \kappa=\kappa(\beta,q)>0,
+ \qquad C_{\mathrm{mem}}=C_{\mathrm{mem}}(\alpha)>0,
+ \qquad C_{\mathrm{cmp}}=C_{\mathrm{cmp}}(\alpha,\beta,q)>0,
+\]
+such that, with probability at least $1-Cd^{-q}-Ce^{-cd}$, the
+following statements hold simultaneously for every integer $K$ with
+\begin{equation}
+ Kh\leq\kappa d^2.
+ \label{eq:head-size}
+\end{equation}
+One has
+\begin{align}
+ &\normF{S_K}\lesssim\sqrt K,
+ \qquad
+ \normop{S_K}\lesssim1+\sqrt{K/d},
+ \label{eq:SK-norms}\\
+ &(u_i-u_j)^\top S_Kv_i\geq\frac14
+ \quad(i\leq K,\ j\neq i).
+ \label{eq:head-margin}
+\end{align}
+For
+\begin{equation}
+ W_K:=C_{\mathrm{mem}}hS_K,
+ \label{eq:WK-def}
+\end{equation}
+one has
+\begin{align}
+ &\normF{W_K}\lesssim h\sqrt K,
+ \qquad
+ \normop{W_K}\lesssim h(1+\sqrt{K/d}),
+ \label{eq:WK-norms}\\
+ &L(W_K)\leq P_Kh+C_{\mathrm{cmp}}\mathsf e_K.
+ \label{eq:WK-loss}
+\end{align}
+If in addition
+\begin{equation}
+ C_{\mathrm{cmp}}\mathsf e_K
+ \leq\frac{c_0}{4}Kp_Kh,
+ \label{eq:head-admissible}
+\end{equation}
+then every
+\begin{equation}
+ P_Kh+C_{\mathrm{cmp}}\mathsf e_K
+ \leq\eps\leq P_Kh+c_0Kp_Kh
+ \label{eq:one-head-window}
+\end{equation}
+satisfies
+\begin{equation}
+ \Rop(\eps)\lesssim h(1+\sqrt{K/d}),
+ \qquad
+ \RF(\eps)\gtrsim h\sqrt K.
+ \label{eq:one-head-radii}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The norm estimates in \eqref{eq:SK-norms} are
+\eqref{eq:bilinear-matrix} with $K$ unit coefficients, followed by a
+union bound over $K\leq N$.
+
+For the margin, fix $(K,i,j)$ with $i\leq K$ and $j\neq i$.  Decompose
+\begin{align*}
+ (u_i-u_j)^\top S_Kv_i
+ &= (u_i-u_j)^\top u_i\norm{v_i}^2\\
+ &\quad+\mathbf1_{\{j\leq K\}}
+ (u_i-u_j)^\top u_j(v_j^\top v_i)\\
+ &\quad+\sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+ (u_i-u_j)^\top u_k(v_k^\top v_i).
+\end{align*}
+On \eqref{eq:base-norms}--\eqref{eq:base-inner}, the first term is at
+least $4/5$ and the second is $o(1)$.  Conditional only on the anchor
+vectors $(u_i,u_j,v_i)$, the summands in the last line are independent,
+centered, have total squared conditional $\psi_1$ norm $O(K/d^2)$,
+and have maximal conditional $\psi_1$ norm $O(d^{-1})$.  Bernstein's inequality
+with $t=(q+4)h$, followed by a union bound over at most $N^3$ triples,
+gives
+\[
+ \left|\sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+ (u_i-u_j)^\top u_k(v_k^\top v_i)\right|
+ \lesssim \frac{\sqrt{Kh}}d+\frac hd
+\]
+with failure at most $d^{-q}$.  Choose $\kappa(\beta,q)$ sufficiently
+small in \eqref{eq:head-size}; then the last two terms have total
+absolute value at most $1/2$ for all large $d$, proving
+\eqref{eq:head-margin}.
+
+Choose $C_{\mathrm{mem}}$ so that
+$C_{\mathrm{mem}}/4\geq4\alpha+6$.  For $i\leq K$,
+\eqref{eq:head-margin} then gives
+\[
+ \ell_i(W_K)\leq
+ \log(1+Ne^{-C_{\mathrm{mem}}h/4})
+ \leq N^{-4\alpha-5}.
+\]
+It remains to control the tail.  Let
+\[
+ \mathcal F_K:=\sigma(u_1,\ldots,u_N,v_1,\ldots,v_K).
+\]
+Then $W_K$ is $\mathcal F_K$-measurable, while the vectors
+$(v_i)_{i>K}$ are conditionally independent.  For fixed $i>K$, the
+function
+\[
+ f_i(v):=\log\sum_j e^{(u_j-u_i)^\top W_Kv}
+\]
+is $4\normop{W_K}$-Lipschitz on \eqref{eq:base-norms}.  Conditional
+Gaussian concentration therefore gives
+\[
+ \sum_{i>K}p_i\bigl(f_i(v_i)-\Ee[f_i(v_i)\mid\mathcal F_K]\bigr)
+ \lesssim \normop{W_K}\sqrt{\frac{s_Kh}{d}}
+\]
+simultaneously for all $K$, with failure at most $d^{-q}$.  For the
+conditional mean, Jensen's inequality and the Gaussian moment-generating
+function give
+\[
+ \Ee[f_i(v_i)\mid\mathcal F_K]
+ \leq h+C\normop{W_K}^2/d.
+\]
+Multiplying by $p_i$, summing over $i>K$, and using
+\eqref{eq:WK-norms} yields \eqref{eq:WK-loss} with one fixed
+$C_{\mathrm{cmp}}$.  The head contribution is absorbed by the final
+term in \eqref{eq:head-error}.
+
+If \eqref{eq:one-head-window} holds, $W_K$ is feasible by
+\eqref{eq:WK-loss}, which gives the operator upper bound.  Its upper
+endpoint is exactly the hypothesis of \Cref{lem:pooled}, which gives the
+Frobenius lower bound.
+\end{proof}
+
+\begin{lemma}[Coverage for $1/2<\alpha<1$]
+\label{lem:between-coverage}
+Let $1/2<\alpha<1$ and define
+\begin{equation}
+ K_*:=\left(\frac{d^2}{N^{1-\alpha}h}\right)^{1/\alpha}.
+ \label{eq:Kstar-between}
+\end{equation}
+There is a fixed $\kappa_< >0$ such that, whenever
+$K_*/d\to\infty$, the integer
+\[
+ M:=\lfloor\kappa_< K_*\rfloor
+\]
+satisfies $M\geq d$ for all large $d$, every $d\leq K\leq M$ obeys
+\eqref{eq:head-size} and \eqref{eq:head-admissible}, and the union of
+the corresponding gain windows contains
+\begin{equation}
+ F_d\leq\Delta\leq(1-c_0/4)F_M,
+ \qquad
+ F_K:=h\sum_{i\leq K}p_i.
+ \label{eq:exact-between-covered}
+\end{equation}
+Consequently,
+\begin{equation}
+ h(d/N)^{1-\alpha}\lesssim\Delta\lesssim
+ h\left(\frac{d^2}{Nh}\right)^{(1-\alpha)/\alpha}
+ \label{eq:between-covered-orders}
+\end{equation}
+is covered.  The condition $K_*/d\to\infty$ is equivalent to
+\eqref{eq:between-condition}.
+\end{lemma}
+
+\begin{proof}
+For $K\leq N/2$, \Cref{lem:zipf} gives
+\begin{equation}
+ Kp_Kh\asymp N^{\alpha-1}K^{1-\alpha}h,
+ \qquad
+ s_K\asymp N^{2\alpha-2}K^{1-2\alpha}.
+ \label{eq:between-head-scales}
+\end{equation}
+Also $K_*/N=(d^2/(Nh))^{1/\alpha}\to0$, so all $K\leq M$ are at most
+$N/2$ for large $d$.  For $K\geq d$, the deterministic part of
+\eqref{eq:head-error} is at most $CKh^2/d^2$.  Dividing by the first
+quantity in \eqref{eq:between-head-scales} gives
+\[
+ C\frac{N^{1-\alpha}K^\alpha h}{d^2}
+ \leq C\kappa_<^\alpha.
+\]
+The fluctuation term divided by $Kp_Kh$ is $O(\sqrt h/d)$, uniformly in
+$d\leq K\leq M$, and the final $N^{-4\alpha-4}$ term is uniformly
+$o(Kp_Kh)$.  Choose $\kappa_<$ sufficiently small and then $d$
+sufficiently large; this proves \eqref{eq:head-admissible}.  Moreover,
+\[
+ \frac{K_*h}{d^2}
+ =\left(\frac{d^2}{Nh}\right)^{(1-\alpha)/\alpha}\to0,
+\]
+so \eqref{eq:head-size} also holds after decreasing $\kappa_<$.
+
+The gain version of \eqref{eq:one-head-window} contains
+\begin{equation}
+ I_K:=
+ \left[F_K-c_0Kp_Kh,
+       F_K-\frac{c_0}{4}Kp_Kh\right].
+ \label{eq:between-IK}
+\end{equation}
+Let $L_K,U_K$ be its two endpoints.  Since $p_{K+1}\leq p_K$,
+\[
+ (K+1)p_{K+1}-Kp_K\leq p_{K+1}.
+\]
+Hence
+\[
+ L_{K+1}-L_K\geq(1-c_0)p_{K+1}h>0,
+ \qquad
+ U_{K+1}-U_K\geq(1-c_0/4)p_{K+1}h>0.
+\]
+Thus the intervals move to the right.  Consecutive intervals overlap if
+$L_{K+1}\leq U_K$, equivalently if
+\begin{equation}
+ [c_0(K+1)-1]p_{K+1}
+ \geq(c_0/4)Kp_K.
+ \label{eq:between-overlap}
+\end{equation}
+For all sufficiently large $K$,
+$c_0(K+1)-1\geq(c_0/2)K$ and
+$p_{K+1}/p_K\geq3/4$, so the left side of
+\eqref{eq:between-overlap} is at least
+$(3c_0/8)Kp_K$.  Therefore
+\[
+ \bigcup_{K=d}^M I_K=[L_d,U_M].
+\]
+Because $Kp_Kh\leq F_K$,
+\[
+ L_d\leq F_d,
+ \qquad
+ U_M\geq(1-c_0/4)F_M.
+\]
+Furthermore,
+\[
+ \frac{F_M}{F_d}\asymp(M/d)^{1-\alpha}\to\infty,
+\]
+so $F_d\leq(1-c_0/4)F_M$ for all large $d$.  This proves the exact
+inclusion \eqref{eq:exact-between-covered}.
+
+Finally,
+$F_K\asymp h(K/N)^{1-\alpha}$ and
+$M\asymp K_*$, which gives \eqref{eq:between-covered-orders}.  Directly,
+\[
+ \frac{K_*}{d}
+ =d^{[2-\alpha-\beta(1-\alpha)]/\alpha}h^{-1/\alpha},
+\]
+which tends to infinity exactly under \eqref{eq:between-condition}.
+\end{proof}
+
+\begin{lemma}[Coverage at $\alpha=1$]
+\label{lem:one-coverage}
+Assume $\alpha=1$.  There are fixed constants
+$\kappa_1=\kappa_1(\beta,q)>0$ and $A=A(\beta,q)>0$ such that, with
+\[
+ M:=\left\lfloor\kappa_1\frac{d^2}{h^2}\right\rfloor,
+\]
+every integer $d\leq K\leq M$ obeys
+\eqref{eq:head-size} and \eqref{eq:head-admissible}, and the union of
+the corresponding loss windows contains
+\begin{equation}
+ \log\!\left(\frac{Nh^2}{d^2}\right)+A
+ \leq\eps\leq
+ \log\!\left(\frac Nd\right)-A.
+ \label{eq:one-covered}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+At $\alpha=1$,
+\[
+ Kp_Kh=h/H_{N,1}=1+o(1),
+ \qquad s_K\asymp(Kh^2)^{-1}.
+\]
+For $K\geq d$, \eqref{eq:head-error} is bounded by
+\[
+ CKh^2/d^2+C\sqrt h/d+o(1).
+\]
+Choose $\kappa_1$ sufficiently small and then $d$ large; this proves
+\eqref{eq:head-admissible}.  Also
+$Kh\leq\kappa_1d^2/h\leq\kappa d^2$, so
+\eqref{eq:head-size} holds.
+
+Write $b_K:=P_Kh$.  Uniformly in this range,
+\begin{equation}
+ b_K=\log(N/K)+O(1).
+ \label{eq:bK-one}
+\end{equation}
+For all large $d$, $7/8\leq Kp_Kh\leq9/8$, while admissibility gives
+$C_{\mathrm{cmp}}\mathsf e_K\leq(c_0/4)Kp_Kh$.  Hence the fixed interval
+\[
+ J_K:=[b_K+c_0/3,\ b_K+c_0/2]
+\]
+is contained in the one-head window.  Since
+\[
+ b_K-b_{K+1}=p_{K+1}h\leq2/(K+1)<c_0/6
+\]
+for $K\geq d$ and large $d$, consecutive $J_K$ overlap.  Their
+endpoints decrease with $K$, so
+\[
+ \bigcup_{K=d}^M J_K=[b_M+c_0/3,\ b_d+c_0/2].
+\]
+Using \eqref{eq:bK-one} and
+$M\asymp d^2/h^2$ gives
+\[
+ b_M=\log(Nh^2/d^2)+O(1),
+ \qquad b_d=\log(N/d)+O(1).
+\]
+A sufficiently large fixed $A$ therefore makes
+\eqref{eq:one-covered} a subinterval of this union.  Its length tends
+to infinity because $\log(d/h^2)\to\infty$.
+\end{proof}
+
+\begin{lemma}[Coverage and inversion for $\alpha>1$]
+\label{lem:above-coverage}
+Assume $\alpha>1$.  There exist a fixed integer $K_0=K_0(\alpha)$, a
+constant $\kappa_>=\kappa_>(\alpha,\beta,q)>0$, and
+$\eta=\eta(\alpha)\in(0,1)$ such that, with
+\[
+ M:=\left\lfloor\kappa_>\frac{d^2}{h}\right\rfloor,
+\]
+every $K_0\leq K\leq M$ obeys \eqref{eq:head-size} and the stronger
+bound
+\begin{equation}
+ C_{\mathrm{cmp}}\mathsf e_K
+ \leq\frac{c_0}{16}Kp_Kh.
+ \label{eq:above-strong-admissible}
+\end{equation}
+The corresponding loss windows cover
+\begin{equation}
+ \frac{h^\alpha}{d^{2(\alpha-1)}}\lesssim\eps\leq\eta h.
+ \label{eq:above-covered}
+\end{equation}
+For every covered $\eps$, one may choose $K$ so that
+\begin{equation}
+ K\asymp(h/\eps)^{1/(\alpha-1)}.
+ \label{eq:above-inversion}
+\end{equation}
+Finally, the fixed comparator $W_{K_0}$ satisfies
+\begin{equation}
+ L(W_{K_0})<\eta h.
+ \label{eq:fixed-head-comparator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For $K\leq N/2$, \Cref{lem:zipf} gives
+\[
+ P_K\asymp K^{1-\alpha},
+ \qquad Kp_K\asymp K^{1-\alpha},
+ \qquad s_K\asymp K^{1-2\alpha}.
+\]
+Dividing \eqref{eq:head-error} by $Kp_Kh$ yields, uniformly for
+$1\leq K\leq M$,
+\begin{equation}
+ \frac{C_{\mathrm{cmp}}\mathsf e_K}{Kp_Kh}
+ \lesssim
+ \frac hd+\frac{Kh}{d^2}
+ +\sqrt{\frac h{dK}}+\frac{\sqrt h}{d}+o(1).
+ \label{eq:above-error-ratio}
+\end{equation}
+Choose $\kappa_>$ sufficiently small and then $d$ sufficiently large;
+this proves \eqref{eq:above-strong-admissible} and
+\eqref{eq:head-size}.  Also $M/N\to0$, so all quoted Zipf estimates are
+valid.
+
+The one-head window contains
+\begin{equation}
+ J_K:=h\left[
+ P_K+\frac{c_0}{8}Kp_K,
+ P_K+\frac{c_0}{2}Kp_K
+ \right].
+ \label{eq:above-JK}
+\end{equation}
+Choose $K_0$ so large that, for every $K\geq K_0$,
+\begin{equation}
+ \left[\frac{c_0}{2}(K+1)-1\right]p_{K+1}
+ \geq\frac{c_0}{8}Kp_K.
+ \label{eq:above-overlap}
+\end{equation}
+This is possible because $p_{K+1}/p_K\to1$.  Since
+$P_{K+1}=P_K-p_{K+1}$, condition \eqref{eq:above-overlap} is exactly the
+statement that the upper endpoint of $J_{K+1}$ is at least the lower
+endpoint of $J_K$.  Both endpoints decrease with $K$, because
+$P_K$ and $Kp_K=K^{1-\alpha}/H_{N,\alpha}$ decrease.  Thus
+\[
+ \bigcup_{K=K_0}^M J_K
+ =\left[\inf J_M,\ \sup J_{K_0}\right].
+\]
+Every $\eps\in J_K$ satisfies
+\begin{equation}
+ \eps\asymp hK^{1-\alpha},
+ \label{eq:above-window-scale}
+\end{equation}
+which proves \eqref{eq:above-inversion}.  Moreover,
+\[
+ \inf J_M\asymp hM^{1-\alpha}
+ \asymp \frac{h^\alpha}{d^{2(\alpha-1)}}.
+\]
+
+It remains to choose the fixed upper endpoint.  Let
+$p_i^{(\infty)}=i^{-\alpha}/\zeta(\alpha)$ and
+$P_K^{(\infty)}=\sum_{i>K}p_i^{(\infty)}$.  For the fixed $K_0$, set
+\[
+ a:=P_{K_0}^{(\infty)}+\frac{c_0}{16}K_0p_{K_0}^{(\infty)},
+ \qquad
+ b:=P_{K_0}^{(\infty)}+\frac{c_0}{8}K_0p_{K_0}^{(\infty)},
+ \qquad
+ \eta:=\frac{a+b}{2}.
+\]
+Then $0<a<\eta<b<1$: indeed
+$Kp_K^{(\infty)}\leq1-P_K^{(\infty)}$ and $c_0/8<1$.
+For all large $d$,
+\begin{equation}
+ P_{K_0}+\frac{c_0}{16}K_0p_{K_0}
+ <\eta<
+ P_{K_0}+\frac{c_0}{8}K_0p_{K_0}.
+ \label{eq:eta-sandwich}
+\end{equation}
+The right inequality places $\eta h$ below the lower endpoint of
+$J_{K_0}$, whereas $\inf J_M=o(h)$.  The connected union therefore
+contains \eqref{eq:above-covered} after fixing the implicit lower
+constant.  Finally, \eqref{eq:WK-loss},
+\eqref{eq:above-strong-admissible}, and the left inequality in
+\eqref{eq:eta-sandwich} give \eqref{eq:fixed-head-comparator}.
+\end{proof}
+
+\begin{theorem}[Consequences of the head windows]
+\label{thm:head-results}
+On the intersection of the events in
+\Cref{prop:base-event,lem:pooled,prop:head-comparator}, the following
+hold simultaneously.
+\begin{enumerate}[label=\textup{(\roman*)}]
+\item Under the assumptions of \Cref{lem:between-coverage}, every gain
+in \eqref{eq:between-covered-orders} satisfies
+\[
+ \mathcal R_F(\Delta)/\mathcal R_{\mathrm{op}}(\Delta)\asymp\sqrt d.
+\]
+\item At $\alpha=1$, every loss in \eqref{eq:one-covered} satisfies
+$\RF(\eps)/\Rop(\eps)\asymp\sqrt d$.
+\item If $\alpha>1$, then every loss in
+\eqref{eq:above-covered} satisfies
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \asymp
+ \min\left\{\sqrt d,
+ (h/\eps)^{1/(2(\alpha-1))}\right\}.
+ \label{eq:above-head-formula}
+\end{equation}
+The same formula holds for $\eta h\leq\eps<h$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For every one-head window, \eqref{eq:one-head-radii} gives
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \gtrsim\frac{\sqrt K}{1+\sqrt{K/d}}
+ \asymp\min\{\sqrt K,\sqrt d\}.
+ \label{eq:head-ratio-lower}
+\end{equation}
+In the first two cases, the covering constructions use $K\geq d$, so
+\eqref{eq:head-ratio-lower} and the universal upper bound
+\eqref{eq:universal-ratio} give $\asymp\sqrt d$.
+
+Now let $\alpha>1$ and $\eps\leq\eta h$.  The same comparator is
+feasible, so \eqref{eq:WK-norms} also gives
+$\RF(\eps)\lesssim h\sqrt K$.  Moreover,
+$h-\eps\geq(1-\eta)h$ and \eqref{eq:base-nuclear} gives
+$\normnuc{G}\asymp1$, so the tangent bound yields
+$\Rop(\eps)\gtrsim h$.  Hence
+\[
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \lesssim\min\{\sqrt K,\sqrt d\}.
+\]
+Combine this with \eqref{eq:head-ratio-lower} and
+\eqref{eq:above-inversion}.
+
+For $\eta h\leq\eps<h$, let $W_0=W_{K_0}$ and
+$\Delta_0=h-L(W_0)\gtrsim h$.  Convex scaling gives, with
+$\Delta=h-\eps$,
+\[
+ \RF(\eps)+\Rop(\eps)\lesssim\Delta,
+\]
+because $K_0$ is fixed and $\normF{W_0}+\normop{W_0}\lesssim h$.
+The two tangent bounds and
+$\normF{G}\asymp\normnuc{G}\asymp1$ give the reverse inequalities.
+Thus the ratio is $\asymp1$, which agrees with
+\eqref{eq:above-head-formula} because $h/\eps$ is bounded above and
+below by fixed constants.
+\end{proof}
+
+% ============================================================
+\section{Weak-weight all-accuracy obstruction}
+% ============================================================
+
+This section assumes
+\begin{equation}
+ \frac12<\alpha<1,
+ \qquad \beta(1-\alpha)>2.
+ \label{eq:weak-regime}
+\end{equation}
+The companion note~\cite{companion} proves that, because $N>d^2$, a finite minimizer
+exists with probability at least
+\begin{equation}
+ 1-2^{1-N}\sum_{r=0}^{d^2-1}\binom{N-1}{r}.
+ \label{eq:companion-prob}
+\end{equation}
+
+\begin{lemma}[Strict convexity and coercivity]
+\label{lem:strict-coercive}
+Assume $N\geq d+1$.  Almost surely, $\Psi$ is strictly convex and
+coercive on $\R^{d\times d}$.
+\end{lemma}
+
+\begin{proof}
+Almost surely, $v_1,\ldots,v_d$ span $\R^d$.  Also
+\[
+ \operatorname{span}\{x_1,\ldots,x_N\}
+ =\operatorname{span}\{u_1-u_N,\ldots,u_{N-1}-u_N\}.
+\]
+The $d\times d$ matrix
+$[u_1-u_N,\ldots,u_d-u_N]$ has a nondegenerate Gaussian law on
+$\R^{d\times d}$: for coefficient vectors $a_1,\ldots,a_d$ not all
+zero,
+\[
+ \Var\!\left(\sum_{r=1}^d a_r^\top(u_r-u_N)\right)
+ =\frac1d\sum_{r=1}^d\norm{a_r}^2
+ +\frac1d\norm{\sum_{r=1}^d a_r}^2>0.
+\]
+Hence its determinant is nonzero almost surely, and the $x_j$ span
+$\R^d$.
+
+If $D^2\Psi(W)[A,A]=0$, then by \eqref{eq:hessian-variance}, for each
+$i$, the numbers $x_j^\top Av_i$ are constant in $j$.  Their uniform
+average is zero, so $x_j^\top Av_i=0$ for all $i,j$.  The two spanning
+properties imply $A=0$.  Hence the Hessian is positive definite in
+every nonzero direction, proving strict convexity.
+
+We next show that the origin lies in the interior of
+$\operatorname{conv}\{x_j\}$.  Otherwise a supporting-hyperplane
+argument would give $y\neq0$ such that $x_j^\top y\geq0$ for every
+$j$.  Averaging and using $N^{-1}\sum_jx_j=0$ forces
+$x_j^\top y=0$ for every $j$, contradicting the spanning property.
+Therefore there is a random $r_x>0$ such that
+\[
+ \max_j x_j^\top y\geq r_x\norm y
+ \qquad(y\in\R^d).
+\]
+For every $y$,
+\[
+ \log\left(\frac1N\sum_j e^{x_j^\top y}\right)
+ \geq\max_jx_j^\top y-h
+ \geq r_x\norm y-h.
+\]
+Applying this with $y=Wv_i$ and averaging over $i$ gives
+\[
+ \Psi(W)\geq r_x\sum_i p_i\norm{Wv_i}-h.
+\]
+The map $W\mapsto\sum_i p_i\norm{Wv_i}$ is a norm because the $v_i$
+span $\R^d$.  By equivalence of norms on the finite-dimensional matrix
+space, it is bounded below by a positive random multiple of
+$\normF{W}$.  Hence $\Psi(W)\to\infty$ as $\normF{W}\to\infty$.
+\end{proof}
+
+\begin{lemma}[Minimizer homotopy and Fisher sandwich]
+\label{lem:homotopy-fisher}
+Assume that $F_1(W):=\Psi(W)-\ip{G}{W}$ has a finite minimizer.  For
+$t\in[0,1]$, let $W_t$ be the minimizer of
+$F_t(W):=\Psi(W)-t\ip{G}{W}$.  Then $W_t$ is uniquely defined,
+$t\mapsto W_t$ is $C^1$, $W_0=0$, $W_1=W_\star$, and
+\begin{equation}
+ \nabla\Psi(W_t)=tG,
+ \qquad
+ \dot W_t=[\nabla^2\Psi(W_t)]^{-1}[G].
+ \label{eq:homotopy}
+\end{equation}
+Moreover, if
+\[
+ \rho(W):=\max_{i,j}|x_j^\top Wv_i|\leq\rho_0,
+\]
+then for every $A$,
+\begin{equation}
+ e^{-4\rho_0}\tr(A^\top\Sigma_x A M_v)
+ \leq D^2\Psi(W)[A,A]
+ \leq e^{4\rho_0}\tr(A^\top\Sigma_x A M_v).
+ \label{eq:fisher}
+\end{equation}
+On \eqref{eq:base-Sigma} and \eqref{eq:base-Mv-two-sided}, the last
+quantity is $\asymp d^{-2}\normF{A}^2$.
+\end{lemma}
+
+\begin{proof}
+By \Cref{lem:strict-coercive}, $\Psi$ is strictly convex and coercive.
+For $t<1$,
+$F_t=(1-t)\Psi+tF_1$ is coercive because $F_1$ is bounded below; at
+$t=1$, existence is assumed.  Strict convexity gives uniqueness.  The
+first-order condition is $\nabla\Psi(W_t)=tG$.  Since the Hessian is
+positive definite, the implicit function theorem gives local $C^1$
+branches; uniqueness makes the branches agree on overlaps, yielding the
+global path and \eqref{eq:homotopy}.  Since $\Psi\geq0$ and
+$\Psi(0)=0$, strict convexity gives $W_0=0$, while $F_1=L-h$ gives
+$W_1=W_\star$.
+
+If $\rho(W)\leq\rho_0$, then
+$e^{-2\rho_0}/N\leq q_{ji}(W)\leq e^{2\rho_0}/N$.  For any probability
+vector $q$,
+\[
+ \Cov_q(x)=\frac12\sum_{j,k}q_jq_k(x_j-x_k)(x_j-x_k)^\top,
+\]
+while
+\[
+ \Sigma_x=\frac1{2N^2}\sum_{j,k}(x_j-x_k)(x_j-x_k)^\top.
+\]
+Comparison of the coefficients, followed by
+\eqref{eq:hessian-variance}, gives \eqref{eq:fisher}.  The final claim
+follows from the two-sided covariance bounds.
+\end{proof}
+
+\begin{theorem}[Weak-weight obstruction]
+\label{thm:weak}
+On the intersection of the base Gaussian event and the companion
+finite-minimizer event,
+\begin{equation}
+ \normF{W_\star}\lesssim d^2\sqrt{s_2},
+ \qquad
+ h-L(W_\star)\gtrsim d^2s_2.
+ \label{eq:weak-localization}
+\end{equation}
+Consequently, simultaneously for every feasible
+$L_\star\leq\eps<h$,
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}\lesssim d^{1-\alpha}.
+ \label{eq:weak-obstruction}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By \eqref{eq:s2-orders} and \eqref{eq:weak-regime},
+\begin{equation}
+ d^2\sqrt{s_2}\asymp d^2N^{\alpha-1}\longrightarrow0.
+ \label{eq:weak-small}
+\end{equation}
+Fix a small $\rho_0>0$ and define the exit time
+\[
+ \tau:=\sup\{t\in[0,1]:\rho(W_s)\leq\rho_0
+ \text{ for every }0\leq s\leq t\}.
+\]
+Because $W_0=0$ and the path is continuous, $\tau>0$.  The defining
+property also holds at $\tau$ by continuity.  On $[0,\tau]$,
+\eqref{eq:fisher} gives
+\[
+ \normF{\dot W_t}\lesssim d^2\normF{G},
+\]
+so
+\[
+ \normF{W_t}\lesssim d^2\sqrt{s_2}.
+\]
+On \eqref{eq:base-norms},
+$\rho(W_t)\lesssim\normF{W_t}$; by \eqref{eq:weak-small}, this is at
+most $\rho_0/2$ for all large $d$.  If $\tau<1$, continuity would
+extend the defining property beyond $\tau$, a contradiction.  Hence
+$\tau=1$ and the first inequality in \eqref{eq:weak-localization}
+holds.
+
+For the gain, take $W=t_0d^2G$ with a sufficiently small fixed $t_0$.
+On \eqref{eq:base-norms},
+\[
+ \max_{0\leq s\leq1}\rho(sW)
+ \lesssim\normF{W}\lesssim d^2\sqrt{s_2}=o(1),
+\]
+so the segment from $0$ to $W$ lies in the same small-logit ball.  The
+upper Fisher bound and Taylor's formula give
+\[
+ L(W)
+ \leq h-t_0d^2\normF{G}^2
+ +Ct_0^2d^2\normF{G}^2
+ \leq h-cd^2s_2.
+\]
+Optimality of $W_\star$ proves the second inequality in
+\eqref{eq:weak-localization}.
+
+Finally, \eqref{eq:all-accuracy}, \eqref{eq:base-nuclear}, and
+\eqref{eq:weak-localization} give, for every feasible positive gain,
+\[
+ \frac{\mathcal R_F(\Delta)}
+ {\mathcal R_{\mathrm{op}}(\Delta)}
+ \lesssim
+ \frac{d^2\sqrt{s_2}\,
+ d^{1-\alpha}\sqrt{s_2}}{d^2s_2}
+ =d^{1-\alpha}.
+\]
+\end{proof}
+
+% ============================================================
+\section{Assembly of the main theorem}
+% ============================================================
+
+\begin{proof}[Proof of \Cref{thm:main}]
+Parts (i) and (ii) follow from \Cref{thm:diffuse} and
+\eqref{eq:diffuse-mass}.  The local statements in parts (iii) and (iv)
+are \Cref{cor:local-phase} together with \eqref{eq:s2-orders}.
+The head statement for $1/2<\alpha<1$ follows from
+\Cref{lem:between-coverage,thm:head-results}; its nonemptiness was proved
+through $K_*/d\to\infty$.  The second statement at $\alpha=1$ follows
+from \Cref{lem:one-coverage,thm:head-results}.  Part (v) follows from
+\Cref{lem:above-coverage,thm:head-results}; the square-root subinterval
+is obtained by comparing
+$(h/\eps)^{1/(2(\alpha-1))}$ with $\sqrt d$.  Since its lower endpoint
+is $o(h/d^{\alpha-1})$, the asserted additive and multiplicative widths
+follow.
+
+The positive statements use a finite intersection of the base event,
+the diffuse event when $\alpha\leq1/2$, or the head event when
+$\alpha>1/2$.  The corresponding failure probabilities sum to
+$Cd^{-q}+Ce^{-cd}$.  All estimates were proved simultaneously over the
+required integer indices, and the interval arguments are deterministic,
+which proves \eqref{eq:main-prob}.  The final statement is
+\Cref{thm:weak}; intersecting with the companion event and using
+\eqref{eq:companion-prob} gives \eqref{eq:weak-main-prob}.
+\end{proof}
+
+% ============================================================
+\section{Subquadratic interpolation regime: \texorpdfstring{$0<\beta<2$}{0 < beta < 2}}
+\label{sec:subquadratic}
+% ============================================================
+
+In this section only, replace the standing assumption $\beta>2$ by
+\begin{equation}
+ 0<\beta<2,
+ \qquad N=\lceil d^\beta\rceil,
+ \qquad h=\log N,
+ \label{eq:subquadratic-regime}
+\end{equation}
+while keeping the model, the Zipf weights, and the definitions of
+$R_{\mathrm F}(\eps)$ and $R_{\mathrm{op}}(\eps)$ unchanged.  Thus
+$Nh=o(d^2)$.  For $x>0$, write
+$\log_+x:=\max\{\log x,0\}$.
+
+Set
+\begin{equation}
+ S:=\sum_{i=1}^N u_iv_i^\top,
+ \qquad
+ B:=\sum_{i=1}^N x_iv_i^\top,
+ \qquad x_i=u_i-\bar u.
+ \label{eq:subquadratic-SB}
+\end{equation}
+
+\begin{lemma}[Uniform interpolation geometry]
+\label{lem:subquadratic-geometry}
+Fix $q>0$.  For all sufficiently large $d$, with probability at least
+\begin{equation}
+ 1-Cd^{-q}-Ce^{-cd},
+ \label{eq:subquadratic-geometry-prob}
+\end{equation}
+one has simultaneously
+\begin{align}
+ &(u_i-u_j)^\top Sv_i\geq\frac14
+ &&(1\leq i\neq j\leq N),
+ \label{eq:subquadratic-margin}\\
+ &\normF{S}\leq C\sqrt N,
+ \qquad
+ \normop{S}\leq C\left(1+\sqrt{N/d}\right),
+ \label{eq:subquadratic-S-norms}\\
+ &\normF{B}\leq C\sqrt N,
+ \qquad
+ \operatorname{rank}(B)\leq\min\{N,d\}.
+ \label{eq:subquadratic-B-norms}
+\end{align}
+The constants may depend on $(\beta,q)$ but not on $d$ or $N$.
+\end{lemma}
+
+\begin{proof}
+Standard Gaussian norm and inner-product tails, followed by a union
+bound over $O(N^2)$ indices, give an event of probability at least
+$1-Cd^{-q}-Ce^{-cd}$ on which
+\begin{equation}
+ \max_i\left|\norm{u_i}^2-1\right|
+ +\max_i\left|\norm{v_i}^2-1\right|\leq\frac1{10}
+ \label{eq:subquadratic-anchor-norms}
+\end{equation}
+and
+\begin{equation}
+ \max_{i\neq j}
+ \left(|u_i^\top u_j|+|v_i^\top v_j|\right)
+ \leq C\sqrt{h/d}.
+ \label{eq:subquadratic-anchor-inner}
+\end{equation}
+Because $h/d\to0$, the right-hand side of
+\eqref{eq:subquadratic-anchor-inner} is at most $1/20$ for all large
+$d$ because the constant $C$ is fixed.
+
+Fix $i\neq j$.  Expanding the margin gives
+\begin{align}
+ (u_i-u_j)^\top Sv_i
+ &= (u_i-u_j)^\top u_i\norm{v_i}^2
+ \nonumber\\
+ &\quad +(u_i-u_j)^\top u_j(v_j^\top v_i)
+ \nonumber\\
+ &\quad +\sum_{k\notin\{i,j\}}
+ (u_i-u_j)^\top u_k(v_k^\top v_i).
+ \label{eq:subquadratic-margin-expansion}
+\end{align}
+On \eqref{eq:subquadratic-anchor-norms}--
+\eqref{eq:subquadratic-anchor-inner}, the first term is at least
+\[
+ (9/10-1/20)(9/10)>3/4,
+\]
+whereas the absolute value of the second term is at most
+\[
+ (11/10+1/20)(1/20)<1/16.
+\]
+Condition on the anchor vectors $(u_i,u_j,v_i)$.  For
+$k\notin\{i,j\}$, the random variables
+\[
+ X_k:=(u_i-u_j)^\top u_k(v_k^\top v_i)
+\]
+are conditionally independent and centered.  Moreover, the two
+Gaussian factors in $X_k$ are conditionally independent and have
+conditional subgaussian norms bounded respectively by
+$C\norm{u_i-u_j}/\sqrt d$ and $C\norm{v_i}/\sqrt d$.  Hence, on
+\eqref{eq:subquadratic-anchor-norms},
+\[
+ \left\lVert X_k\right\rVert_{\psi_1\mid u_i,u_j,v_i}\leq C/d.
+\]
+Conditional Bernstein with $t=A h$, where
+$A=A(\beta,q)$ is sufficiently large, yields
+\begin{equation}
+ \left|\sum_{k\notin\{i,j\}}X_k\right|
+ \leq C\left(\frac{\sqrt{Nh}}d+\frac hd\right)
+ \label{eq:subquadratic-cross-bound}
+\end{equation}
+except on an event of conditional probability at most $2e^{-Ah}$.
+A union bound over fewer than $N^2$ ordered pairs leaves failure at most
+$d^{-q}$.  Since $Nh=o(d^2)$, the right-hand side of
+\eqref{eq:subquadratic-cross-bound} tends to zero.  Combining the three
+terms in \eqref{eq:subquadratic-margin-expansion} proves
+\eqref{eq:subquadratic-margin} for all large $d$.
+
+Apply \Cref{lem:bilinear} with all coefficients equal to one.  This
+gives \eqref{eq:subquadratic-S-norms} with failure $Ce^{-cd}$.  Finally,
+write
+\[
+ B=S-\bar u\left(\sum_{i=1}^N v_i\right)^\top.
+\]
+Since $\sqrt N\,\bar u$ and
+$N^{-1/2}\sum_i v_i$ are independent copies of
+$\cN(0,\Id_d/d)$, Gaussian norm concentration gives
+\[
+ \norm{\bar u}\lesssim N^{-1/2},
+ \qquad
+ \norm{\sum_i v_i}\lesssim\sqrt N
+\]
+with failure $Ce^{-cd}$.  Thus the centering term has Frobenius norm
+$O(1)$, and \eqref{eq:subquadratic-B-norms} follows from
+\eqref{eq:subquadratic-S-norms}.  The rank bound is deterministic,
+because $B=XV^\top$ for the $d\times N$ matrices
+$X=[x_1,\ldots,x_N]$ and $V=[v_1,\ldots,v_N]$.
+\end{proof}
+
+\begin{theorem}[Sharp full-memory interpolation phase]
+\label{thm:subquadratic-interpolation}
+Assume \eqref{eq:subquadratic-regime} and fix $q>0$.  There are constants
+$c_\star,c,C>0$, with $c_\star$ absolute and $c,C$ allowed to depend on
+$(\alpha,\beta,q)$, such that, on an event of probability at least
+\begin{equation}
+ 1-Cd^{-q}-Ce^{-cd},
+ \label{eq:subquadratic-main-prob}
+\end{equation}
+the following statements hold.
+
+First,
+\begin{equation}
+ L_\star=0,
+ \label{eq:subquadratic-Lstar}
+\end{equation}
+but no finite matrix attains loss zero.  Second, simultaneously for
+every
+\begin{equation}
+ 0<\eps\leq c_\star Np_Nh,
+ \label{eq:subquadratic-accuracy-phase}
+\end{equation}
+one has
+\begin{align}
+ \RF(\eps)
+ &\asymp
+ \sqrt N\left(h+\log_+\frac{p_N}{\eps}\right),
+ \label{eq:subquadratic-RF}\\
+ \Rop(\eps)
+ &\asymp
+ \left(1+\sqrt{N/d}\right)
+ \left(h+\log_+\frac{p_N}{\eps}\right).
+ \label{eq:subquadratic-Rop}
+\end{align}
+Consequently,
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \asymp
+ \sqrt{\min\{N,d\}}
+ \asymp
+ \begin{cases}
+ d^{\beta/2},&0<\beta<1,\\
+ \sqrt d,&1\leq\beta<2.
+ \end{cases}
+ \label{eq:subquadratic-separation}
+\end{equation}
+The upper endpoint of \eqref{eq:subquadratic-accuracy-phase} has the
+explicit order
+\begin{equation}
+ Np_Nh\asymp
+ \begin{cases}
+ h,&0\leq\alpha<1,\\
+ 1,&\alpha=1,\\
+ hN^{1-\alpha},&\alpha>1.
+ \end{cases}
+ \label{eq:subquadratic-endpoint}
+\end{equation}
+
+every displayed assertion being simultaneous over the whole continuum
+of loss levels in \eqref{eq:subquadratic-accuracy-phase}.
+\end{theorem}
+
+\begin{proof}
+Work on the event in \Cref{lem:subquadratic-geometry}.  By
+\eqref{eq:subquadratic-margin}, for every $t\geq0$ and every $i$,
+\[
+ \ell_i(tS)
+ \leq
+ \log\left(1+(N-1)e^{-t/4}\right).
+\]
+The right-hand side tends to zero as $t\to\infty$, and therefore
+$L_\star=0$.  On the other hand, if $W$ is finite and $N\geq2$, then
+all terms in the defining exponential sum are strictly positive, so
+$\ell_i(W)>0$ for every $i$ and hence $L(W)>0$.  Thus the infimum is not
+attained at a finite matrix.
+
+Fix a level satisfying \eqref{eq:subquadratic-accuracy-phase}, and put
+\begin{equation}
+ a_\eps:=h+\log_+\frac{p_N}{\eps}.
+ \label{eq:subquadratic-aeps}
+\end{equation}
+Because $H_{N,\alpha}\leq N$,
+\[
+ p_N=\frac{N^{-\alpha}}{H_{N,\alpha}}
+ \geq N^{-(\alpha+1)},
+ \qquad
+ \log(1/p_N)\leq(\alpha+1)h.
+\]
+If $\eps\leq p_N$, then
+\[
+ \log(N/\eps)
+ =h+\log(1/p_N)+\log(p_N/\eps)
+ \leq(\alpha+2)a_\eps.
+\]
+If $\eps>p_N$, then $a_\eps=h$ and again
+\[
+ \log(N/\eps)
+ \leq h+\log(1/p_N)
+ \leq(\alpha+2)a_\eps.
+\]
+Hence, with
+\[
+ t_\eps:=4(\alpha+2)a_\eps,
+\]
+one has $(N-1)e^{-t_\eps/4}\leq\eps$, and therefore
+$L(t_\eps S)\leq\eps$.  The norm bounds
+\eqref{eq:subquadratic-S-norms} give
+\begin{equation}
+ \RF(\eps)\lesssim\sqrt N\,a_\eps,
+ \qquad
+ \Rop(\eps)\lesssim
+ \left(1+\sqrt{N/d}\right)a_\eps.
+ \label{eq:subquadratic-upper-radii}
+\end{equation}
+
+We next prove the matching lower bounds.  Let $W$ satisfy
+$L(W)\leq\eps$.  Jensen's inequality over all $N$ classes gives, as in
+\Cref{lem:pooled},
+\begin{equation}
+ x_i^\top Wv_i\geq h-\ell_i(W).
+ \label{eq:subquadratic-pooled-single}
+\end{equation}
+Since $p_i\geq p_N$ and all losses are nonnegative,
+\[
+ p_N\sum_{i=1}^N\ell_i(W)
+ \leq\sum_{i=1}^Np_i\ell_i(W)
+ =L(W)\leq\eps.
+\]
+Summing \eqref{eq:subquadratic-pooled-single} therefore yields
+\begin{equation}
+ \ip{W}{B}\geq Nh-\frac\eps{p_N}.
+ \label{eq:subquadratic-pooled-alignment}
+\end{equation}
+Choose, for definiteness, $c_\star=1/32$.  If
+$p_N\leq\eps\leq c_\star Np_Nh$, then $a_\eps=h$ and
+\eqref{eq:subquadratic-pooled-alignment} gives
+\begin{equation}
+ \ip{W}{B}\geq(1-c_\star)Nh\gtrsim Na_\eps.
+ \label{eq:subquadratic-alignment-large}
+\end{equation}
+
+It remains to treat $0<\eps<p_N$.  Let
+\[
+ \bar u_{-i}:=\frac1{N-1}\sum_{j\neq i}u_j,
+ \qquad
+ z_i:=(u_i-\bar u_{-i})^\top Wv_i
+ =\frac N{N-1}x_i^\top Wv_i.
+\]
+Jensen's inequality over the $N-1$ distractors gives
+\begin{align*}
+ \ell_i(W)
+ &=\log\left(1+\sum_{j\neq i}
+ e^{(u_j-u_i)^\top Wv_i}\right)\\
+ &\geq\log\left(1+(N-1)e^{-z_i}\right).
+\end{align*}
+Because $p_i\ell_i(W)\leq L(W)\leq\eps$,
+$\ell_i(W)\leq\eps/p_i\leq\eps/p_N<1$.  Since
+$e^x-1\leq2x$ for $0\leq x\leq1$, inversion of the preceding display
+gives
+\begin{align}
+ z_i
+ &\geq\log\left(\frac{N-1}{e^{\eps/p_i}-1}\right)
+ \geq\log\left(\frac{(N-1)p_i}{2\eps}\right)
+ \nonumber\\
+ &\geq\log\left(\frac{(N-1)p_N}{2\eps}\right)
+ =a_\eps+\log(1-1/N)-\log2.
+ \label{eq:subquadratic-individual-margin}
+\end{align}
+Since $a_\eps\geq h\to\infty$, the right-hand side is at least
+$a_\eps/2$ for all large $d$.  Summing over $i$ and using the identity
+for $z_i$ yields
+\begin{equation}
+ \ip{W}{B}
+ =\frac{N-1}{N}\sum_{i=1}^Nz_i
+ \geq\frac{N-1}{2}a_\eps
+ \gtrsim Na_\eps.
+ \label{eq:subquadratic-alignment-small}
+\end{equation}
+Thus \eqref{eq:subquadratic-alignment-large} and
+\eqref{eq:subquadratic-alignment-small} imply, throughout the entire
+phase,
+\begin{equation}
+ \ip{W}{B}\gtrsim Na_\eps.
+ \label{eq:subquadratic-master-alignment}
+\end{equation}
+
+By \eqref{eq:subquadratic-B-norms},
+\[
+ \normnuc{B}
+ \leq\sqrt{\operatorname{rank}(B)}\normF{B}
+ \lesssim\sqrt{N\min\{N,d\}}.
+\]
+Frobenius duality and nuclear--operator duality applied to
+\eqref{eq:subquadratic-master-alignment} now give
+\begin{align}
+ \normF{W}
+ &\gtrsim\sqrt N\,a_\eps,
+ \label{eq:subquadratic-lower-F}\\
+ \normop{W}
+ &\gtrsim
+ \sqrt{\frac{N}{\min\{N,d\}}}\,a_\eps
+ \asymp
+ \left(1+\sqrt{N/d}\right)a_\eps.
+ \label{eq:subquadratic-lower-op}
+\end{align}
+Taking infima over all feasible $W$ and combining with
+\eqref{eq:subquadratic-upper-radii} proves
+\eqref{eq:subquadratic-RF}--\eqref{eq:subquadratic-Rop}.  Their quotient
+is
+\[
+ \frac{\sqrt N}{1+\sqrt{N/d}}
+ \asymp\sqrt{\min\{N,d\}},
+\]
+which gives \eqref{eq:subquadratic-separation} after substituting
+$N=\lceil d^\beta\rceil$.  Finally,
+\eqref{eq:subquadratic-endpoint} follows from the Zipf estimates in
+\Cref{lem:zipf}.  No union bound over $\eps$ is required, because all
+arguments after the Gaussian event are deterministic and hold for every
+level simultaneously.
+\end{proof}
+
+
+\begin{thebibliography}{9}
+\bibitem{companion}
+\emph{Finite Existence and Uniqueness of the Gaussian Softmax
+Associative-Memory Minimizer}, companion technical note, 2026.
+
+\bibitem{vershynin}
+R.~Vershynin,
+\emph{High-Dimensional Probability: An Introduction with Applications
+in Data Science}, Cambridge University Press, 2018.
+
+\bibitem{tropp}
+J.~A.~Tropp,
+\emph{An Introduction to Matrix Concentration Inequalities},
+Foundations and Trends in Machine Learning, 2015.
+
+\bibitem{janson}
+S.~Janson,
+\emph{Gaussian Hilbert Spaces}, Cambridge University Press, 1997.
+\end{thebibliography}
+
+\end{document}

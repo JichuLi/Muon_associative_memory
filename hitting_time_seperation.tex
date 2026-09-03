@@ -1,0 +1,2219 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem,microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\usepackage{aliascnt}
+
+\newtheorem{theorem}{Theorem}[section]
+\newaliascnt{proposition}{theorem}
+\newtheorem{proposition}[proposition]{Proposition}
+\aliascntresetthe{proposition}
+\newaliascnt{lemma}{theorem}
+\newtheorem{lemma}[lemma]{Lemma}
+\aliascntresetthe{lemma}
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
+\newaliascnt{remark}{theorem}
+\newtheorem{remark}[remark]{Remark}
+\aliascntresetthe{remark}
+\theoremstyle{definition}
+\newaliascnt{definition}{theorem}
+\newtheorem{definition}[definition]{Definition}
+\aliascntresetthe{definition}
+
+\crefname{theorem}{theorem}{theorems}
+\Crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{proposition}{propositions}
+\Crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{lemma}{lemmas}
+\Crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{corollary}{corollaries}
+\Crefname{corollary}{Corollary}{Corollaries}
+\crefname{remark}{remark}{remarks}
+\Crefname{remark}{Remark}{Remarks}
+
+% Bold notation from the supplied preamble.  Only symbols used below are kept.
+\newcommand{\gb}{\mathbf{g}}
+\newcommand{\ub}{\mathbf{u}}
+\newcommand{\vb}{\mathbf{v}}
+\newcommand{\wb}{\mathbf{w}}
+\newcommand{\zb}{\mathbf{z}}
+\newcommand{\Ab}{\mathbf{A}}
+\newcommand{\Gb}{\mathbf{G}}
+\newcommand{\Ib}{\mathbf{I}}
+\newcommand{\Sb}{\mathbf{S}}
+\newcommand{\Ub}{\mathbf{U}}
+\newcommand{\Vb}{\mathbf{V}}
+\newcommand{\Wb}{\mathbf{W}}
+\newcommand{\Xb}{\mathbf{X}}
+\newcommand{\Yb}{\mathbf{Y}}
+\newcommand{\Zb}{\mathbf{Z}}
+
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert_2}
+\newcommand{\normF}[1]{\left\lVert #1\right\rVert_{\mathrm F}}
+\newcommand{\normop}[1]{\left\lVert #1\right\rVert_{\mathrm{op}}}
+\newcommand{\HF}{H_{\mathrm F}}
+\newcommand{\Hop}{H_{\mathrm{op}}}
+\DeclareMathOperator{\polar}{polar}
+
+\title{A Schedule-Robust $\Omega(d)$ Hitting-Time Separation\\
+between Stable Gradient Descent and Spectral-Frank-Wolfe}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We study a over-capacity Gaussian associative-memory loss with Zipf weights, where
+$N=\operatorname{poly}(d)$ and $N\gtrsim d^2$.  On the target accuracy range
+$\frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \lesssim\eps\lesssim
+ \frac{\log N}{d^{\alpha-1}},
+$ the standard Frank-Wolfe
+smoothness-radius certificate for NGD is a factor $d$ larger than the Muon
+ certificate.  We also prove an actual $\Omega(d)$ hitting-time separation
+ between any fixed stable GD schedule prescribed before the sample, with
+ steps at most $3$, and Muon-Frank-Wolfe.  Finally, we show that the Muon's hitting-time order remains valid after the effective learning rate is capped by an arbitrary fixed positive constant.
+\end{abstract}
+
+% ============================================================
+\section{Setup and main results}
+% ============================================================
+
+Fix $\alpha>1$.  Assume throughout that $N=\operatorname{poly}(d)$ and
+$N\gtrsim d^2$.  All asymptotics are as $d\to\infty$.  Hidden constants
+may depend on $\alpha$ and on the prescribed failure exponent, but not on
+$d,N,\eps$, or the prescribed GD schedule.
+
+Write $[N]:=\{1,\ldots,N\}$ and draw two mutually independent families
+\[
+ \ub_1,\ldots,\ub_N,
+ \quad
+ \vb_1,\ldots,\vb_N
+ \overset{\mathrm{i.i.d.}}{\sim}
+ \mathcal N\!\left(\mathbf 0,\frac1d\Ib_d\right).
+\]
+Let $p_i:=i^{-\alpha}/\sum_{k=1}^Nk^{-\alpha}$.  For
+$\Wb\in\RR^{d\times d}$, define
+\begin{align*}
+ \ell_i(\Wb)
+ &:={}
+ \log\!\left(
+  \sum_{j=1}^N
+  \exp\!\left((\ub_j-\ub_i)^\top\Wb\vb_i\right)
+ \right),\\
+ L(\Wb)&:=\sum_{i=1}^Np_i\ell_i(\Wb).
+\end{align*}
+The term $j=i$ gives $L\geq0$, and $L(\mathbf 0)=\log N$.  Each $\ell_i$ is
+a log-sum-exp of affine functions of $\Wb$, so each $\ell_i$ is convex.
+Since the weights are positive, their weighted sum $L$ is also convex.
+
+For $X\in\{\mathrm F,\mathrm{op}\}$, define the intrinsic radius
+\[
+ R_X(\eps)
+ :=
+ \inf\bigl\{\|\Wb\|_X:L(\Wb)\leq\eps\bigr\}.
+\]
+Whenever this set is nonempty, the infimum is attained: a minimizing
+sequence is bounded, hence has a convergent subsequence, and the sublevel
+set is closed because $L$ is continuous.  The global smoothness constants
+are
+\begin{align*}
+ \HF
+ &:={}
+ \sup_{\Wb\in\RR^{d\times d}}
+ \sup_{\Ab\ne\mathbf 0}
+ \frac{\nabla^2L(\Wb)[\Ab,\Ab]}{\normF{\Ab}^2},\\
+ \Hop
+ &:={}
+ \sup_{\Wb\in\RR^{d\times d}}
+ \sup_{\Ab\ne\mathbf 0}
+ \frac{\nabla^2L(\Wb)[\Ab,\Ab]}{\normop{\Ab}^2}.
+\end{align*}
+
+\paragraph{Frank-wolfe.} For $X\in\{\mathrm F,\mathrm{op}\}$, Frank-Wolfe for target $\eps$ is
+run on the ball of radius $R_X(\eps/2)$.  Starting from
+$\Wb_0^X=\mathbf 0$, let $\gamma_t=2/(t+2)$ and define
+\[
+ \Sb_t^X
+ \in\mathop{\arg\min}_{\|\Sb\|_X\leq R_X(\eps/2)}
+ \left\langle\nabla L(\Wb_t^X),\Sb\right\rangle_{\mathrm F},
+ \quad
+ \Wb_{t+1}^X=(1-\gamma_t)\Wb_t^X+\gamma_t\Sb_t^X.
+\]
+The operator-ball oracle is
+$-R_{\mathrm{op}}(\eps/2)\polar(\nabla L)$ and is called
+Muon-Frank-Wolfe.  The Frobenius-ball oracle is
+$-R_{\mathrm F}(\eps/2)\nabla L/\normF{\nabla L}$ and is called
+NGD-Frank-Wolfe; the fraction is zero when the gradient is zero.  Write
+\[
+ \tau_X(\eps):=\inf\{t\in\mathbb N:L(\Wb_t^X)\leq\eps\},
+ \quad
+ \tau_{\mathrm{Muon}}(\eps):=\tau_{\mathrm{op}}(\eps),
+ \quad
+ \tau_{\mathrm{NGD}}(\eps):=\tau_{\mathrm F}(\eps).
+\]
+If $\Gb=\Ub\Sigma\Vb^\top$ is a compact singular-value decomposition,
+define $\polar(\Gb):=\Ub\Vb^\top$, and set
+$\polar(\mathbf0):=\mathbf0$.  Then
+$\normop{\polar(\Gb)}\leq1$ and
+$\langle\Gb,\polar(\Gb)\rangle_{\mathrm F}=\|\Gb\|_*$.
+
+\paragraph{Stable GD.}
+For a target $0<\varepsilon<\log N$, prescribe a deterministic sequence
+$\{\eta_t(\varepsilon)\}_{t\geq0}$ before drawing the Gaussian sample.  The
+sequence may depend arbitrarily on $(t,\varepsilon,d,N)$ and the fixed model
+parameters, and must only satisfy
+\begin{equation}
+ 0\leq\eta_t(\varepsilon)\leq 3
+ \quad\text{for every }t\geq0.
+ \label{eq:eta-cap}
+\end{equation}
+Starting from $\bm W^{\mathrm{GD}}_0=\bm 0$, define
+\begin{align*}
+ \bm W^{\mathrm{GD}}_{t+1}
+ &=
+ \bm W^{\mathrm{GD}}_t
+ -\eta_t(\varepsilon)\nabla L(\bm W^{\mathrm{GD}}_t),
+ \\
+ \tau_{\mathrm{GD}}(\varepsilon)
+ &:=
+ \inf\{t\in\mathbb N:L(\bm W^{\mathrm{GD}}_t)\leq\varepsilon\}.
+\end{align*}
+The fixed schedule is suppressed from the hitting-time notation.  As usual,
+$\inf\varnothing=+\infty$.  The pre-sample requirement is needed
+only for the sign-conditioning step in the lower bound; it still permits an
+arbitrary target-dependent schedule.  Data-adaptive line searches are not
+included in this definition.
+
+\subsection*{Main results}
+
+\begin{theorem}[Muon and NGD Frank-Wolfe bounds]
+\label{thm:fw}
+Fix $q>0$.  There exist $C_{\mathrm{low}},c_{\mathrm{up}}>0$ such that,
+with probability at least $1-O(d^{-q})$, simultaneously for every
+$
+ C_{\mathrm{low}}
+ \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \leq\eps\leq
+ c_{\mathrm{up}}
+ \frac{\log N}{d^{\alpha-1}},
+$
+one has
+\begin{align*}
+ \tau_{\mathrm{Muon}}(\eps)\lesssim
+ \frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}, \quad
+ \tau_{\mathrm{NGD}}(\eps)
+ \lesssim
+ \frac{\HF R_{\mathrm F}(\eps/2)^2}{\eps}.
+\end{align*}
+In particular, the two standard Frank-Wolfe certificates satisfy
+\[
+ \frac{\HF R_{\mathrm F}(\eps/2)^2}{\eps}
+ \eqsim (\log N)
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)} \eqsim
+ d\,\frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}.
+\]
+\end{theorem}
+
+\begin{theorem}[GD lower bound and actual $\Omega(d)$ separation]
+\label{thm:gd}
+Fix $q>0$.  There exist $C_{\mathrm{low}},c_{\mathrm{up}}>0$, which may be
+chosen so that \Cref{thm:fw} holds on the same range, such that for every
+target satisfying
+$
+ C_{\mathrm{low}}
+ \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \leq\eps\leq
+ c_{\mathrm{up}}
+ \frac{\log N}{d^{\alpha-1}},
+$
+and every deterministic schedule prescribed before the sample satisfying
+$0\leq\eta_t(\eps)\leq3$, the following holds with probability at least
+$1-O(d^{-q})$:
+\[
+ \tau_{\mathrm{GD}}(\eps)
+ \gtrsim
+ (\log N)
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}
+ \gtrsim
+ d\,\tau_{\mathrm{Muon}}(\eps).
+\]
+\end{theorem}
+
+\begin{theorem}[Muon with an arbitrarily capped effective learning rate]
+\label{thm:capped}
+Fix $q>0$ and any constant $\bar\eta>0$.  There exist
+$C_{\mathrm{low}},c_{\mathrm{up}}>0$, which may be chosen so that
+\Cref{thm:fw} holds on the same range, such that for every target in the range
+$
+ C_{\mathrm{low}}
+ \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \leq\eps\leq
+ c_{\mathrm{up}}
+ \frac{\log N}{d^{\alpha-1}}.
+$
+In the same Muon-Frank-Wolfe recursion, replace only the mixing schedule
+by
+\[
+ \gamma_t=\frac2{t+2+a},
+ \quad
+ a=\max\!\left\{
+ 0,\frac{2R_{\mathrm{op}}(\eps/2)}{\bar\eta}-2
+ \right\}.
+\]
+Write $\tau_{\mathrm{Muon}}(\eps;\gamma)$ for the hitting time of this same
+recursion with the displayed schedule.  Then, for every $t\geq0$,
+\[
+ \gamma_tR_{\mathrm{op}}(\eps/2)\leq\bar\eta,
+ \qquad
+ \normop{\Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
+ \leq2\bar\eta.
+\]
+With probability at least $1-O(d^{-q})$,
+\[
+ \tau_{\mathrm{Muon}}(\eps;\gamma)
+ \lesssim_{\bar\eta}
+ \frac{\Hop R_{\mathrm{op}}(\eps)^2}{\eps}
+ \lesssim_{\bar\eta}
+ \frac{\log N}{d}
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+\]
+\end{theorem}
+
+\begin{remark}[What the two separations mean]
+The factor $d$ in \Cref{thm:fw} compares the standard Frank-Wolfe
+smoothness-radius certificates; it is not a lower bound on the actual NGD
+hitting time.  The factor $d$ in \Cref{thm:gd} is an actual hitting-time
+separation.  In \Cref{thm:capped}, the quantity being capped is the
+effective learning rate $R_{\mathrm{op}}(\eps/2)\gamma_t$, not merely the mixing coefficient $\gamma_t\leq1$.
+\end{remark}
+
+% ============================================================
+\section{Proof of \Cref{thm:fw}}
+% ============================================================
+
+\subsection{Gaussian regularity and global smoothness}
+
+\begin{lemma}[Gaussian regularity]
+\label{lem:regularity-v2}
+With probability at least $1-e^{-\Omega(d)}$, all the following hold:
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=2.2em]
+\item
+\[
+ \max_{i\leq N}
+ \left\{
+  \left|\norm{\ub_i}^2-1\right|,
+  \left|\norm{\vb_i}^2-1\right|
+ \right\}\leq\frac1{10},
+\]
+and
+\[
+ \max_{i\ne j}
+ \left\{
+  |\ub_i^\top\ub_j|,
+  |\vb_i^\top\vb_j|
+ \right\}\leq\frac1{100}.
+\]
+\item Every consecutive $B\subset[N]$ with
+$d\leq|B|\leq2d$ and $\min B\geq d/3$ satisfies
+\[
+ \normop{[\vb_i]_{i\in B}}\leq4.
+\]
+\end{enumerate}
+This event is unchanged by arbitrary sign flips of the vectors $\vb_i$.
+\end{lemma}
+
+\begin{proof}
+For $\gb\sim\mathcal N(\mathbf0,\Ib_d/d)$, the chi-square tail bound gives
+\[
+ \PP\!\left(\left|\norm{\gb}^2-1\right|>\frac1{10}\right)
+ \leq2e^{-c d}.
+\]
+For independent $\gb,\widetilde\gb$, conditionally on $\gb$ one has
+$\gb^\top\widetilde\gb\sim
+\mathcal N(0,\norm{\gb}^2/d)$.  Hence
+\begin{align*}
+ \PP\!\left(|\gb^\top\widetilde\gb|>\frac1{100}\right)
+ &\leq
+ \PP(\norm{\gb}>2)
+ +\PP\!\left(
+  |\gb^\top\widetilde\gb|>\frac1{100},\ \norm{\gb}\leq2
+ \right)\\
+ &\leq
+ 2e^{-c d}+2\exp\!\left(-\frac{d}{8\cdot10^4}\right)\\
+ &\leq2e^{-c'd}.
+\end{align*}
+There are polynomially many vectors and pairs, so a union bound proves
+part~(i).
+
+If $|B|=m\in[d,2d]$, then
+$[\vb_i]_{i\in B}=\Gb/\sqrt d$ for a standard Gaussian $d\times m$
+matrix.  The Gaussian singular-value inequality gives
+\begin{align*}
+ \PP\!\left(\normop{\Gb/\sqrt d}>4\right)
+ &\leq
+ \PP\!\left(\normop{\Gb}>\sqrt d+\sqrt m+\sqrt d\right)\\
+ &\leq2e^{-d/2},
+\end{align*}
+because $2+\sqrt{m/d}<4$.  There are polynomially many consecutive blocks,
+so another union bound proves part~(ii).  Norms, absolute inner products,
+and singular values are unchanged by column sign flips.
+\end{proof}
+
+\begin{lemma}[Sharp global smoothness]
+\label{lem:smoothness-v2}
+On the event in \Cref{lem:regularity-v2},
+\[
+ 1\lesssim\HF\leq\Hop
+ \leq\frac{1221}{2000}<\frac23.
+\]
+Consequently, every GD map
+$\Wb\mapsto\Wb-\eta\nabla L(\Wb)$ with $0\leq\eta\leq3$ is
+nonexpansive in Frobenius norm.
+\end{lemma}
+
+\begin{proof}
+We first derive the Hessian without invoking the log-sum-exp variance formula
+as a black box.  Define
+\[
+ \pi_{ji}(\Wb)
+ :=
+ \frac{e^{(\ub_j-\ub_i)^\top\Wb\vb_i}}
+ {\sum_{k=1}^Ne^{(\ub_k-\ub_i)^\top\Wb\vb_i}}.
+\]
+Directional differentiation gives
+\begin{align*}
+ D\ell_i(\Wb)[\Ab]
+ &=\sum_{j=1}^N\pi_{ji}(\Wb)
+ (\ub_j-\ub_i)^\top\Ab\vb_i,\\
+ D\pi_{ji}(\Wb)[\Ab]
+ &=\pi_{ji}(\Wb)\Bigg[
+ (\ub_j-\ub_i)^\top\Ab\vb_i-
+ \sum_{k=1}^N\pi_{ki}(\Wb)
+ (\ub_k-\ub_i)^\top\Ab\vb_i
+ \Bigg].
+\end{align*}
+Substituting the second identity into the derivative of the first gives
+\begin{align*}
+ \nabla^2\ell_i(\Wb)[\Ab,\Ab]
+ &=\sum_{j=1}^N\pi_{ji}(\Wb)
+ \bigl((\ub_j-\ub_i)^\top\Ab\vb_i\bigr)^2-
+ \left[
+  \sum_{j=1}^N\pi_{ji}(\Wb)
+  (\ub_j-\ub_i)^\top\Ab\vb_i
+ \right]^2\\
+ &=\operatorname{Var}_{j\sim\pi_{\cdot i}(\Wb)}
+ \!\left((\ub_j-\ub_i)^\top\Ab\vb_i\right)\\
+ &=\operatorname{Var}_{j\sim\pi_{\cdot i}(\Wb)}
+ \!\left(\ub_j^\top\Ab\vb_i\right).
+\end{align*}
+The last equality holds because $\ub_i^\top\Ab\vb_i$ is constant in $j$.
+
+If a scalar variable is supported on $[m,M]$, then
+\begin{align*}
+ \operatorname{Var}(Y)
+ &=\min_{c\in\RR}\EE[(Y-c)^2]\\
+ &\leq\EE\!\left[\left(Y-\frac{m+M}{2}\right)^2\right]
+ \leq\frac{(M-m)^2}{4}.
+\end{align*}
+For $Y_j=\ub_j^\top\Ab\vb_i$, its range satisfies
+\begin{align*}
+ \max_jY_j-\min_jY_j
+ &=\max_{j,k}(\ub_j-\ub_k)^\top\Ab\vb_i\\
+ &\leq
+ \max_{j,k}\norm{\ub_j-\ub_k}\,\norm{\Ab\vb_i},
+\end{align*}
+where the last line is Euclidean Cauchy--Schwarz.  On the regularity event,
+the distance is zero for $j=k$, while for $j\ne k$,
+\begin{align*}
+ \norm{\ub_j-\ub_k}^2
+ &=\norm{\ub_j}^2+\norm{\ub_k}^2-2\ub_j^\top\ub_k\\
+ &\leq\frac{11}{10}+\frac{11}{10}+\frac2{100}
+ =\frac{111}{50}.
+\end{align*}
+Consequently,
+\begin{align*}
+ \nabla^2L(\Wb)[\Ab,\Ab]
+ &=\sum_{i=1}^Np_i\nabla^2\ell_i(\Wb)[\Ab,\Ab]\\
+ &\leq\frac{111}{200}
+ \sum_{i=1}^Np_i\norm{\Ab\vb_i}^2\\
+ &\leq\frac{111}{200}\normop{\Ab}^2
+ \sum_{i=1}^Np_i\norm{\vb_i}^2\\
+ &\leq\frac{111}{200}\frac{11}{10}\normop{\Ab}^2
+ =\frac{1221}{2000}\normop{\Ab}^2.
+\end{align*}
+The third line used
+$\norm{\Ab\vb_i}\leq\normop{\Ab}\norm{\vb_i}$.  Replacing this by
+$\norm{\Ab\vb_i}\leq\normF{\Ab}\norm{\vb_i}$ proves the Frobenius
+upper bound.  Since $\normop{\Ab}\leq\normF{\Ab}$ for every $\Ab$, the
+definitions also give $\HF\leq\Hop$.
+
+We also verify explicitly that these Hessian bounds imply the smoothness
+inequalities used below.  For $X\in\{\mathrm F,\mathrm{op}\}$ and arbitrary
+$\Wb,\Ab$, the one-dimensional fundamental theorem of calculus gives
+\begin{align*}
+ L(\Wb+\Ab)-L(\Wb)
+ &=\int_0^1
+ \left\langle\nabla L(\Wb+s\Ab),\Ab\right\rangle_{\mathrm F}\,ds\\
+ &=\left\langle\nabla L(\Wb),\Ab\right\rangle_{\mathrm F}
+ +\int_0^1(1-s)\nabla^2L(\Wb+s\Ab)[\Ab,\Ab]\,ds\\
+ &\leq\left\langle\nabla L(\Wb),\Ab\right\rangle_{\mathrm F}
+ +\int_0^1(1-s)H_X\|\Ab\|_X^2\,ds\\
+ &=\left\langle\nabla L(\Wb),\Ab\right\rangle_{\mathrm F}
+ +\frac{H_X}{2}\|\Ab\|_X^2.
+\end{align*}
+
+We now prove that the lower bound is constant rather than merely positive.
+Define, only in this paragraph,
+\[
+ \wb
+ :=\ub_1+\ub_2
+ -\frac{\norm{\ub_1}^2-\norm{\ub_2}^2}
+ {\norm{\ub_1-\ub_2}^2}(\ub_1-\ub_2).
+\]
+By construction,
+$(\ub_1-\ub_2)^\top\wb=0$, and hence
+$\ub_1^\top\wb=\ub_2^\top\wb$.  The regularity bounds give
+\begin{align*}
+ \left|
+  \frac{\norm{\ub_1}^2-\norm{\ub_2}^2}
+  {\norm{\ub_1-\ub_2}^2}
+ \right|
+ &\leq\frac{1/5}{9/5-1/50}<\frac18,\\
+ \ub_1^\top\wb
+ &\geq
+ \left(\frac9{10}-\frac1{100}\right)
+ -\frac18\left(\frac{11}{10}+\frac1{100}\right)
+ >\frac7{10},\\
+ |\ub_j^\top\wb|
+ &\leq\frac2{100}+\frac18\frac2{100}<\frac1{40}
+ \qquad(j\geq3).
+\end{align*}
+Thus keys $1$ and $2$ are the unique tied maximizers of
+$j\mapsto\ub_j^\top\wb$.
+
+For $s>0$, let
+\[
+ \Wb_s:=s\,\frac{\wb\vb_1^\top}{\norm{\vb_1}^2},
+ \qquad
+ \Ab:=\frac{(\ub_1-\ub_2)\vb_1^\top}
+ {\norm{\ub_1-\ub_2}\norm{\vb_1}}.
+\]
+The rank-one norm identities give
+\begin{align*}
+ \normF{\Ab}
+ &=\frac{\norm{\ub_1-\ub_2}\norm{\vb_1}}
+ {\norm{\ub_1-\ub_2}\norm{\vb_1}}=1,\\
+ \normop{\Ab}&=\normF{\Ab}=1.
+\end{align*}
+Moreover, $\Wb_s\vb_1=s\wb$.  Therefore, in the first query's softmax,
+\begin{align*}
+ \pi_{j1}(\Wb_s)
+ &=\frac{e^{s\ub_j^\top\wb}}
+ {\sum_{k=1}^Ne^{s\ub_k^\top\wb}},
+\end{align*}
+where the common factor $e^{-s\ub_1^\top\wb}$ cancels.  The strict gap
+proved above implies
+\[
+ \pi_{11}(\Wb_s),\pi_{21}(\Wb_s)\longrightarrow\frac12,
+ \qquad
+ \pi_{j1}(\Wb_s)\longrightarrow0\quad(j\geq3).
+\]
+For every $s>0$, the definition of $\HF$, the identity
+$\normF{\Ab}=1$, and nonnegativity of every query variance give
+\begin{align*}
+ \HF
+ &\geq\nabla^2L(\Wb_s)[\Ab,\Ab]\\
+ &=\sum_{i=1}^Np_i
+ \operatorname{Var}_{j\sim\pi_{\cdot i}(\Wb_s)}
+ (\ub_j^\top\Ab\vb_i)\\
+ &\geq p_1
+ \operatorname{Var}_{j\sim\pi_{\cdot1}(\Wb_s)}
+ (\ub_j^\top\Ab\vb_1).
+\end{align*}
+Taking $s\to\infty$ and using the already proved convergence of
+$\pi_{\cdot1}(\Wb_s)$ yields
+\begin{align*}
+ \HF
+ &\geq\frac{p_1}{4}
+ \bigl((\ub_1-\ub_2)^\top\Ab\vb_1\bigr)^2\\
+ &=\frac{p_1}{4}\norm{\ub_1-\ub_2}^2\norm{\vb_1}^2
+ \gtrsim1.
+\end{align*}
+Here $p_1\geq1/\zeta(\alpha)$ and both squared norms are bounded below on
+the regularity event.  This proves the lower smoothness bound.
+
+The nonexpansiveness claim follows from cocoercivity, proved in full in
+\Cref{lem:cocoercive-v2}: since $L$ is $2/3$-smooth, every
+$0\leq\eta\leq2/(2/3)=3$ is allowed.
+\end{proof}
+
+\subsection{The standard Frank--Wolfe factor}
+
+\begin{proposition}[Standard Frank--Wolfe smoothness--radius factor]
+\label{prop:fw-factor-v2}
+Fix $X\in\{\mathrm F,\mathrm{op}\}$ and $R>0$.  Frank--Wolfe on
+$\{\Wb:\|\Wb\|_X\leq R\}$, started from zero with
+$\gamma_t=2/(t+2)$, satisfies, for every $t\geq1$,
+\[
+ L(\Wb_t)-\min_{\|\Wb\|_X\leq R}L(\Wb)
+ \leq\frac{8H_XR^2}{t+2}.
+\]
+Consequently, if $R\geq R_X(\eps/2)$, then its hitting time for $\eps$
+satisfies
+\[
+ \inf\{t:L(\Wb_t)\leq\eps\}
+ \lesssim1+\frac{H_XR^2}{\eps}.
+\]
+\end{proposition}
+
+\begin{proof}
+Let $\Wb_R^*$ minimize $L$ on the ball and write
+$h_t:=L(\Wb_t)-L(\Wb_R^*)$.  Because $\gamma_t\in[0,1]$ and both
+$\Wb_0$ and every oracle point $\Sb_t$ lie in the ball, induction gives
+$\|\Wb_t\|_X\leq R$ for every $t$.  The exact linear oracle gives
+\begin{align*}
+ \left\langle\nabla L(\Wb_t),\Sb_t-\Wb_t\right\rangle_{\mathrm F}
+ &=
+ \min_{\|\Sb\|_X\leq R}
+ \left\langle\nabla L(\Wb_t),\Sb\right\rangle_{\mathrm F}
+ -\left\langle\nabla L(\Wb_t),\Wb_t\right\rangle_{\mathrm F}\\
+ &\leq
+ \left\langle\nabla L(\Wb_t),\Wb_R^*\right\rangle_{\mathrm F}
+ -\left\langle\nabla L(\Wb_t),\Wb_t\right\rangle_{\mathrm F}\\
+ &=\left\langle
+ \nabla L(\Wb_t),\Wb_R^*-\Wb_t
+ \right\rangle_{\mathrm F}.
+\end{align*}
+Convexity at $\Wb_t$ states
+\[
+ L(\Wb_R^*)
+ \geq L(\Wb_t)
+ +\left\langle\nabla L(\Wb_t),\Wb_R^*-\Wb_t\right\rangle_{\mathrm F}.
+\]
+Rearranging this inequality and substituting it into the preceding display
+gives
+\[
+ \left\langle\nabla L(\Wb_t),\Sb_t-\Wb_t\right\rangle_{\mathrm F}
+ \leq L(\Wb_R^*)-L(\Wb_t)=-h_t.
+\]
+
+The update gives the exact displacement
+$\Wb_{t+1}-\Wb_t=\gamma_t(\Sb_t-\Wb_t)$.  The triangle inequality and
+feasibility give
+\[
+ \|\Sb_t-\Wb_t\|_X
+ \leq\|\Sb_t\|_X+\|\Wb_t\|_X
+ \leq2R.
+\]
+Apply the smoothness inequality derived in \Cref{lem:smoothness-v2} with
+$\Ab=\gamma_t(\Sb_t-\Wb_t)$ and then use the last two displays to obtain
+\begin{align*}
+ h_{t+1}
+ &\leq h_t
+ +\gamma_t\left\langle
+  \nabla L(\Wb_t),\Sb_t-\Wb_t
+ \right\rangle_{\mathrm F}
+ +\frac{H_X\gamma_t^2}{2}\|\Sb_t-\Wb_t\|_X^2\\
+ &\leq(1-\gamma_t)h_t+2H_XR^2\gamma_t^2.
+\end{align*}
+Since $\gamma_0=1$, this recurrence gives $h_1\leq2H_XR^2$.  Suppose
+$h_t\leq8H_XR^2/(t+2)$.  Substituting $\gamma_t=2/(t+2)$ gives
+\begin{align*}
+ h_{t+1}
+ &\leq
+ \frac{t}{t+2}\frac{8H_XR^2}{t+2}
+ +2H_XR^2\frac4{(t+2)^2}\\
+ &=\frac{8H_XR^2(t+1)}{(t+2)^2}\\
+ &\leq\frac{8H_XR^2}{t+3},
+\end{align*}
+where the last inequality is equivalent to
+$(t+1)(t+3)\leq(t+2)^2$.  The base case follows from
+$2H_XR^2\leq8H_XR^2/3$, so induction proves the first claim.
+
+If $R\geq R_X(\eps/2)$, the attainment observation in the setup gives
+$L(\Wb_R^*)\leq\eps/2$.  When
+$8H_XR^2/(t+2)\leq\eps/2$, the first claim gives
+\[
+ L(\Wb_t)=L(\Wb_R^*)+h_t
+ \leq\frac\eps2+\frac\eps2=\eps.
+\]
+Solving the preceding scalar inequality for $t$ proves the hitting bound.
+\end{proof}
+
+\subsection{The Gaussian comparator and prefix bounds}
+
+\begin{proposition}[Uniform Gaussian prefix]
+\label{prop:prefix-v2}
+Fix $q>0$.  There is $c>0$ such that, with probability at least
+$1-O(d^{-q})$, simultaneously for every integer
+$d\leq K\leq c d^2/\log N$, the matrix
+\[
+ \Sb_K:=\sum_{k=1}^K\ub_k\vb_k^\top,
+ \qquad
+ \widehat\Wb_K:=16(\alpha+2)(\log N)\Sb_K
+\]
+satisfies
+\begin{align*}
+ \normop{\Sb_K}&\lesssim1+\sqrt{K/d},\\
+ \normF{\Sb_K}&\lesssim\sqrt K,\\
+ \left\|
+  \sum_{i=1}^K
+  \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)\vb_i^\top
+ \right\|_{\mathrm F}
+ &\lesssim\sqrt K,\\
+ (\ub_i-\ub_j)^\top\Sb_K\vb_i
+ &\geq\frac14
+ \qquad(i\leq K,\ j\ne i),\\
+ L(\widehat\Wb_K)&\lesssim(\log N)K^{1-\alpha}.
+\end{align*}
+\end{proposition}
+
+\begin{proof}
+We prove every line separately.
+
+\paragraph{Operator and Frobenius norms.}
+Let $\Ub_K:=[\ub_1,\ldots,\ub_K]$.  The Gaussian singular-value bound gives
+\[
+ \normop{\Ub_K}\leq2+\sqrt{K/d}
+\]
+except with probability $2e^{-d/2}$.  Conditional on $\Ub_K$, for every
+standard basis vector $\mathbf e_r$,
+\[
+ \Sb_K\mathbf e_r
+ =\sum_{k=1}^K(\vb_k)_r\ub_k.
+\]
+The coordinates $(\vb_k)_r$ are independent
+$\mathcal N(0,1/d)$ variables.  Therefore the columns
+$\Sb_K\mathbf e_r$ are conditionally independent centered Gaussians with
+covariance
+\[
+ \EE[\Sb_K\mathbf e_r(\Sb_K\mathbf e_r)^\top\mid\Ub_K]
+ =\frac1d\sum_{k=1}^K\ub_k\ub_k^\top
+ =\frac1d\Ub_K\Ub_K^\top.
+\]
+Consequently, conditionally on $\Ub_K$,
+\[
+ \Sb_K\overset{\mathrm d}=
+ (\Ub_K\Ub_K^\top)^{1/2}\frac{\Gb}{\sqrt d},
+\]
+where $\Gb$ is a standard $d\times d$ Gaussian matrix.  On the event
+$\normop{\Gb}\leq3\sqrt d$,
+\begin{align*}
+ \normop{\Sb_K}
+ &\leq
+ \normop{(\Ub_K\Ub_K^\top)^{1/2}}
+ \frac{\normop{\Gb}}{\sqrt d}\\
+ &=\normop{\Ub_K}\frac{\normop{\Gb}}{\sqrt d}\\
+ &\leq3(2+\sqrt{K/d})
+ \lesssim1+\sqrt{K/d}.
+\end{align*}
+For the Frobenius norm, submultiplicativity in the form
+$\|AB\|_{\mathrm F}\leq\|A\|_{\mathrm F}\|B\|_{\mathrm{op}}$ gives
+\begin{align*}
+ \normF{\Sb_K}
+ &\leq
+ \normF{(\Ub_K\Ub_K^\top)^{1/2}}
+ \frac{\normop{\Gb}}{\sqrt d}\\
+ &=\normF{\Ub_K}\frac{\normop{\Gb}}{\sqrt d}\\
+ &=\left(\sum_{k=1}^K\norm{\ub_k}^2\right)^{1/2}
+ \frac{\normop{\Gb}}{\sqrt d}\\
+ &\lesssim\sqrt K.
+\end{align*}
+The Gaussian bound for $\Gb$, the bound for $\Ub_K$, and the norm event in
+\Cref{lem:regularity-v2} each fail with probability $e^{-\Omega(d)}$.
+Taking a union bound over the polynomially many values of $K$ preserves this
+order.
+
+Next, the triangle inequality and the rank-one Frobenius identity give
+\begin{align*}
+ &\left\|
+  \sum_{i=1}^K
+  \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)\vb_i^\top
+ \right\|_{\mathrm F}\leq
+ \left\|\sum_{i=1}^K\ub_i\vb_i^\top\right\|_{\mathrm F}
+ +\left\|\frac1N\sum_{j=1}^N\ub_j\right\|
+  \left\|\sum_{i=1}^K\vb_i\right\|.
+\end{align*}
+The two Gaussian sums satisfy
+\begin{align*}
+ \frac1N\sum_{j=1}^N\ub_j
+ &\sim\mathcal N\!\left(\mathbf0,\frac1{dN}\Ib_d\right),\\
+ \sum_{i=1}^K\vb_i
+ &\sim\mathcal N\!\left(\mathbf0,\frac Kd\Ib_d\right).
+\end{align*}
+Chi-square concentration and a union bound over $K$ therefore give
+\[
+ \left\|\frac1N\sum_{j=1}^N\ub_j\right\|\lesssim\frac1{\sqrt N},
+ \qquad
+ \left\|\sum_{i=1}^K\vb_i\right\|\lesssim\sqrt K.
+\]
+Substitution into the triangle inequality, together with
+$\normF{\Sb_K}\lesssim\sqrt K$, proves the centered-prefix bound.
+
+\paragraph{Uniform margins.}
+Fix $K$, $i\leq K$, and $j\ne i$.  Expanding every part of the sum gives
+\begin{align*}
+ (\ub_i-\ub_j)^\top\Sb_K\vb_i
+ &=
+ (\norm{\ub_i}^2-\ub_j^\top\ub_i)\norm{\vb_i}^2\\
+ &\quad+
+ \mathbf{1}_{\{j\leq K\}}
+ (\ub_i^\top\ub_j-\norm{\ub_j}^2)(\vb_j^\top\vb_i)\\
+ &\quad+
+ \sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+ (\ub_i-\ub_j)^\top\ub_k(\vb_k^\top\vb_i).
+\end{align*}
+On the regularity event, the first line obeys
+\[
+ (\norm{\ub_i}^2-\ub_j^\top\ub_i)\norm{\vb_i}^2
+ \geq\left(\frac9{10}-\frac1{100}\right)\frac9{10}
+ >\frac45,
+\]
+while the second line has absolute value at most
+\[
+ \left(\frac{11}{10}+\frac1{100}\right)\frac1{100}<\frac3{200}.
+\]
+
+Condition on $(\ub_i,\ub_j,\vb_i)$, restricting first to conditioned values
+that satisfy the three norm bounds in \Cref{lem:regularity-v2}.  This
+restriction is measurable with respect to the conditioning.  For
+$k\notin\{i,j\}$, the two factors in the last line are independent centered
+Gaussians, because the first depends only on $\ub_k$ and the second only on
+$\vb_k$.  For every such conditioned value, their conditional variances are
+\begin{align*}
+ \operatorname{Var}((\ub_i-\ub_j)^\top\ub_k
+ \mid\ub_i,\ub_j)
+ &=\frac{\norm{\ub_i-\ub_j}^2}{d}\lesssim\frac1d,\\
+ \operatorname{Var}(\vb_k^\top\vb_i\mid\vb_i)
+ &=\frac{\norm{\vb_i}^2}{d}\lesssim\frac1d.
+\end{align*}
+Thus their product is centered subexponential with conditional
+subexponential norm $O(d^{-1})$.  Bernstein's inequality yields, for every
+$s\geq1$,
+\[
+ \PP\!\left(
+  \left|
+   \sum_{\substack{k\leq K\\k\notin\{i,j\}}}
+   (\ub_i-\ub_j)^\top\ub_k(\vb_k^\top\vb_i)
+  \right|
+  >C\left(\frac{\sqrt{Ks}}d+\frac{s}{d}\right)
+  \,\middle|\,\ub_i,\ub_j,\vb_i
+ \right)
+ \leq2e^{-s}.
+\]
+For fixed $(K,i,j)$, let $\mathcal F_{Kij}$ denote the deviation event
+inside this probability.  The tower property gives
+\begin{align*}
+ &\PP\!\left(
+  \left\{
+   \max\{\norm{\ub_i}^2,\norm{\ub_j}^2,\norm{\vb_i}^2\}
+   \leq\frac{11}{10}
+  \right\}
+  \cap\mathcal F_{Kij}
+ \right)\\
+ &\qquad=
+ \EE\!\left[
+  \mathbf{1}_{\{
+   \max\{\norm{\ub_i}^2,\norm{\ub_j}^2,\norm{\vb_i}^2\}\leq11/10
+  \}}
+  \PP(\mathcal F_{Kij}\mid\ub_i,\ub_j,\vb_i)
+ \right]\\
+ &\qquad\leq2e^{-s}.
+\end{align*}
+Take $s$ to be a sufficiently large fixed multiple of $\log N$.  A union
+bound over all triples $(K,i,j)$, followed by adding the failure probability
+of the norm event, gives total failure $O(d^{-q})$.  Since
+$K\leq c d^2/\log N$, the displayed deviation is at most
+$O(\sqrt c)+o(1)$.  Choose the fixed $c$ sufficiently small.  The last two
+lines of the margin expansion then have total absolute value at most $1/2$,
+and the margin is at least $4/5-1/2>1/4$.
+
+\paragraph{Comparator loss.}
+For $i\leq K$, the margin gives
+\begin{align*}
+ \ell_i(\widehat\Wb_K)
+ &=\log\!\left[
+  1+\sum_{j\ne i}
+  \exp\!\left(
+   -16(\alpha+2)(\log N)
+   (\ub_i-\ub_j)^\top\Sb_K\vb_i
+  \right)
+ \right]\\
+ &\leq\log\!\left(1+(N-1)N^{-4(\alpha+2)}\right)\\
+ &\leq N^{-4\alpha-7}.
+\end{align*}
+
+For $i>K$, condition on all key vectors and on $\vb_1,\ldots,\vb_K$.
+Then $\widehat\Wb_K$ is fixed and $\vb_i$ remains Gaussian.  Define only
+inside this paragraph
+\[
+ f_i(\vb)
+ :=\log\sum_{j=1}^N
+ \exp\!\left((\ub_j-\ub_i)^\top\widehat\Wb_K\vb\right).
+\]
+Its gradient is
+\[
+ \nabla f_i(\vb)
+ =\widehat\Wb_K^\top
+ \left(\sum_{j=1}^N\pi_j(\vb)\ub_j-\ub_i\right),
+\]
+where the $\pi_j(\vb)$ are nonnegative and sum to one.  Hence
+\begin{align*}
+ \norm{\nabla f_i(\vb)}
+ &\leq\normop{\widehat\Wb_K}
+ \left(\sum_j\pi_j(\vb)\norm{\ub_j}+\norm{\ub_i}\right)\\
+ &\leq3\normop{\widehat\Wb_K}.
+\end{align*}
+The product-space gradient of the weighted tail therefore satisfies
+\begin{align*}
+ \left\|
+  \nabla_{(\vb_i)_{i>K}}
+  \sum_{i>K}p_if_i(\vb_i)
+ \right\|_2^2=
+ \sum_{i>K}p_i^2\norm{\nabla f_i(\vb_i)}^2\leq
+ 9\normop{\widehat\Wb_K}^2\sum_{i>K}p_i^2.
+\end{align*}
+For every conditioning satisfying
+$\max_j\|\ub_j\|^2\le 11/10$, the following holds.
+The random vectors $(\vb_i)_{i>K}$ are independent and
+$\vb_i\sim\mathcal N(\mathbf0,\Ib_d/d)$, so the product measure
+is a centered Gaussian on the product space with covariance operator
+$\sigma^2\Ib$ where $\sigma^2=1/d$.
+
+Define the function
+\[
+g\bigl((\vb_i)_{i>K}\bigr)
+:=\sum_{i>K}p_i\,f_i(\vb_i).
+\]
+Its Euclidean gradient (with respect to the product Euclidean structure)
+satisfies
+\begin{align*}
+\|\nabla g\|_2^2
+&=\sum_{i>K}p_i^2\|\nabla f_i(\vb_i)\|^2
+\le\sum_{i>K}p_i^2\cdot\bigl(3\|\widehat\Wb_K\|_{\mathrm{op}}\bigr)^2
+=9\|\widehat\Wb_K\|_{\mathrm{op}}^2\sum_{i>K}p_i^2,
+\end{align*}
+where the bound $\|\nabla f_i\|\le 3\|\widehat\Wb_K\|_{\mathrm{op}}$
+holds uniformly on the conditioning event
+$\max_j\|\ub_j\|^2\le 11/10$.
+Consequently $g$ is Lipschitz continuous with constant
+\[
+L=3\|\widehat\Wb_K\|_{\mathrm{op}}\sqrt{\sum_{i>K}p_i^2}.
+\]
+
+The standard Gaussian concentration inequality for an $L$-Lipschitz
+function of a Gaussian vector with covariance $\sigma^2\Ib$ asserts that
+\[
+\PP\bigl(|g-\EE[g\mid\text{conditioning}]|>t\bigm|\text{conditioning}\bigr)
+\le 2\exp\Bigl(-\frac{t^2}{2L^2\sigma^2}\Bigr).
+\]
+Choosing
+\[
+t=C\|\widehat\Wb_K\|_{\mathrm{op}}
+\sqrt{\frac{\bigl(\sum_{i>K}p_i^2\bigr)\log N}{d}}
+\]
+with a sufficiently large absolute constant $C$ (e.g.\ $C=3\sqrt{2(q+5)}$)
+makes the right-hand side at most $N^{-q-4}$. 
+Therefore, with conditional probability at least $1-N^{-q-4}$,
+\begin{align*}
+\biggl|
+\sum_{i>K}p_i
+\bigl(f_i(\vb_i)-\EE[f_i(\vb_i)\mid\text{conditioning}]\bigr)
+\biggr|
+&\lesssim
+\|\widehat\Wb_K\|_{\mathrm{op}}
+\sqrt{\frac{\bigl(\sum_{i>K}p_i^2\bigr)\log N}{d}}.
+\end{align*}
+For fixed $K$, let $\mathcal F_K$ be failure of this concentration
+inequality.  Since the key-norm event is measurable with respect to the
+conditioning, the tower property gives
+\begin{align*}
+ &\PP\!\left(
+  \left\{\max_j\norm{\ub_j}^2\leq\frac{11}{10}\right\}
+  \cap\mathcal F_K
+ \right)\\
+ &\qquad=
+ \EE\!\left[
+  \mathbf{1}_{\{\max_j\norm{\ub_j}^2\leq11/10\}}
+  \PP(\mathcal F_K\mid\text{conditioning})
+ \right]\\
+ &\qquad\leq N^{-q-4}.
+\end{align*}
+There are at most $d^2$ admissible values of $K$.  A union bound, using
+$N\gtrsim d^2$, and then adding the failure probability of the key-norm
+event make this estimate simultaneous in $K$ with total failure
+$O(d^{-q})$.
+
+For the conditional mean, Jensen's inequality and the Gaussian
+moment-generating function give every intermediate step:
+\begin{align*}
+ \EE[f_i(\vb_i)\mid\text{conditioning}]
+ &\leq
+ \log\EE\!\left[
+  \sum_{j=1}^N
+  e^{(\ub_j-\ub_i)^\top\widehat\Wb_K\vb_i}
+  \,\middle|\,\text{conditioning}
+ \right]\\
+ &=\log\sum_{j=1}^N
+ \EE\!\left[
+  e^{(\ub_j-\ub_i)^\top\widehat\Wb_K\vb_i}
+  \,\middle|\,\text{conditioning}
+ \right]\\
+ &=\log\sum_{j=1}^N
+ \exp\!\left(
+  \frac{\norm{\widehat\Wb_K^\top(\ub_j-\ub_i)}^2}{2d}
+ \right)\\
+ &\leq\log N
+ +\max_j\frac{\norm{\widehat\Wb_K^\top(\ub_j-\ub_i)}^2}{2d}\\
+ &\leq\log N+\frac3d\normop{\widehat\Wb_K}^2.
+\end{align*}
+The third line uses that the exponent is a centered Gaussian with variance
+$\norm{\widehat\Wb_K^\top(\ub_j-\ub_i)}^2/d$.  The last line uses
+$\norm{\ub_j-\ub_i}^2\leq111/50<6$.
+
+Adding the head loss, the conditional tail mean, and the concentration term
+gives
+\begin{align*}
+ L(\widehat\Wb_K)
+ &\leq
+ (\log N)\sum_{i>K}p_i
+ +\frac3d\left(\sum_{i>K}p_i\right)
+ \normop{\widehat\Wb_K}^2\\
+ &\quad+
+ O\!\left(
+  \normop{\widehat\Wb_K}
+  \sqrt{\frac{(\sum_{i>K}p_i^2)\log N}{d}}
+ \right)
+ +N^{-4\alpha-7}.
+\end{align*}
+Integral comparison gives
+\[
+ \sum_{i>K}p_i\lesssim Kp_K,
+ \qquad
+ \sum_{i>K}p_i^2\lesssim Kp_K^2.
+\]
+Using
+$\normop{\widehat\Wb_K}\lesssim(\log N)(1+\sqrt{K/d})$, the conditional
+mean error divided by $Kp_K\log N$ satisfies
+\begin{align*}
+ \frac{
+  d^{-1}(\sum_{i>K}p_i)\normop{\widehat\Wb_K}^2
+ }{Kp_K\log N}&\lesssim
+ \frac{d^{-1}(Kp_K)(\log N)^2(1+K/d)}
+ {Kp_K\log N}\\
+ &=
+ \frac{\log N}{d}+\frac{K\log N}{d^2}.
+\end{align*}
+The concentration error divided by the same quantity satisfies
+\begin{align*}
+ \frac{
+  \normop{\widehat\Wb_K}
+  \sqrt{(\sum_{i>K}p_i^2)\log N/d}
+ }{Kp_K\log N}&\lesssim
+ \frac{
+  (\log N)(1+\sqrt{K/d})p_K\sqrt{K\log N/d}
+ }{Kp_K\log N}\\
+ &=\sqrt{\frac{\log N}{Kd}}+\frac{\sqrt{\log N}}d.
+\end{align*}
+Finally, since $Kp_K\eqsim K^{1-\alpha}$ and $K\leq d^2$,
+\begin{align*}
+ \frac{N^{-4\alpha-7}}{Kp_K\log N}
+ &\lesssim
+ \frac{K^{\alpha-1}}{N^{4\alpha+7}\log N}\\
+ &\leq
+ \frac{d^{2(\alpha-1)}}{N^{4\alpha+7}\log N}=o(1).
+\end{align*}
+The first ratio is $O(c)+o(1)$ and the second is $o(1)$ uniformly in the
+admissible range, and the last display treats the head error.  Shrink the
+fixed $c$ and then take $d$ large.  The loss estimate then yields
+\begin{align*}
+ L(\widehat\Wb_K)
+ &\lesssim(\log N)\sum_{i>K}p_i+Kp_K\log N\\
+ &\lesssim(\log N)K^{1-\alpha}.
+\end{align*}
+Intersecting all events and taking the stated union bounds proves the
+proposition.
+\end{proof}
+
+\subsection{Intrinsic radius bounds and completion of the proof}
+
+\begin{proof}[Proof of \Cref{thm:fw}]
+Fix a target in the stated range.  Since
+$1\leq\sum_{j=1}^Nj^{-\alpha}\leq\zeta(\alpha)$,
+\begin{align*}
+ \frac{K^{-\alpha}}{\zeta(\alpha)}
+ &\leq p_K\leq K^{-\alpha},\\
+ \sum_{i>K}p_i
+ &=\frac{\sum_{i=K+1}^Ni^{-\alpha}}
+ {\sum_{j=1}^Nj^{-\alpha}}\leq\sum_{i=K+1}^{\infty}i^{-\alpha}\leq\int_K^\infty y^{-\alpha}\,dy
+ =\frac{K^{1-\alpha}}{\alpha-1}.
+\end{align*}
+If $K\leq N/2$, the reverse tail bound follows from the first $K$ terms:
+\begin{align*}
+ \sum_{i>K}p_i
+ &\geq\sum_{i=K+1}^{2K}p_i\geq Kp_{2K}\geq\frac{2^{-\alpha}}{\zeta(\alpha)}K^{1-\alpha}.
+\end{align*}
+Consequently, uniformly for $K\leq N/2$,
+$p_K\eqsim K^{-\alpha}$,
+$\sum_{i>K}p_i\eqsim K^{1-\alpha}$, and
+$Kp_K\eqsim K^{1-\alpha}$.
+
+The target range gives the auxiliary scale directly, without introducing a
+new symbol:
+\begin{align*}
+ \eps
+ &\leq c_{\mathrm{up}}\frac{\log N}{d^{\alpha-1}}
+ \quad\Longrightarrow\quad
+ \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)}
+ \gtrsim d,\\
+ \eps
+ &\geq C_{\mathrm{low}}
+ \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \quad\Longrightarrow\quad
+ \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)}
+ \lesssim\frac{d^2}{\log N}.
+\end{align*}
+Moreover, $N\gtrsim d^2$ implies
+$c d^2/\log N\leq N/2$ for all sufficiently large $d$.  Thus every
+auxiliary $K$ used below lies in the range where the preceding Zipf
+estimates are valid.
+
+For the operator-radius upper bound, choose an integer
+\[
+ K\eqsim\left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)}
+\]
+with a sufficiently large fixed implicit constant.  The target range,
+after increasing $C_{\mathrm{low}}$ and decreasing $c_{\mathrm{up}}$ to
+leave fixed-factor slack, therefore ensures
+$d\leq K\leq c d^2/\log N$.  The last bound in
+\Cref{prop:prefix-v2} then gives
+\begin{align*}
+ L(\widehat\Wb_K)
+ &\lesssim(\log N)K^{1-\alpha}
+ \leq\eps.
+\end{align*}
+Thus $\widehat\Wb_K$ is feasible in the definition of
+$R_{\mathrm{op}}(\eps)$.  Since $K\geq d$,
+\begin{align*}
+ R_{\mathrm{op}}(\eps)
+ &\leq\normop{\widehat\Wb_K}\\
+ &\lesssim(\log N)(1+\sqrt{K/d})\\
+ &\lesssim\frac{\log N}{\sqrt d}
+ \left(\frac{\log N}{\eps}\right)^{1/[2(\alpha-1)]}.
+\end{align*}
+
+We next prove the nontrivial Frobenius-radius lower bound.  Choose an integer
+of the same order, now with a sufficiently small fixed implicit constant,
+so that
+\[
+ \eps\leq\frac18Kp_K\log N.
+\]
+This is possible because $Kp_K\log N\eqsim(\log N)K^{1-\alpha}$; the target
+range again makes this $K$ admissible.  Let $\Wb$ be any matrix satisfying
+$L(\Wb)\leq\eps$.  Since $p_i\geq p_K$ for $i\leq K$ and every loss is
+nonnegative,
+\begin{align*}
+ p_K\sum_{i=1}^K\ell_i(\Wb)
+ &\leq\sum_{i=1}^Kp_i\ell_i(\Wb)\leq L(\Wb)\leq\eps,
+\end{align*}
+and therefore
+\[
+ \sum_{i=1}^K\ell_i(\Wb)
+ \leq\frac{\eps}{p_K}
+ \leq\frac18K\log N.
+\]
+
+For every $i$, Jensen's inequality gives
+\begin{align*}
+ \ell_i(\Wb)
+ &=\log N
+ +\log\!\left[
+  \frac1N\sum_{j=1}^N
+  e^{(\ub_j-\ub_i)^\top\Wb\vb_i}
+ \right]\\
+ &\geq\log N
+ +\frac1N\sum_{j=1}^N
+ (\ub_j-\ub_i)^\top\Wb\vb_i\\
+ &=\log N
+ -\left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)^\top\Wb\vb_i.
+\end{align*}
+Rearranging this inequality, summing from $1$ to $K$, and then using the
+preceding loss bound gives
+\begin{align*}
+ &\left\langle
+  \Wb,
+  \sum_{i=1}^K
+  \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)\vb_i^\top
+ \right\rangle_{\mathrm F}\\
+ &\qquad=
+ \sum_{i=1}^K
+ \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)^\top\Wb\vb_i\\
+ &\qquad\geq
+ K\log N-\sum_{i=1}^K\ell_i(\Wb)\\
+ &\qquad\geq\frac78K\log N.
+\end{align*}
+Frobenius Cauchy--Schwarz and the centered-prefix bound in
+\Cref{prop:prefix-v2} now give
+\begin{align*}
+ \frac78K\log N
+ &\leq
+ \left|
+  \left\langle
+   \Wb,
+   \sum_{i=1}^K
+   \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)\vb_i^\top
+  \right\rangle_{\mathrm F}
+ \right|\\
+ &\leq
+ \normF{\Wb}
+ \left\|
+  \sum_{i=1}^K
+  \left(\ub_i-\frac1N\sum_{j=1}^N\ub_j\right)\vb_i^\top
+ \right\|_{\mathrm F}\\
+ &\lesssim\normF{\Wb}\sqrt K.
+\end{align*}
+Thus every feasible $\Wb$ satisfies
+\[
+ \normF{\Wb}
+ \gtrsim(\log N)\sqrt K
+ \eqsim(\log N)
+ \left(\frac{\log N}{\eps}\right)^{1/[2(\alpha-1)]}.
+\]
+Taking the infimum proves the Frobenius lower bound.
+
+For every $d\times d$ matrix,
+$\normF{\Wb}\leq\sqrt d\normop{\Wb}$.  Taking infima over the same
+sublevel set gives, with every step shown,
+\begin{align*}
+ R_{\mathrm F}(\eps)
+ &=\inf_{L(\Wb)\leq\eps}\normF{\Wb}\\
+ &\leq\inf_{L(\Wb)\leq\eps}\sqrt d\normop{\Wb}\\
+ &=\sqrt d\,R_{\mathrm{op}}(\eps).
+\end{align*}
+Combining the Frobenius lower bound with
+$R_{\mathrm F}(\eps)\leq\sqrt d\,R_{\mathrm{op}}(\eps)$ gives
+\begin{align*}
+ R_{\mathrm{op}}(\eps)
+ &\geq\frac{R_{\mathrm F}(\eps)}{\sqrt d}\gtrsim
+ \frac{\log N}{\sqrt d}
+ \left(\frac{\log N}{\eps}\right)^{1/[2(\alpha-1)]}.
+\end{align*}
+Together with the operator-radius upper bound, this proves
+\[
+ R_{\mathrm{op}}(\eps)
+ \eqsim
+ \frac{\log N}{\sqrt d}
+ \left(\frac{\log N}{\eps}\right)^{1/[2(\alpha-1)]}.
+\]
+Conversely, the operator-radius upper bound and the same deterministic norm
+comparison give
+\begin{align*}
+ R_{\mathrm F}(\eps)
+ &\leq\sqrt d\,R_{\mathrm{op}}(\eps)\lesssim
+ (\log N)
+ \left(\frac{\log N}{\eps}\right)^{1/[2(\alpha-1)]}.
+\end{align*}
+Together with the Frobenius-radius lower bound, this proves
+\[
+ R_{\mathrm F}(\eps)
+ \eqsim
+ (\log N)
+ \left(\frac{\log N}{\eps}\right)^{1/[2(\alpha-1)]}.
+\]
+In particular,
+\[
+ R_{\mathrm F}(\eps)^2\eqsim dR_{\mathrm{op}}(\eps)^2.
+\]
+Choose $C_{\mathrm{low}}$ sufficiently large and
+$c_{\mathrm{up}}$ sufficiently small so that the two preceding choices of
+$K$ remain in $[d,c d^2/\log N]$ both for $\eps$ and for $\eps/2$.
+Repeating the same two radius arguments with $\eps/2$ in place of $\eps$
+therefore gives
+\[
+ R_X(\eps/2)^2\eqsim R_X(\eps)^2,
+ \qquad X\in\{\mathrm F,\mathrm{op}\}.
+\]
+
+By operator-nuclear norm duality and Frobenius self-duality,
+the linear minimization oracles specified in the setup are exact:
+\[
+ \min_{\normop{\Sb}\le R}\langle \Gb,\Sb\rangle_{\mathrm F}
+ =-R\|\Gb\|_*,
+ \qquad
+ \min_{\normF{\Sb}\le R}\langle \Gb,\Sb\rangle_{\mathrm F}
+ =-R\normF{\Gb}.
+\]
+The minima are attained by
+$-R\polar(\Gb)$ and
+$-R\Gb/\normF{\Gb}$, respectively, with the latter interpreted as
+$\mathbf 0$ when $\Gb=\mathbf 0$.
+Hence \Cref{prop:fw-factor-v2} applies with $R=R_X(\eps/2)$.
+
+
+The hitting bound in \Cref{prop:fw-factor-v2}, the radius scales, and
+$\HF,\Hop\eqsim1$ give
+\begin{align*}
+ \frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}
+ &\eqsim
+ \frac{(\log N)^2}{d\eps}
+ \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)}=\frac{\log N}{d}
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)},\\
+ \frac{\HF R_{\mathrm F}(\eps/2)^2}{\eps}
+ &\eqsim
+ \frac{(\log N)^2}{\eps}
+ \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)}=(\log N)
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+\end{align*}
+Both quantities diverge in the target range, so they absorb the additive
+$1$.  Finally, $1\lesssim\HF\leq\Hop\lesssim1$ and the sharp radius relation
+give
+\begin{align*}
+ \frac{\HF R_{\mathrm F}(\eps/2)^2}
+ {\Hop R_{\mathrm{op}}(\eps/2)^2}
+ &=\frac{\HF}{\Hop}
+ \frac{R_{\mathrm F}(\eps/2)^2}{R_{\mathrm{op}}(\eps/2)^2}\\
+ &\eqsim 1\cdot d=d.
+\end{align*}
+This is a comparison of the standard Frank-Wolfe smoothness-radius
+certificates, not a lower bound on $\tau_{\mathrm{NGD}}(\eps)$.  This
+completes the proof.
+\end{proof}
+
+% ============================================================
+\section{Proof of \Cref{thm:gd}}
+% ============================================================
+
+\subsection{Block gradients and nonexpansiveness}
+
+For $B\subset[N]$, write
+$L_B(\Wb):=\sum_{i\in B}p_i\ell_i(\Wb)$ only in this section.
+
+\begin{lemma}[Uniform block-gradient bound]
+\label{lem:block-v2}
+On the event in \Cref{lem:regularity-v2}, every consecutive block with
+$d\leq|B|\leq2d$ and $\min B\geq d/3$ satisfies
+\[
+ \sup_{\Wb}\normF{\nabla L_B(\Wb)}^2
+ \lesssim\sum_{i\in B}p_i^2.
+\]
+\end{lemma}
+
+\begin{proof}
+Differentiating the loss once gives
+\[
+ \nabla\ell_i(\Wb)
+ =\left(\sum_{j=1}^N\pi_{ji}(\Wb)\ub_j-\ub_i\right)\vb_i^\top.
+\]
+Fix $\Ab$ with $\normF{\Ab}=1$.  Expanding the Frobenius inner product,
+then applying the triangle inequality and Euclidean Cauchy--Schwarz, gives
+\begin{align*}
+ |\langle\Ab,\nabla L_B(\Wb)\rangle_{\mathrm F}|&=
+ \left|
+  \sum_{i\in B}p_i
+  \left\langle
+   \Ab,
+   \left(\sum_j\pi_{ji}(\Wb)\ub_j-\ub_i\right)\vb_i^\top
+  \right\rangle_{\mathrm F}
+ \right|\\
+ &\quad=
+ \left|
+  \sum_{i\in B}p_i
+  \left(\sum_j\pi_{ji}(\Wb)\ub_j-\ub_i\right)^\top
+  \Ab\vb_i
+ \right|\\
+ &\quad\leq
+ \sum_{i\in B}p_i
+ \left\|\sum_j\pi_{ji}(\Wb)\ub_j-\ub_i\right\|
+ \norm{\Ab\vb_i}\\
+ &\quad\leq3\sum_{i\in B}p_i\norm{\Ab\vb_i}.
+\end{align*}
+The last line uses
+\begin{align*}
+ \left\|\sum_j\pi_{ji}(\Wb)\ub_j-\ub_i\right\|
+ &\leq\sum_j\pi_{ji}(\Wb)\norm{\ub_j}+\norm{\ub_i}\\
+ &\leq2\sqrt{11/10}<3.
+\end{align*}
+Weighted scalar Cauchy--Schwarz now gives
+\begin{align*}
+ \sum_{i\in B}p_i\norm{\Ab\vb_i}
+ &=\sum_{i\in B}\sqrt{p_i}
+ \bigl(\sqrt{p_i}\norm{\Ab\vb_i}\bigr)\\
+ &\leq
+ \left(\sum_{i\in B}p_i\right)^{1/2}
+ \left(\sum_{i\in B}p_i\norm{\Ab\vb_i}^2\right)^{1/2}.
+\end{align*}
+
+We next expand the matrix term that appears here.  Since
+$\normF{\Ab}=1$,
+\begin{align*}
+ \sum_{i\in B}p_i\norm{\Ab\vb_i}^2
+ &=\sum_{i\in B}p_i\vb_i^\top\Ab^\top\Ab\vb_i\\
+ &=\operatorname{tr}\!\left(
+  \Ab^\top\Ab\sum_{i\in B}p_i\vb_i\vb_i^\top
+ \right)\\
+ &\leq
+ \lambda_{\max}\!\left(\sum_{i\in B}p_i\vb_i\vb_i^\top\right)
+ \operatorname{tr}(\Ab^\top\Ab)\\
+ &=\lambda_{\max}\!\left(\sum_{i\in B}p_i\vb_i\vb_i^\top\right).
+\end{align*}
+The inequality follows because for a positive-semidefinite matrix $M$,
+$M\preceq\lambda_{\max}(M)\Ib_d$, and multiplication by
+$\Ab^\top\Ab\succeq0$ followed by the trace preserves this order.
+
+For every unit vector $\zb$,
+\begin{align*}
+ \zb^\top\left(\sum_{i\in B}p_i\vb_i\vb_i^\top\right)\zb
+ &=\sum_{i\in B}p_i(\vb_i^\top\zb)^2\\
+ &\leq\left(\max_{i\in B}p_i\right)
+ \sum_{i\in B}(\vb_i^\top\zb)^2\\
+ &=\left(\max_{i\in B}p_i\right)
+ \left\|[\vb_i]_{i\in B}^\top\zb\right\|^2\\
+ &\leq\left(\max_{i\in B}p_i\right)
+ \normop{[\vb_i]_{i\in B}}^2\\
+ &\leq16\max_{i\in B}p_i.
+\end{align*}
+Taking the supremum over unit $\zb$ proves the corresponding eigenvalue
+bound.
+
+Finally, since $B$ is consecutive, $|B|\le 2d$, and $\min B\ge d/3$,
+\[
+\frac{\max B}{\min B}
+\le
+1+\frac{2d}{\min B}
+\le 7.
+\]
+The largest index in $B$ is at most seven times the smallest, so
+$\max_{i\in B}p_i\leq7^\alpha\min_{i\in B}p_i$.  Hence
+\begin{align*}
+ \left(\sum_{i\in B}p_i\right)\max_{i\in B}p_i
+ &\leq7^\alpha
+ \left(\sum_{i\in B}p_i\right)\min_{i\in B}p_i\\
+ &\leq7^\alpha\sum_{i\in B}p_i^2,
+\end{align*}
+where the last inequality uses
+$p_i^2\geq(\min_{k\in B}p_k)p_i$ term by term.  Substitution into all
+preceding displays gives
+\[
+ |\langle\Ab,\nabla L_B(\Wb)\rangle_{\mathrm F}|
+ \lesssim\left(\sum_{i\in B}p_i^2\right)^{1/2}.
+\]
+Taking the supremum over all Frobenius-unit $\Ab$ and then squaring proves
+the lemma.
+\end{proof}
+
+\begin{lemma}[Cocoercivity and nonexpansiveness]
+\label{lem:cocoercive-v2}
+If $f$ is convex and $H$-smooth in Frobenius norm, then
+\[
+ \left\langle
+  \nabla f(\Xb)-\nabla f(\Yb),\Xb-\Yb
+ \right\rangle_{\mathrm F}
+ \geq\frac1H\normF{\nabla f(\Xb)-\nabla f(\Yb)}^2.
+\]
+Consequently, $\Wb\mapsto\Wb-\eta\nabla f(\Wb)$ is nonexpansive whenever
+$0\leq\eta\leq2/H$.
+\end{lemma}
+
+\begin{proof}
+Fix $\Xb,\Yb$ and define
+$\phi(\Zb):=f(\Zb)-\langle\nabla f(\Yb),\Zb\rangle_{\mathrm F}$.
+Then $\nabla\phi(\Yb)=\mathbf0$, so convexity makes $\Yb$ a minimizer of
+$\phi$.  Smoothness at $\Xb$ in direction
+$-H^{-1}\nabla\phi(\Xb)$ gives
+\begin{align*}
+ \phi\!\left(\Xb-\frac1H\nabla\phi(\Xb)\right)
+ &\leq\phi(\Xb)
+ -\frac1H\normF{\nabla\phi(\Xb)}^2
+ +\frac{H}{2}\frac1{H^2}\normF{\nabla\phi(\Xb)}^2\\
+ &=\phi(\Xb)-\frac1{2H}\normF{\nabla\phi(\Xb)}^2.
+\end{align*}
+Since $\phi(\Yb)$ is no larger than the left-hand side, substitution of the
+definition of $\phi$ gives
+\[
+ f(\Xb)-f(\Yb)
+ -\langle\nabla f(\Yb),\Xb-\Yb\rangle_{\mathrm F}
+ \geq\frac1{2H}\normF{\nabla f(\Xb)-\nabla f(\Yb)}^2.
+\]
+Interchanging $\Xb$ and $\Yb$ gives the second inequality
+\[
+ f(\Yb)-f(\Xb)
+ -\langle\nabla f(\Xb),\Yb-\Xb\rangle_{\mathrm F}
+ \geq\frac1{2H}\normF{\nabla f(\Xb)-\nabla f(\Yb)}^2.
+\]
+Adding their left-hand sides cancels the function values and yields
+\begin{align*}
+ &-\langle\nabla f(\Yb),\Xb-\Yb\rangle_{\mathrm F}
+ -\langle\nabla f(\Xb),\Yb-\Xb\rangle_{\mathrm F}\\
+ &\qquad=
+ \langle\nabla f(\Xb)-\nabla f(\Yb),\Xb-\Yb\rangle_{\mathrm F}.
+\end{align*}
+Adding the right-hand sides proves cocoercivity.
+
+Put $\Gb:=\nabla f(\Xb)-\nabla f(\Yb)$.  Direct expansion gives
+\begin{align*}
+ &\left\|
+  (\Xb-\eta\nabla f(\Xb))-(\Yb-\eta\nabla f(\Yb))
+ \right\|_{\mathrm F}^2\\
+ &\qquad=
+ \normF{\Xb-\Yb}^2
+ -2\eta\langle\Gb,\Xb-\Yb\rangle_{\mathrm F}
+ +\eta^2\normF{\Gb}^2\\
+ &\qquad\leq
+ \normF{\Xb-\Yb}^2
+ -\left(\frac{2\eta}{H}-\eta^2\right)\normF{\Gb}^2\\
+ &\qquad\leq\normF{\Xb-\Yb}^2
+\end{align*}
+when $0\leq\eta\leq2/H$.
+\end{proof}
+
+Fix a block $B$ and run the same schedule after deleting that block:
+\[
+ \widetilde\Wb_0^{(B)}=\mathbf0,
+ \qquad
+ \widetilde\Wb_{t+1}^{(B)}
+ =\widetilde\Wb_t^{(B)}
+ -\eta_t(\eps)\nabla(L-L_B)(\widetilde\Wb_t^{(B)}).
+\]
+
+\begin{lemma}[Leave-block stability]
+\label{lem:leave-v2}
+On the regularity event, every block in \Cref{lem:block-v2} satisfies
+\begin{align*}
+ \normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}
+ &\lesssim
+ \left(\sum_{s<t}\eta_s(\eps)\right)
+ \left(\sum_{i\in B}p_i^2\right)^{1/2},\\
+ L_B(\Wb_t^{\mathrm{GD}})
+ &\geq L_B(\widetilde\Wb_t^{(B)})
+ -O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \sum_{i\in B}p_i^2
+ \right).
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+Let
+$T_t(\Wb):=\Wb-\eta_t(\eps)\nabla L(\Wb)$.  By
+\Cref{lem:smoothness-v2,lem:cocoercive-v2}, $T_t$ is nonexpansive.  The
+reduced update is exactly
+\[
+ \widetilde\Wb_{t+1}^{(B)}
+ =T_t(\widetilde\Wb_t^{(B)})
+ +\eta_t(\eps)\nabla L_B(\widetilde\Wb_t^{(B)}).
+\]
+Subtracting it from the full update gives
+\begin{align*}
+ \Wb_{t+1}^{\mathrm{GD}}-\widetilde\Wb_{t+1}^{(B)}
+ &=T_t(\Wb_t^{\mathrm{GD}})-T_t(\widetilde\Wb_t^{(B)})-\eta_t(\eps)\nabla L_B(\widetilde\Wb_t^{(B)}).
+\end{align*}
+Taking Frobenius norms, using nonexpansiveness, and then applying
+\Cref{lem:block-v2} gives
+\begin{align*}
+ \normF{\Wb_{t+1}^{\mathrm{GD}}-\widetilde\Wb_{t+1}^{(B)}}
+ &\leq\normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}+\eta_t(\eps)
+ \sup_{\Zb}\normF{\nabla L_B(\Zb)}\\
+ &\leq\normF{\Wb_t^{\mathrm{GD}}-\widetilde\Wb_t^{(B)}}
+ +O\!\left(
+  \eta_t(\eps)\left(\sum_{i\in B}p_i^2\right)^{1/2}
+ \right).
+\end{align*}
+The initial distance is zero.  Summing this scalar recurrence from
+$s=0$ to $s=t-1$ proves the first claim.
+
+For arbitrary $\Wb,\widetilde\Wb$, the fundamental theorem of calculus
+along the line segment gives
+\begin{align*}
+ L_B(\Wb)-L_B(\widetilde\Wb)
+ &=\int_0^1
+ \left\langle
+  \nabla L_B(\widetilde\Wb+s(\Wb-\widetilde\Wb)),
+  \Wb-\widetilde\Wb
+ \right\rangle_{\mathrm F}\,ds\\
+ &\geq-\int_0^1
+ \normF{\nabla L_B(\widetilde\Wb+s(\Wb-\widetilde\Wb))}
+ \normF{\Wb-\widetilde\Wb}\,ds\\
+ &\geq-\sup_{\Zb}\normF{\nabla L_B(\Zb)}
+ \normF{\Wb-\widetilde\Wb}.
+\end{align*}
+Apply this inequality with the two trajectories, then substitute the first
+claim and \Cref{lem:block-v2}.  This proves the second claim.
+\end{proof}
+
+\subsection{Sign symmetry and preservation of the tail}
+
+\begin{lemma}[Sign-symmetry bound]
+\label{lem:sign-v2}
+Fix the keys, vectors $(\zb_i)_{i\in B}$, and a matrix $\Wb$.  Put
+$\vb_i=\sigma_i\zb_i$ for independent Rademacher signs.  For every
+$0<\rho<1$,
+\[
+ \PP_\sigma\!\left(
+  L_B(\Wb)<(1-\rho)(\log N)\sum_{i\in B}p_i
+ \right)
+ \leq
+ \exp\!\left(
+  -\frac{\rho^2(\sum_{i\in B}p_i)^2}
+  {2\sum_{i\in B}p_i^2}
+ \right).
+\]
+\end{lemma}
+
+\begin{proof}
+Display the query as $\ell_i(\Wb;\vb)$.  It is convex in $\vb$ and equals
+$\log N$ at zero, so midpoint convexity gives
+\[
+ \ell_i(\Wb;\zb_i)+\ell_i(\Wb;-\zb_i)\geq2\log N.
+\]
+Let
+$Y_i(\sigma_i):=\min\{\ell_i(\Wb;\sigma_i\zb_i),2\log N\}$.  Since the
+losses are nonnegative, either truncation changes neither signed loss, or
+one truncated loss alone equals $2\log N$.  Therefore
+\[
+ \frac{Y_i(+1)+Y_i(-1)}2\geq\log N.
+\]
+The independent variables $p_iY_i(\sigma_i)$ lie in
+$[0,2p_i\log N]$.  If
+$Z:=\sum_{i\in B}p_iY_i(\sigma_i)$ and
+$b:=(\log N)\sum_{i\in B}p_i$, then $\EE_\sigma Z\geq b$.  Hence
+\begin{align*}
+ \{Z<(1-\rho)b\}
+ &\subseteq
+ \{Z-\EE_\sigma Z\leq-\rho b\}.
+\end{align*}
+Hoeffding's inequality, with interval lengths $2p_i\log N$, gives
+\begin{align*}
+ \PP_\sigma(Z<(1-\rho)b)
+ &\leq
+ \exp\!\left(
+  -\frac{2\rho^2b^2}{\sum_{i\in B}(2p_i\log N)^2}
+ \right)\\
+ &=\exp\!\left(
+  -\frac{\rho^2(\sum_{i\in B}p_i)^2}
+  {2\sum_{i\in B}p_i^2}
+ \right).
+\end{align*}
+Finally,
+$L_B(\Wb)\geq\sum_{i\in B}p_iY_i(\sigma_i)=Z$, so the same bound applies
+to the event in the lemma.
+\end{proof}
+
+\begin{proposition}[Tail preservation]
+\label{prop:tail-v2}
+Fix the target, schedule, a constant $0<\rho<1$, an integer
+$d/3\leq r\leq d^2/\log N$, and
+$0\leq T\leq\lceil d^{2\alpha+2}\rceil$.  With probability at least
+$1-e^{-\Omega(d)}$, simultaneously for $0\leq t\leq T$,
+\begin{align*}
+ \sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}})
+ &\geq(1-\rho)(\log N)\sum_{i=r}^Np_i-O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \sum_{i=r}^Np_i^2
+ \right).
+\end{align*}
+\end{proposition}
+
+\begin{proof}
+Let $m=N-r+1$ and $J=\lfloor m/d\rfloor$.  Since
+$r\leq d^2/\log N$ and $N\gtrsim d^2$, one has $m\geq2d$ for large $d$.  Divide
+$\{r,\ldots,N\}$ into $J$ consecutive blocks whose sizes differ by at most
+one.  The inequalities
+\[
+ J\leq\frac md,
+ \qquad
+ J\geq\frac md-1\geq\frac m{2d}
+\]
+show that every block has size between $d$ and $2d$.  Its first index is at
+least $r\geq d/3$.
+
+Represent each query vector as
+$\vb_i=\sigma_i\zb_i,$
+where $\zb_i\sim\mathcal N(0,\Ib_d/d)$ are independent and
+$\sigma_i\in\{-1,+1\}$ are independent Rademacher variables, independent
+also of the $\zb_i$.  Since the Gaussian distribution is symmetric,
+$\sigma_i\zb_i\stackrel{d}{=}\zb_i$ for every $i$, and independence is
+preserved across indices.  Hence the family
+$(\vb_i)_{i=1}^N=(\sigma_i\zb_i)_{i=1}^N$ has exactly the same joint law
+as the original Gaussian queries.
+
+Fix a block $B$ and a time $t$.  Let $\mathcal C_B$ be the
+$\sigma$-algebra generated by all key vectors $(\ub_i)_{i=1}^N$, all
+Gaussian magnitudes/directions $(\zb_i)_{i=1}^N$, and all signs
+$(\sigma_i)_{i\notin B}$.  Conditional on $\mathcal C_B$, the only
+remaining randomness is therefore the collection
+$(\sigma_i)_{i\in B}$, which remains a family of independent Rademacher
+variables.
+
+Recall that the leave-block trajectory is defined by
+\[
+ \widetilde\Wb^{(B)}_{s+1}
+ =
+ \widetilde\Wb^{(B)}_s
+ -
+ \eta_s(\eps)\,
+ \nabla(L-L_B)(\widetilde\Wb^{(B)}_s),
+ \qquad
+ \widetilde\Wb^{(B)}_0=\mathbf 0.
+\]
+The objective $L-L_B$ contains no loss term indexed by $i\in B$ and hence
+does not involve the corresponding query vectors
+$\vb_i=\sigma_i\zb_i$, $i\in B$.  Since the schedule
+$(\eta_s(\eps))_{s\ge0}$ is prescribed before the sample is drawn, it is
+also independent of these signs.  Consequently,
+$\widetilde\Wb^{(B)}_s$ is $\mathcal C_B$-measurable for every $s$,
+and in particular $\widetilde\Wb^{(B)}_t$ is fixed when we condition on
+$\mathcal C_B$.  We may therefore apply the sign-symmetry bound to
+$\widetilde\Wb^{(B)}_t$ using the still-random signs
+$(\sigma_i)_{i\in B}$.
+
+The regularity event $\mathcal E_{\mathrm{reg}}$ from \Cref{lem:regularity-v2} is also
+$\mathcal C_B$-measurable: query norms and absolute inner products are
+sign-invariant, and multiplying columns by signs preserves singular values.
+Weights within $B$ differ by at most $7^\alpha$, so
+\begin{align*}
+ \frac{(\sum_{i\in B}p_i)^2}{\sum_{i\in B}p_i^2}\geq
+ \frac{|B|^2(\min_{i\in B}p_i)^2}
+ {|B|(\max_{i\in B}p_i)^2}\geq\frac{|B|}{7^{2\alpha}}
+ \geq\frac d{7^{2\alpha}}.
+\end{align*}
+Thus \Cref{lem:leave-v2,lem:sign-v2} imply, except with conditional
+probability $e^{-c_{\alpha,\rho}d}$,
+\begin{align*}
+ L_B(\Wb_t^{\mathrm{GD}})
+ &\geq L_B(\widetilde\Wb_t^{(B)})
+ -O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \sum_{i\in B}p_i^2
+ \right)\\
+ &\geq(1-\rho)(\log N)\sum_{i\in B}p_i
+ -O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \sum_{i\in B}p_i^2
+ \right).
+\end{align*}
+
+Let $\mathcal F_{B,t}$ be failure of this block inequality.  The tower
+property and $\mathcal C_B$-measurability of the regularity event give
+\begin{align*}
+ \PP(\mathcal E_{\mathrm{reg}}\cap\mathcal F_{B,t})
+ &=\EE\!\left[
+  \EE[\mathbf{1}_{\mathcal E_{\mathrm{reg}}}
+      \mathbf{1}_{\mathcal F_{B,t}}\mid\mathcal C_B]
+ \right]\\
+ &=\EE\!\left[
+  \mathbf{1}_{\mathcal E_{\mathrm{reg}}}
+  \PP(\mathcal F_{B,t}\mid\mathcal C_B)
+ \right]\\
+ &\leq e^{-c_{\alpha,\rho}d}.
+\end{align*}
+There are at most $N/d$ blocks and polynomially many times.  A union bound,
+followed by adding
+$\PP(\mathcal E_{\mathrm{reg}}^c)\leq e^{-\Omega(d)}$, keeps total failure
+at $e^{-\Omega(d)}$.
+
+On the complementary event, summing over the exact block partition gives
+\begin{align*}
+ \sum_B L_B(\Wb_t^{\mathrm{GD}})
+ &=\sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}}),\\
+ \sum_B\sum_{i\in B}p_i
+ &=\sum_{i=r}^Np_i,\\
+ \sum_B\sum_{i\in B}p_i^2
+ &=\sum_{i=r}^Np_i^2.
+\end{align*}
+Substitution proves the proposition.
+\end{proof}
+
+% \subsection{Completion of the GD lower bound}
+
+% \begin{proof}[Proof of \Cref{thm:gd}]
+% Choose an integer
+% $ K\eqsim\left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)}
+% $
+% with a sufficiently small fixed implicit constant.  The target range makes
+% $d\leq K\leq d^2/\log N$, and the implicit constant can be chosen so that
+% $Kp_K\log N$ is a sufficiently large fixed multiple of $\eps$.  Put
+% $r=\lfloor K/2\rfloor+1$.
+
+% We record the three weight estimates with their derivations.  There are at
+% least $K/3$ indices in $\{r,\ldots,K\}$ for large $K$, and each has weight
+% at least $p_K$, so
+% \[
+%  \sum_{i=r}^Kp_i\geq\frac K3p_K\gtrsim Kp_K.
+% \]
+% Since $r>K/2$, integral comparison gives
+% \begin{align*}
+%  \sum_{i=r}^Np_i
+%  &\leq
+%  \frac{r^{-\alpha}+\int_r^\infty y^{-\alpha}\,dy}
+%  {\sum_{j=1}^Nj^{-\alpha}}\lesssim\frac{K^{1-\alpha}}{\sum_{j=1}^Nj^{-\alpha}}
+%  \eqsim Kp_K,\\
+%  \sum_{i=r}^Np_i^2
+%  &\leq
+%  \frac{r^{-2\alpha}+\int_r^\infty y^{-2\alpha}\,dy}
+%  {(\sum_{j=1}^Nj^{-\alpha})^2}\lesssim\frac{K^{1-2\alpha}}
+%  {(\sum_{j=1}^Nj^{-\alpha})^2}
+%  \eqsim Kp_K^2.
+% \end{align*}
+
+% Apply \Cref{prop:tail-v2} with a fixed sufficiently small $\rho>0$.
+% The weight bounds above imply, after choosing this fixed $\rho$ sufficiently
+% small, that
+% \begin{align*}
+%  &(\log N)\sum_{i=r}^Kp_i
+%  -\rho(\log N)\sum_{i=r}^Np_i \gtrsim Kp_K\log N.
+% \end{align*}
+% Using the exact decomposition
+% $\sum_{i=r}^Np_i=\sum_{i>K}p_i+\sum_{i=r}^Kp_i$, we obtain
+% \begin{align*}
+%  L(\Wb_t^{\mathrm{GD}})
+%  &\geq\sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}})\\
+%  &\geq(1-\rho)(\log N)\sum_{i=r}^Np_i
+%  -O\!\left(
+%   \left(\sum_{s<t}\eta_s(\eps)\right)
+%   \sum_{i=r}^Np_i^2
+%  \right)\\
+%  &= (\log N)\sum_{i>K}p_i
+%  +(\log N)\sum_{i=r}^Kp_i
+%  -\rho(\log N)\sum_{i=r}^Np_i-O\!\left(
+%   \left(\sum_{s<t}\eta_s(\eps)\right)
+%   \sum_{i=r}^Np_i^2
+%  \right)\\
+%  &\geq(\log N)\sum_{i>K}p_i
+%  +\left[
+%   (\log N)\sum_{i=r}^Kp_i
+%   -\rho(\log N)\sum_{i=r}^Np_i
+%  \right]-
+%  O\!\left(
+%   \left(\sum_{s<t}\eta_s(\eps)\right)Kp_K^2
+%  \right).
+% \end{align*}
+% If
+% \[
+%  \sum_{s<t}\eta_s(\eps)
+%  \lesssim\frac{\log N}{p_K},
+% \]
+% where the implicit constant on the left is chosen sufficiently small, the
+% last error term is at most one half of the positive bracket.  Substitution
+% into the last display therefore gives
+% \begin{align*}
+%  L(\Wb_t^{\mathrm{GD}})
+%  &\geq(\log N)\sum_{i>K}p_i
+%  +\frac12\left[
+%   (\log N)\sum_{i=r}^Kp_i
+%   -\rho(\log N)\sum_{i=r}^Np_i
+%  \right]\\
+%  &\gtrsim Kp_K\log N >\eps,
+% \end{align*}
+% where the strict last inequality is ensured by the fixed implicit constant
+% in the choice of $K$.
+
+% Because $\eta_s(\eps)\leq3$,
+% \[
+%  \sum_{s<t}\eta_s(\eps)\leq3t.
+% \]
+% Consequently, every $t\lesssim(\log N)/p_K$, with a sufficiently small
+% implicit constant, lies in the preceding cumulative-step regime and has
+% loss larger than the target.  This time is within the horizon in
+% \Cref{prop:tail-v2}, because
+% \begin{align*}
+%  \frac{\log N}{p_K}
+%  &\lesssim(\log N)K^\alpha\lesssim(\log N)\left(\frac{d^2}{\log N}\right)^\alpha
+%  \leq d^{2\alpha+2}
+% \end{align*}
+% for large $d$.  Hence
+% \begin{align*}
+%  \tau_{\mathrm{GD}}(\eps)
+%  &\gtrsim\frac{\log N}{p_K}\eqsim(\log N)K^\alpha\eqsim(\log N)
+%  \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+% \end{align*}
+% Intersecting this pointwise schedule event with the common event in
+% \Cref{thm:fw} and applying the Muon upper bound there proves
+% $\tau_{\mathrm{GD}}(\eps)\gtrsim d\tau_{\mathrm{Muon}}(\eps)$.
+% The probability statement remains pointwise in the fixed target--schedule
+% pair because the leave-block trajectory is independent of the removed signs
+% only for a schedule fixed before the sample.
+% \end{proof}
+
+
+\begin{proof}[Proof of \Cref{thm:gd}]
+Fix an arbitrary target $\eps$ in the stated range and an arbitrary deterministic pre-sample schedule satisfying $\eta_t(\eps)<3.$ We first prove a $K$-parameterized lower bound that holds for every integer $d\leq K\leq\frac{d^2}{\log N},$ without yet relating $K$ to $\eps$. For each such $K$,  Put $r=\lfloor K/2\rfloor+1$, which is admissible in \Cref{prop:tail-v2}.
+
+We record the three weight estimates with their derivations.  There are at
+least $K/3$ indices in $\{r,\ldots,K\}$ for large $K$, and each has weight
+at least $p_K$, so
+\[
+ \sum_{i=r}^Kp_i\geq\frac K3p_K\gtrsim Kp_K.
+\]
+Since $r>K/2$, integral comparison gives
+\begin{align*}
+ \sum_{i=r}^Np_i
+ &\leq
+ \frac{r^{-\alpha}+\int_r^\infty y^{-\alpha}\,dy}
+ {\sum_{j=1}^Nj^{-\alpha}}\lesssim\frac{K^{1-\alpha}}{\sum_{j=1}^Nj^{-\alpha}}
+ \eqsim Kp_K,\\
+ \sum_{i=r}^Np_i^2
+ &\leq
+ \frac{r^{-2\alpha}+\int_r^\infty y^{-2\alpha}\,dy}
+ {(\sum_{j=1}^Nj^{-\alpha})^2}\lesssim\frac{K^{1-2\alpha}}
+ {(\sum_{j=1}^Nj^{-\alpha})^2}
+ \eqsim Kp_K^2.
+\end{align*}
+
+Apply \Cref{prop:tail-v2} with a fixed sufficiently small $\rho>0$.
+The weight bounds above imply, after choosing this fixed $\rho$ sufficiently
+small, that
+\begin{align*}
+ &(\log N)\sum_{i=r}^Kp_i
+ -\rho(\log N)\sum_{i=r}^Np_i \gtrsim Kp_K\log N.
+\end{align*}
+
+Using the exact decomposition
+$\sum_{i=r}^Np_i=\sum_{i>K}p_i+\sum_{i=r}^Kp_i$, we obtain
+\begin{align*}
+ L(\Wb_t^{\mathrm{GD}})
+ &\geq\sum_{i=r}^Np_i\ell_i(\Wb_t^{\mathrm{GD}})\\
+ &\geq(1-\rho)(\log N)\sum_{i=r}^Np_i
+ -O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \sum_{i=r}^Np_i^2
+ \right)\\
+ &= (\log N)\sum_{i>K}p_i
+ +(\log N)\sum_{i=r}^Kp_i
+ -\rho(\log N)\sum_{i=r}^Np_i-O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)
+  \sum_{i=r}^Np_i^2
+ \right)\\
+ &\geq(\log N)\sum_{i>K}p_i
+ +\left[
+  (\log N)\sum_{i=r}^Kp_i
+  -\rho(\log N)\sum_{i=r}^Np_i
+ \right]-
+ O\!\left(
+  \left(\sum_{s<t}\eta_s(\eps)\right)Kp_K^2
+ \right).
+\end{align*}
+
+Consequently, if
+$ \sum_{s<t}\eta_s(\eps)
+ \lesssim\frac{\log N}{p_K},
+$
+where the implicit constant is chosen sufficiently small, the
+last error term is at most one half of the positive bracket.  Substitution
+into the last display therefore gives
+\begin{align*}
+ L(\Wb_t^{\mathrm{GD}})
+ &\geq(\log N)\sum_{i>K}p_i
+ +\frac12\left[
+  (\log N)\sum_{i=r}^Kp_i
+  -\rho(\log N)\sum_{i=r}^Np_i
+ \right]\\
+ &\gtrsim Kp_K\log N,
+\end{align*}
+
+In the application of \Cref{prop:tail-v2}, take $T=\lceil d^{2\alpha+2}\rceil$.  Since there are at most $d^2$ admissible
+integer values of $K$, a union bound shows that, with probability at least $1-e^{-\Omega(d)},$ the preceding estimate holds simultaneously for every admissible $K$ and
+every $0\leq t\leq T$.
+
+Since $0\leq\eta_s(\eps)\leq3$, whenever $t$ is at most a sufficiently
+small fixed multiple of $(\log N)/p_K$, we have
+$
+ \sum_{s<t}\eta_s(\eps)\leq 3t \lesssim\frac{\log N}{p_K}.
+$
+This time is within the horizon in
+\Cref{prop:tail-v2}, because
+\begin{align*}
+ \frac{\log N}{p_K}
+ &\lesssim(\log N)K^\alpha\lesssim(\log N)\left(\frac{d^2}{\log N}\right)^\alpha
+ \leq d^{2\alpha+2}
+\end{align*}
+for sufficiently large d.
+
+We have thus proved the following $K$-parameterized statement: simultaneously
+for every integer $d\leq K\leq d^2/\log N$,
+For every $t\lesssim\frac{\log N}{p_K},$ we have
+\[
+ L(\Wb_t^{\mathrm{GD}})
+ \gtrsim Kp_K\log N.
+\]
+Equivalently, if $\eps$ is at most a sufficiently small fixed multiple of
+$Kp_K\log N$, then $L(\Wb_t^{\mathrm{GD}})
+ >\eps$ and we get
+\[
+ \tau_{\mathrm{GD}}(\eps)
+ \gtrsim\frac{\log N}{p_K}.
+\]
+
+We now use the target $\eps$ to select $K$.  For an arbitrary
+$
+ C_{\mathrm{low}}
+ \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \leq\eps\leq
+ c_{\mathrm{up}}
+ \frac{\log N}{d^{\alpha-1}},
+$
+choose an integer
+\[
+ K\eqsim
+ \left(\frac{\log N}{\eps}\right)^{1/(\alpha-1)},
+\]
+where the fixed implicit multiplicative constant is chosen sufficiently
+small. The target range, after increasing $C_{\mathrm{low}}$ and decreasing $c_{\mathrm{up}}$ to
+leave fixed-factor slack, therefore ensures
+$d\leq K\leq c d^2/\log N$.
+
+Moreover, 
+\begin{align*}
+ Kp_K\log N
+ &\eqsim(\log N)K^{1-\alpha}\eqsim\eps.
+\end{align*}
+Since $1-\alpha<0$, decreasing the fixed multiplicative constant in the
+choice of $K$ increases the ratio
+$(Kp_K\log N)/\eps$.  We may therefore choose it sufficiently small that
+$Kp_K\log N$ is a sufficiently large fixed multiple of $\eps$.  The
+$K$-parameterized lower bound then gives, for every
+$t\lesssim(\log N)/p_K$,
+\[
+ L(\Wb_t^{\mathrm{GD}})
+ \gtrsim Kp_K\log N
+ >\eps.
+\]
+None of these times can be the hitting time.  Hence
+\begin{align*}
+ \tau_{\mathrm{GD}}(\eps)
+ &\gtrsim\frac{\log N}{p_K}\eqsim(\log N)K^\alpha\eqsim(\log N)
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+\end{align*}
+Intersecting this pointwise schedule event with the common event in
+\Cref{thm:fw} and applying the Muon upper bound there proves
+$\tau_{\mathrm{GD}}(\eps)\gtrsim d\,\tau_{\mathrm{Muon}}(\eps)$.
+The probability statement remains pointwise in the fixed target-schedule
+pair because the leave-block trajectory is independent of the removed signs
+only for a schedule fixed before the sample.
+\end{proof}
+
+% ============================================================
+\section{Proof of \Cref{thm:capped}}
+% ============================================================
+
+\begin{proof}[Proof of \Cref{thm:capped}]
+Work on the common event of probability $1-O(d^{-q})$ from
+\Cref{thm:fw}.  Only the mixing schedule changes; the operator ball and its
+polar oracle are the same.  Since $a\geq0$, one has
+$0<\gamma_t\leq1$.  Moreover, $t\mapsto\gamma_t$ is decreasing and the
+chosen $a$ satisfies
+$2+a\geq2R_{\mathrm{op}}(\eps/2)/\bar\eta$,
+\begin{align*}
+ R_{\mathrm{op}}(\eps/2)\gamma_t
+ &=\frac{2R_{\mathrm{op}}(\eps/2)}{t+2+a}\leq\frac{2R_{\mathrm{op}}(\eps/2)}{2+a}\leq\bar\eta.
+\end{align*}
+Every oracle point satisfies
+$\normop{\Sb_t^{\mathrm{op}}}\leq R_{\mathrm{op}}(\eps/2)$.  Starting from
+$\Wb_0^{\mathrm{op}}=\mathbf0$, feasibility follows by induction: if the
+$t$th iterate is feasible, then
+\begin{align*}
+ \normop{\Wb_{t+1}^{\mathrm{op}}}
+ &=\normop{
+  (1-\gamma_t)\Wb_t^{\mathrm{op}}+\gamma_t\Sb_t^{\mathrm{op}}
+ }\\
+ &\leq
+ (1-\gamma_t)\normop{\Wb_t^{\mathrm{op}}}
+ +\gamma_t\normop{\Sb_t^{\mathrm{op}}}\\
+ &\leq
+ (1-\gamma_t)R_{\mathrm{op}}(\eps/2)
+ +\gamma_tR_{\mathrm{op}}(\eps/2)\\
+ &=R_{\mathrm{op}}(\eps/2).
+\end{align*}
+Thus both the iterate and oracle point lie in the operator ball.  Therefore
+\begin{align*}
+ \normop{\Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
+ &=\gamma_t\normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}\\
+ &\leq\gamma_t
+ \left(\normop{\Sb_t^{\mathrm{op}}}+\normop{\Wb_t^{\mathrm{op}}}\right)\\
+ &\leq2R_{\mathrm{op}}(\eps/2)\gamma_t\leq2\bar\eta.
+\end{align*}
+
+Let $\Wb_R^*$ minimize $L$ on this ball and put
+$h_t:=L(\Wb_t^{\mathrm{op}})-L(\Wb_R^*)$.  The ball contains a point of
+loss at most $\eps/2$, so $L(\Wb_R^*)\leq\eps/2$.  Repeating the oracle and
+convexity argument with every line displayed gives
+\begin{align*}
+ &\left\langle
+  \nabla L(\Wb_t^{\mathrm{op}}),
+  \Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
+ \right\rangle_{\mathrm F}\\
+ &\quad=
+ \min_{\normop{\Sb}\leq R_{\mathrm{op}}(\eps/2)}
+ \left\langle\nabla L(\Wb_t^{\mathrm{op}}),\Sb\right\rangle_{\mathrm F}
+ -\left\langle
+  \nabla L(\Wb_t^{\mathrm{op}}),\Wb_t^{\mathrm{op}}
+ \right\rangle_{\mathrm F}\\
+ &\quad\leq
+ \left\langle
+  \nabla L(\Wb_t^{\mathrm{op}}),\Wb_R^*-\Wb_t^{\mathrm{op}}
+ \right\rangle_{\mathrm F}\\
+ &\quad\leq L(\Wb_R^*)-L(\Wb_t^{\mathrm{op}})=-h_t.
+\end{align*}
+The last inequality is exactly the convexity inequality
+\[
+ L(\Wb_R^*)\geq L(\Wb_t^{\mathrm{op}})
+ +\left\langle
+  \nabla L(\Wb_t^{\mathrm{op}}),\Wb_R^*-\Wb_t^{\mathrm{op}}
+ \right\rangle_{\mathrm F}.
+\]
+
+The displacement identity and the ball diameter give
+\begin{align*}
+ \Wb_{t+1}^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
+ &=\gamma_t(\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}),\\
+ \normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}
+ &\leq2R_{\mathrm{op}}(\eps/2).
+\end{align*}
+Substituting these facts into operator smoothness yields
+\begin{align*}
+ h_{t+1}
+ &\leq h_t
+ +\gamma_t\left\langle
+  \nabla L(\Wb_t^{\mathrm{op}}),
+  \Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}
+ \right\rangle_{\mathrm F}+
+ \frac{\Hop\gamma_t^2}{2}
+ \normop{\Sb_t^{\mathrm{op}}-\Wb_t^{\mathrm{op}}}^2\\
+ &\leq(1-\gamma_t)h_t
+ +2\Hop R_{\mathrm{op}}(\eps/2)^2\gamma_t^2\\
+ &=\frac{t+a}{t+a+2}h_t
+ +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{(t+a+2)^2}.
+\end{align*}
+
+Multiply the recurrence at time $s$ by $(s+a+1)(s+a+2)$.  Summing the
+resulting differences explicitly gives
+\begin{align*}
+ &(t+a)(t+a+1)h_t-a(a+1)h_0\\
+ &\quad=
+ \sum_{s=0}^{t-1}
+ \Bigl[
+  (s+a+1)(s+a+2)h_{s+1}
+  -(s+a)(s+a+1)h_s
+ \Bigr]\\
+ &\quad\leq
+ 8\Hop R_{\mathrm{op}}(\eps/2)^2
+ \sum_{s=0}^{t-1}\frac{s+a+1}{s+a+2}\\
+ &\quad\leq8\Hop R_{\mathrm{op}}(\eps/2)^2t.
+\end{align*}
+Because $h_0=L(\mathbf0)-L(\Wb_R^*)\leq\log N$, for every $t\geq1$ division
+by $(t+a)(t+a+1)\geq t^2$ gives
+\begin{equation}\label{eq:h_t}
+ h_t
+ \leq
+ \frac{a(a+1)\log N}{t^2}
+ +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}.
+\end{equation}
+
+The choice of $a$ gives
+$a+1\le 2R_{\mathrm{op}}(\eps/2)/\bar \eta$. Therefore we have
+$
+ a(a+1)\le 4R_{\mathrm{op}}(\eps/2)^2/(\bar \eta)^2.
+$
+Putting this back into Eq.~\ref{eq:h_t} and get,
+\begin{equation}\nonumber
+ h_t
+ \leq
+ \frac{4R_{\mathrm{op}}(\eps/2)^2\log N}{\bar \eta^2t^2}
+ +\frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}.
+\end{equation}
+To make the first term at most $\eps/4$, it suffices to require
+\[
+ \frac{4R_{\mathrm{op}}(\eps/2)^2\log N}
+ {\bar\eta^2 t^2}
+ \leq \frac{\eps}{4},
+\]
+or equivalently,
+\[
+ t\geq
+ t_1:=
+ \frac{4R_{\mathrm{op}}(\eps/2)}{\bar\eta}
+ \sqrt{\frac{\log N}{\eps}}.
+\]
+Similarly, to make the second term at most $\eps/4$, it suffices to require
+\[
+ \frac{8\Hop R_{\mathrm{op}}(\eps/2)^2}{t}
+ \leq\frac{\eps}{4},
+\]
+or equivalently,
+\[
+ t\geq
+ t_2:=
+ \frac{32\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}.
+\]
+
+We now compare these two time scales.  Their ratio is
+\begin{align*}
+ \frac{t_1}{t_2}
+ &=
+ \frac{
+ \frac{4R_{\mathrm{op}}(\eps/2)}{\bar\eta}
+ \sqrt{\frac{\log N}{\eps}}
+ }{
+ \frac{32\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps}
+ }
+ =
+ \frac{1}{8\bar\eta\Hop}
+ \frac{\sqrt{\eps\log N}}
+ {R_{\mathrm{op}}(\eps/2)}.
+\end{align*}
+The sharp operator radius formula and the upper endpoint of the target range give \begin{align*} 
+R_{\mathrm{op}}(\eps/2)^2 &\eqsim \frac{(\log N)^2}{d} \left(\frac{\log N}{\eps/2}\right)^{1/(\alpha-1)}\\ &\gtrsim \frac{(\log N)^2}{d}\,d =(\log N)^2. \end{align*} 
+Thus $R_{\mathrm{op}}(\eps/2)\gtrsim\log N$
+and $\Hop\eqsim1$.  Hence
+\[
+ \frac{t_1}{t_2}
+ \lesssim_{\bar\eta}
+ \sqrt{\frac{\eps}{\log N}}=o(1).
+\]
+
+In particular, for all sufficiently large $d$, taking $t\geq t_2$
+automatically ensures $t\geq t_1$ as well.  Consequently both terms are at
+most $\eps/4$, and hence $h_t\leq\frac{\eps}{2}.$ 
+\[
+ L(\Wb_t^{\mathrm{op}})
+ =L(\Wb_R^*)+h_t
+ \leq\frac\eps2+\frac\eps2=\eps.
+\]
+Consequently,
+\[
+ \tau_{\mathrm{Muon}}(\eps;\gamma)
+ \lesssim t_2\eqsim \frac{\Hop R_{\mathrm{op}}(\eps/2)^2}{\eps} \lesssim \frac{\log N}{d}
+ \left(\frac{\log N}{\eps}\right)^{\alpha/(\alpha-1)}.
+\]
+This proves the theorem.
+\end{proof}
+
+\begin{thebibliography}{9}
+
+\bibitem{vershynin}
+R.~Vershynin,
+\emph{High-Dimensional Probability: An Introduction with Applications in
+Data Science}, Cambridge University Press, 2018.
+
+\bibitem{hoeffding}
+W.~Hoeffding,
+Probability inequalities for sums of bounded random variables,
+\emph{Journal of the American Statistical Association} 58 (1963), 13--30.
+
+\end{thebibliography}
+
+\end{document}

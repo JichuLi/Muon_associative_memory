@@ -1,0 +1,761 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\RF}{R_{\mathrm F}}
+\newcommand{\Rop}{R_{\mathrm{op}}}
+\newcommand{\HF}{H_{\mathrm F}}
+\newcommand{\Hop}{H_{\mathrm{op}}}
+\newcommand{\normF}[1]{\left\lVert #1\right\rVert_{\mathrm F}}
+\newcommand{\normop}[1]{\left\lVert #1\right\rVert_{\mathrm{op}}}
+\newcommand{\logp}[1]{\log_+\!\left(#1\right)}
+
+\title{Frank--Wolfe Complexity Separation Across Capacity, Frequency,\
+and Accuracy Regimes}
+\author{Technical note}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $N=d^\beta$ and let the memory frequencies satisfy
+$p_i\propto i^{-\alpha}$ for fixed $\alpha\geq0$.  We combine the
+sharp global smoothness estimates under Frobenius and operator-norm
+geometries with the accuracy-dependent radius separation theorem.  The
+result is an explicit phase diagram for the standard Frank--Wolfe
+smoothness--radius factors
+\[
+ \HF\RF^2(\eps)
+ \qquad\text{and}\qquad
+ \Hop\Rop^2(\eps).
+\]
+All final complexity separations are expressed only through powers of
+$d$ (with logarithmic factors displayed or suppressed by a tilde), and
+all accuracy windows are written directly in terms of $d$, $N$, and
+$\log N$.  The critical regime $\beta=2$ is not claimed here.
+\end{abstract}
+
+% ============================================================
+\section{Model and the Frank--Wolfe factor}
+% ============================================================
+
+Fix constants
+\[
+ \alpha\geq0,
+ \qquad
+ \beta>0,
+ \qquad
+ \beta\neq2,
+ \qquad
+ N=d^\beta,
+\]
+where, for simplicity, $d^\beta$ is assumed to be an integer.  Draw two
+mutually independent Gaussian families
+\[
+ u_1,\ldots,u_N,
+ \ v_1,\ldots,v_N
+ \overset{\mathrm{ind}}{\sim}
+ \mathcal N\!\left(0,\frac1d I_d\right),
+\]
+and define
+\[
+ p_i:=\frac{i^{-\alpha}}{H_{N,\alpha}},
+ \qquad
+ H_{N,\alpha}:=\sum_{k=1}^N k^{-\alpha}.
+\]
+For $W\in\R^{d\times d}$, let
+\[
+ L(W)
+ :=
+ \sum_{i=1}^N p_i
+ \log\!\left(
+ 1+\sum_{j\neq i}
+ \exp\!\left((u_j-u_i)^\top Wv_i\right)
+ \right).
+\]
+Then $L(0)=\log N$.  For $X\in\{\mathrm F,\mathrm{op}\}$, define
+\[
+ R_X(\eps)
+ :=
+ \inf\bigl\{\|W\|_X:L(W)\leq\eps\bigr\}.
+\]
+The global smoothness constants are
+\[
+ \HF
+ :=
+ \sup_{W\in\R^{d\times d}}
+ \sup_{A\neq0}
+ \frac{\nabla^2L(W)[A,A]}{\normF{A}^2},
+\]
+\[
+ \Hop
+ :=
+ \sup_{W\in\R^{d\times d}}
+ \sup_{A\neq0}
+ \frac{\nabla^2L(W)[A,A]}{\normop{A}^2}.
+\]
+
+\begin{proposition}[Standard Frank--Wolfe smoothness--radius factor]
+\label{prop:fw-factor}
+Fix $X\in\{\mathrm F,\mathrm{op}\}$ and $R>R_X(\eps)$.  Frank--Wolfe on
+$\{W:\|W\|_X\leq R\}$ satisfies the standard bound
+\[
+ L(W_t)-\min_{\|W\|_X\leq R}L(W)
+ \leq
+ \frac{8H_XR^2}{t+2}.
+\]
+Consequently, for the same final optimization gap, the geometry-dependent
+part of the usual Frank--Wolfe upper bound is $H_XR_X^2(\eps)$, and the
+relevant comparison is
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}.
+ \label{eq:fw-ratio}
+\end{equation}
+\end{proposition}
+
+Throughout the note, $\widetilde\Theta$, $\widetilde O$, and
+$\widetilde\Omega$ suppress powers of $\log d$ only.  All constants may
+depend on the fixed parameters $(\alpha,\beta)$ and, in probability
+statements, on a fixed failure exponent $q>0$.
+
+% ============================================================
+\section{The two companion inputs}
+% ============================================================
+
+\subsection{Smoothness under the two geometries}
+
+The smoothness note proves, for polynomial $N$, that with probability
+$1-e^{-\Omega(d)}$,
+\begin{equation}
+ \HF=\Theta\!\left(\frac1d+p_1\right),
+ \qquad
+ \Hop=\widetilde\Theta\!\left(
+ \frac1d+\sum_{i=1}^{\min\{d,N\}}p_i
+ \right).
+ \label{eq:base-smoothness}
+\end{equation}
+For $N=d^\beta$, these estimates reduce to the following simple forms.
+
+\begin{theorem}[Polynomial specialization of the smoothness theorem]
+\label{thm:smoothness}
+With probability $1-e^{-\Omega(d)}$,
+\begin{equation}
+ \HF=
+ \begin{cases}
+ \Theta\!\left(d^{-\min\{1,\,\beta(1-\alpha)\}}\right),
+     &0\leq\alpha<1,\\[1mm]
+ \Theta\!\left((\log d)^{-1}\right),&\alpha=1,\\[1mm]
+ \Theta(1),&\alpha>1,
+ \end{cases}
+ \label{eq:HF-specialized}
+\end{equation}
+and
+\begin{equation}
+ \Hop=
+ \begin{cases}
+ \Theta(1),&0<\beta\leq1,\\[1mm]
+ \widetilde\Theta\!\left(
+ d^{-\min\{1,\,(\beta-1)(1-\alpha)\}}
+ \right),&\beta>1,\ 0\leq\alpha<1,\\[1mm]
+ \Theta(1),&\beta>1,\ \alpha\geq1.
+ \end{cases}
+ \label{eq:Hop-specialized}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For $0\leq\alpha<1$,
+\[
+ p_1\asymp N^{\alpha-1}=d^{-\beta(1-\alpha)}.
+\]
+If $N\leq d$, then the first $\min\{d,N\}=N$ probabilities have total
+mass one.  If $N>d$, then
+\[
+ \sum_{i=1}^{d}p_i
+ \asymp
+ \left(\frac dN\right)^{1-\alpha}
+ =d^{-(\beta-1)(1-\alpha)}.
+\]
+At $\alpha=1$,
+$p_1\asymp(\log N)^{-1}\asymp(\log d)^{-1}$, while for $N>d$ the
+first $d$ probabilities have mass
+$\asymp\log d/\log N=\Theta(1)$.  For $\alpha>1$, both $p_1$ and the
+head mass are of constant order.  Substitution into
+\eqref{eq:base-smoothness} proves the result.
+\end{proof}
+
+\subsection{Accuracy-dependent radius separation}
+
+We next record the radius conclusions needed below. They are the
+output of the radius-separation note; their long probabilistic proofs are not repeated here.
+
+\begin{theorem}[Radius input]
+\label{thm:radius-input}
+Fix $q>0$.  With probability at least
+\[
+ 1-Cd^{-q}-Ce^{-cd},
+\]
+the following statements hold simultaneously over every loss level in
+the displayed intervals.
+
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=2.2em]
+\item If $0<\beta<2$, then $\inf_WL(W)=0$, and for
+\begin{equation}
+ 0<\eps\leq cNp_N\log N,
+ \label{eq:sub-radius-phase}
+\end{equation}
+\begin{align}
+ \RF(\eps)
+ &\asymp
+ \sqrt N\left(\log N+\logp{\frac{p_N}{\eps}}\right),
+ \label{eq:sub-RF}\\
+ \Rop(\eps)
+ &\asymp
+ \left(1+\sqrt{\frac Nd}\right)
+ \left(\log N+\logp{\frac{p_N}{\eps}}\right).
+ \label{eq:sub-Rop}
+\end{align}
+Hence
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \asymp d^{\min\{\beta,1\}/2}.
+ \label{eq:sub-radius-ratio}
+\end{equation}
+Moreover,
+\begin{equation}
+ Np_N\log N\asymp
+ \begin{cases}
+ \log N,&0\leq\alpha<1,\\
+ 1,&\alpha=1,\\
+ d^{-\beta(\alpha-1)}\log N,&\alpha>1.
+ \end{cases}
+ \label{eq:sub-endpoint}
+\end{equation}
+
+\item Assume $\beta>2$.  If $0\leq\alpha<1/2$, then
+\begin{equation}
+ \log N-cd^{2-\beta}\leq\eps<\log N
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+ \label{eq:radius-diffuse-below}
+\end{equation}
+At $\alpha=1/2$,
+\begin{equation}
+ \log N-cd^{2-\beta}\log N\leq\eps<\log N
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+ \label{eq:radius-diffuse-half}
+\end{equation}
+
+\item If $\beta>2$ and $1/2<\alpha<1$, then
+\begin{equation}
+ \log N-cd^{-2\beta(1-\alpha)}\leq\eps<\log N
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp d^{1-\alpha}.
+ \label{eq:radius-local-between}
+\end{equation}
+If additionally
+\begin{equation}
+ \alpha>\frac{\beta-2}{\beta-1},
+ \label{eq:head-condition}
+\end{equation}
+then the nonempty head phase
+\begin{equation}
+ c\log N\,d^{-(\beta-1)(1-\alpha)}
+ \leq
+ \log N-\eps
+ \leq
+ C\log N
+ \left(\frac{d^{2-\beta}}{\log N}\right)^{(1-\alpha)/\alpha}
+ \label{eq:radius-head-between-window}
+\end{equation}
+satisfies
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+ \label{eq:radius-head-between-ratio}
+\end{equation}
+
+\item If $\beta>2$ and $\alpha=1$, then
+\begin{equation}
+ \log N-\frac{c}{(\log N)^2}\leq\eps<\log N
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\log N,
+ \label{eq:radius-alpha-one-local}
+\end{equation}
+and, for a fixed constant $A>0$,
+\begin{equation}
+ \log N-2\log d+2\log\log N+A
+ \leq\eps\leq
+ \log N-\log d-A
+ \label{eq:radius-alpha-one-head-window}
+\end{equation}
+implies
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+ \label{eq:radius-alpha-one-head-ratio}
+\end{equation}
+
+\item If $\beta>2$ and $\alpha>1$, then, whenever
+\begin{equation}
+ \eps\geq c\frac{(\log N)^\alpha}{d^{2(\alpha-1)}},
+ \qquad
+ \eps<\log N,
+ \label{eq:radius-above-one-full-window}
+\end{equation}
+one has
+\begin{equation}
+ \frac{\RF(\eps)}{\Rop(\eps)}
+ \asymp
+ \min\left\{\sqrt d,
+ \left(\frac{\log N}{\eps}\right)^{1/(2(\alpha-1))}
+ \right\}.
+ \label{eq:radius-above-one-full}
+\end{equation}
+In particular,
+\begin{equation}
+ c\frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \leq\eps\leq
+ C\frac{\log N}{d^{\alpha-1}}
+ \quad\Longrightarrow\quad
+ \frac{\RF(\eps)}{\Rop(\eps)}\asymp\sqrt d.
+ \label{eq:radius-above-one-square-root}
+\end{equation}
+\end{enumerate}
+\end{theorem}
+
+% ============================================================
+\section{Subquadratic capacity: \texorpdfstring{$0<\beta<2$}{0<beta<2}}
+% ============================================================
+
+\begin{theorem}[Frank--Wolfe separation below quadratic capacity]
+\label{thm:sub-fw}
+Assume $0<\beta<2$.  Throughout the full-memory interpolation phase
+\begin{equation}
+ 0<\eps\lesssim
+ \begin{cases}
+ \log N,&0\leq\alpha<1,\\
+ 1,&\alpha=1,\\
+ d^{-\beta(\alpha-1)}\log N,&\alpha>1,
+ \end{cases}
+ \label{eq:sub-fw-phase}
+\end{equation}
+the standard Frank--Wolfe factors satisfy, with probability at least
+$1-Cd^{-q}-Ce^{-cd}$,
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =
+ \begin{cases}
+ \Theta\!\left(d^{\beta\alpha}\right),
+     &0<\beta\leq1,\ 0\leq\alpha<1,\\[1mm]
+ \widetilde\Theta\!\left(
+ d^{\max\{\alpha,(\beta-1)(1-\alpha)\}}
+ \right),
+     &1<\beta<2,\ 0\leq\alpha<1,\\[1mm]
+ \Theta\!\left(
+ d^{\min\{\beta,1\}}/\log d
+ \right),&\alpha=1,\\[1mm]
+ \Theta\!\left(d^{\min\{\beta,1\}}\right),&\alpha>1.
+ \end{cases}
+ \label{eq:sub-fw-main}
+\end{equation}
+In particular, the only subquadratic corner without a polynomial
+separation is $\alpha=0$ and $N\leq d$.
+\end{theorem}
+
+\begin{proof}
+By \eqref{eq:sub-radius-ratio},
+\begin{equation}
+ \frac{\RF^2(\eps)}{\Rop^2(\eps)}
+ \asymp d^{\min\{\beta,1\}}.
+ \label{eq:sub-radius-square}
+\end{equation}
+If $0<\beta\leq1$ and $0\leq\alpha<1$, then
+$\HF=\Theta(d^{-\beta(1-\alpha)})$ and $\Hop=\Theta(1)$, so
+\[
+ d^\beta\frac{\HF}{\Hop}
+ =\Theta(d^{\beta\alpha}).
+\]
+If $1<\beta<2$ and $0\leq\alpha<1$, then
+$(\beta-1)(1-\alpha)<1$, and therefore
+\begin{align*}
+ d\frac{\HF}{\Hop}
+ &\;=\;
+ \widetilde\Theta\!\left(
+ d\frac{d^{-1}+d^{-\beta(1-\alpha)}}
+ {d^{-(\beta-1)(1-\alpha)}}
+ \right)\\
+ &\;=\;
+ \widetilde\Theta\!\left(
+ d^{(\beta-1)(1-\alpha)}+d^\alpha
+ \right)\\
+ &\;=\;
+ \widetilde\Theta\!\left(
+ d^{\max\{\alpha,(\beta-1)(1-\alpha)\}}
+ \right).
+\end{align*}
+At $\alpha=1$, the smoothness ratio is
+$\Theta((\log d)^{-1})$; for $\alpha>1$, it is $\Theta(1)$.
+Combining these facts with \eqref{eq:sub-radius-square} proves
+\eqref{eq:sub-fw-main}.  The accuracy phase is exactly
+\eqref{eq:sub-endpoint}.
+\end{proof}
+
+\begin{remark}[Subquadratic phase boundary for $0\leq\alpha<1$]
+When $1<\beta<2$, the two exponents in
+\eqref{eq:sub-fw-main} are equal at
+\[
+ \alpha=1-\frac1\beta.
+\]
+Hence the separation is governed by
+$d^{(\beta-1)(1-\alpha)}$ below this boundary and by $d^\alpha$ above
+it.
+\end{remark}
+
+% ============================================================
+\section{Superquadratic capacity: \texorpdfstring{$\beta>2$}{beta>2}}
+% ============================================================
+
+\begin{theorem}[Frank--Wolfe separation above quadratic capacity]
+\label{thm:super-fw}
+Assume $\beta>2$.  With probability at least
+$1-Cd^{-q}-Ce^{-cd}$, the following conclusions hold simultaneously
+over the displayed accuracy phases.
+
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=2.2em]
+\item If $0\leq\alpha<1/2$ and
+\[
+ \log N-\Theta(d^{2-\beta})\le\eps<\log N,
+\]
+then
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =
+ \widetilde\Theta\!\left(
+ d^{\min\{1,(\beta-1)(1-\alpha)\}}
+ \right).
+ \label{eq:super-fw-diffuse-below}
+\end{equation}
+At $\alpha=1/2$, the same conclusion holds on
+\[
+ \log N-\Theta(d^{2-\beta}\log N)\leq\eps<\log N.
+\]
+
+\item If $1/2<\alpha<1$ and
+\[
+ \log N-\Theta(d^{-2\beta(1-\alpha)})\leq\eps<\log N,
+\]
+then
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =
+ \widetilde\Theta\!\left(
+ d^{\,2(1-\alpha)
+ +\min\{1,(\beta-1)(1-\alpha)\}
+ -\min\{1,\beta(1-\alpha)\}}
+ \right).
+ \label{eq:super-fw-local-between}
+\end{equation}
+
+\item If $1/2<\alpha<1$ and
+$\alpha>(\beta-2)/(\beta-1)$, then throughout
+\begin{equation}
+ \log N-\Theta\big(\log N
+ \left(\frac{d^{2-\beta}}{\log N}\right)^{(1-\alpha)/\alpha}\big)
+ \leq \eps
+ \leq \log N-\Theta(\log N\,d^{-(\beta-1)(1-\alpha)}),
+ \label{eq:super-fw-head-window}
+\end{equation}
+one has
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =
+ \widetilde\Theta\!\left(
+ d^{\max\{\alpha,(\beta-1)(1-\alpha)\}}
+ \right).
+ \label{eq:super-fw-head-between}
+\end{equation}
+
+\item If $\alpha=1$, then
+\begin{equation}
+ \log N-\frac{c}{(\log N)^2}\leq\eps<\log N
+ \quad\Longrightarrow\quad
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =\Theta(\log d),
+ \label{eq:super-fw-alpha-one-local}
+\end{equation}
+whereas
+\begin{equation}
+ \log N-2\log d+2\log\log N+A
+ \leq\eps\leq
+ \log N-\log d-A
+ \label{eq:super-fw-alpha-one-window}
+\end{equation}
+implies
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =\Theta\!\left(\frac d{\log d}\right).
+ \label{eq:super-fw-alpha-one-head}
+\end{equation}
+
+\item If $\alpha>1$, then
+\begin{equation}
+ \frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+ \lesssim\eps\lesssim
+ \frac{\log N}{d^{\alpha-1}}
+ \label{eq:super-fw-above-one-window}
+\end{equation}
+implies
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ =\Theta(d).
+ \label{eq:super-fw-above-one}
+\end{equation}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For $0\leq\alpha\leq1/2$, one has
+$\beta(1-\alpha)>1$, so
+\[
+ \HF=\Theta(d^{-1}),
+ \qquad
+ \Hop=
+ \widetilde\Theta\!\left(
+ d^{-\min\{1,(\beta-1)(1-\alpha)\}}
+ \right).
+\]
+The radius ratio is $\Theta(\sqrt d)$ in
+\eqref{eq:radius-diffuse-below}--\eqref{eq:radius-diffuse-half}.
+Therefore
+\[
+ d\frac{\HF}{\Hop}
+ =
+ \widetilde\Theta\!\left(
+ d^{\min\{1,(\beta-1)(1-\alpha)\}}
+ \right),
+\]
+which proves part~(i).
+
+For $1/2<\alpha<1$, the local radius ratio in
+\eqref{eq:radius-local-between} has square
+$d^{2(1-\alpha)}$.  Multiplying it by
+\begin{equation}
+ \frac{\HF}{\Hop}
+ =
+ \widetilde\Theta\!\left(
+ d^{\min\{1,(\beta-1)(1-\alpha)\}
+ -\min\{1,\beta(1-\alpha)\}}
+ \right)
+ \label{eq:smoothness-ratio-between}
+\end{equation}
+gives \eqref{eq:super-fw-local-between}.
+
+In the head phase, the squared radius ratio equals $d$.  Condition
+$\alpha>(\beta-2)/(\beta-1)$ is equivalent to
+$(\beta-1)(1-\alpha)<1$.  If
+$\beta(1-\alpha)\geq1$, then
+\[
+ d\frac{\HF}{\Hop}
+ =\widetilde\Theta\!\left(
+ d^{(\beta-1)(1-\alpha)}
+ \right).
+\]
+If $\beta(1-\alpha)\leq1$, then
+\[
+ d\frac{\HF}{\Hop}
+ =\widetilde\Theta(d^\alpha).
+\]
+The larger of these two expressions gives
+\eqref{eq:super-fw-head-between}.
+
+At $\alpha=1$,
+$\HF/\Hop=\Theta((\log d)^{-1})$ and
+$\log N=\Theta(\log d)$.  Squaring the two radius ratios in
+\eqref{eq:radius-alpha-one-local} and
+\eqref{eq:radius-alpha-one-head-ratio} gives respectively
+$(\log N)^2$ and $d$, proving part~(iv).  Finally, for $\alpha>1$,
+both smoothness constants are of constant order, while
+\eqref{eq:radius-above-one-square-root} gives a squared radius ratio of
+order $d$.  This proves part~(v).
+\end{proof}
+
+\begin{remark}[When the diffuse phase reaches the maximal order]
+For $0\leq\alpha\leq1/2$, the exponent in
+\eqref{eq:super-fw-diffuse-below} equals one precisely when
+\[
+ (\beta-1)(1-\alpha)\geq1.
+\]
+In particular, the whole range $0\leq\alpha\leq1/2$ has
+$\widetilde\Theta(d)$ separation whenever $\beta\geq3$.
+\end{remark}
+
+\begin{remark}[The full $\alpha>1$ interpolation]
+The radius theorem gives the more detailed formula
+\eqref{eq:radius-above-one-full}.  Since $\HF/\Hop=\Theta(1)$ for
+$\alpha>1$, the Frank--Wolfe factor interpolates continuously outside
+\eqref{eq:super-fw-above-one-window}.  The main theorem records the
+maximal fixed polynomial phase, on which the separation is $\Theta(d)$.
+\end{remark}
+
+% ============================================================
+\section{A sharp all-accuracy obstruction in the weak-weight regime}
+% ============================================================
+
+The radius note also proves an all-accuracy upper bound when the weights
+are sufficiently diffuse relative to the superquadratic sample size.
+This identifies a regime in which the local phase is already the largest
+possible polynomial separation.
+
+\begin{theorem}[All-accuracy obstruction]
+\label{thm:obstruction}
+Assume
+\[
+ \frac12<\alpha<1,
+ \qquad
+ \beta(1-\alpha)>2,
+\]
+and let $L_\star:=\inf_WL(W)$.  On the intersection of the Gaussian
+event above and the finite-minimizer event from the companion note,
+for every feasible $L_\star\leq\eps<\log N$,
+\begin{equation}
+ \frac{\HF\RF^2(\eps)}{\Hop\Rop^2(\eps)}
+ \lesssim d^{2(1-\alpha)}.
+ \label{eq:all-accuracy-obstruction}
+\end{equation}
+Moreover, on the local phase
+\[
+ \log N-cd^{-2\beta(1-\alpha)}\leq\eps<\log N,
+\]
+the same ratio is
+\begin{equation}
+ \widetilde\Theta\!\left(d^{2(1-\alpha)}\right).
+ \label{eq:all-accuracy-sharp}
+\end{equation}
+Thus the local Frank--Wolfe separation is sharp, up to logarithmic
+factors, uniformly over all feasible accuracies.
+\end{theorem}
+
+\begin{proof}
+The condition $\beta(1-\alpha)>2$ implies
+\[
+ p_1=d^{-\beta(1-\alpha)}=o(d^{-1})
+\]
+and
+\[
+ \sum_{i=1}^{d}p_i
+ \asymp d^{-(\beta-1)(1-\alpha)}=o(d^{-1}).
+\]
+Hence $\HF\asymp d^{-1}$ and $\Hop\gtrsim d^{-1}$, so
+$\HF/\Hop\lesssim1$.  The all-accuracy radius theorem gives
+$\RF(\eps)/\Rop(\eps)\lesssim d^{1-\alpha}$, proving
+\eqref{eq:all-accuracy-obstruction}.  In the local phase the radius
+ratio is $\asymp d^{1-\alpha}$, while the smoothness ratio is one up to
+polylogarithmic factors, yielding \eqref{eq:all-accuracy-sharp}.
+\end{proof}
+
+The probability of the event in Theorem~\ref{thm:obstruction} is at
+least
+\[
+ 1-Cd^{-q}-Ce^{-cd}
+ -2^{1-N}\sum_{r=0}^{d^2-1}\binom{N-1}{r}.
+\]
+
+% ============================================================
+\section{Condensed phase diagram}
+% ============================================================
+
+The preceding theorems can be read as follows.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.16\textwidth}
+>{\raggedright\arraybackslash}p{0.29\textwidth}
+>{\raggedright\arraybackslash}X}
+\toprule
+Capacity & Frequency regime & Frank--Wolfe separation on the stated phase\\
+\midrule
+$0<\beta\leq1$
+& $0\leq\alpha<1$
+& $\Theta(d^{\beta\alpha})$ on
+$0<\eps\lesssim\log N$\\
+
+$0<\beta\leq1$
+& $\alpha\geq1$
+& $\Theta(d^\beta/\log d)$ at $\alpha=1$ and
+$\Theta(d^\beta)$ at $\alpha>1$\\
+
+$1<\beta<2$
+& $0\leq\alpha<1$
+& $\widetilde\Theta\!\left(
+ d^{\max\{\alpha,(\beta-1)(1-\alpha)\}}
+ \right)$\\
+
+$1<\beta<2$
+& $\alpha\geq1$
+& $\Theta(d/\log d)$ at $\alpha=1$ and $\Theta(d)$ at $\alpha>1$\\
+
+$\beta>2$
+& $0\leq\alpha\leq1/2$
+& $\widetilde\Theta\!\left(
+ d^{\min\{1,(\beta-1)(1-\alpha)\}}
+ \right)$ near $\log N$\\
+
+$\beta>2$
+& $1/2<\alpha<1$
+& Local phase: \eqref{eq:super-fw-local-between};
+head phase, when it exists:
+$\widetilde\Theta\!\left(
+ d^{\max\{\alpha,(\beta-1)(1-\alpha)\}}
+ \right)$\\
+
+$\beta>2$
+& $\alpha=1$
+& $\Theta(\log d)$ in the local phase and
+$\Theta(d/\log d)$ in the head phase\\
+
+$\beta>2$
+& $\alpha>1$
+& $\Theta(d)$ on
+$\frac{(\log N)^\alpha}{d^{2(\alpha-1)}}
+\lesssim\eps\lesssim
+\frac{\log N}{d^{\alpha-1}}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{remark}[Critical quadratic capacity]
+The smoothness theorem applies at $N=d^2$, but the radius-separation
+note deliberately excludes the critical case $\beta=2$.  Consequently,
+none of the Frank--Wolfe separation statements above should be
+extrapolated to $N=d^2$ or $N=\widetilde\Theta(d^2)$ without a separate
+critical-radius analysis.
+\end{remark}
+
+\begin{thebibliography}{9}
+
+\bibitem{smoothnessnote}
+\emph{A Finite-Dimensional Technical Note on Global Smoothness of
+Gaussian Associative-Memory Cross-Entropy under Frobenius and
+Operator-Norm Geometries}, companion technical note, 2026.
+
+\bibitem{radiusnote}
+\emph{Sharp Accuracy-Dependent Frobenius--Operator Radius Separation
+for Gaussian Associative Memory with Zipf Frequencies}, companion
+technical note, 2026.
+
+\end{thebibliography}
+
+\end{document}
